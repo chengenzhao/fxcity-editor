@@ -2,9 +2,7 @@ package com.whitewoodcity.fxcityeditor;
 
 import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
-import com.almasb.fxgl.app.scene.SceneFactory;
 import com.almasb.fxgl.dsl.FXGL;
-import com.whitewoodcity.fxgl.service.LoadingScene;
 import javafx.scene.Cursor;
 import javafx.stage.Screen;
 
