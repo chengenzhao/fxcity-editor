@@ -18,7 +18,8 @@ public class GameApp extends GameApplication {
   }
 
   @Override
-  protected void initGame() {
+  protected void initUI() {
     FXGL.getGameScene().setCursor(Cursor.DEFAULT);
   }
+
 }
