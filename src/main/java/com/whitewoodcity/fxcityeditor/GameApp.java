@@ -5,9 +5,7 @@ import com.almasb.fxgl.app.GameSettings;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
 import javafx.scene.Cursor;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
@@ -36,6 +34,16 @@ public class GameApp extends GameApplication {
     var loadImage = new MenuItem("Load Image");
     menu.getItems().add(loadImage);
 
+    var menubar = new MenuBar(menu);
+    menubar.setPrefWidth(WIDTH);
+
+    var treeview = new TreeView<String>();
+    treeview.translateYProperty().bind(menubar.heightProperty());
+
+    var entityTreeItem = new TreeItem<>("Entity");
+
+    treeview.setRoot(entityTreeItem);
+
     loadImage.setOnAction(_ -> {
       FileChooser fileChooser = new FileChooser();
 
@@ -52,14 +60,14 @@ public class GameApp extends GameApplication {
         var view = new ImageView(image);
         var entity = new Entity();
         entity.getViewComponent().addChild(view);
+        var treeItem = new TreeItem<>(file.getName());
+        entityTreeItem.getChildren().add(treeItem);
+        treeview.getSelectionModel().select(treeItem);
         FXGL.getGameWorld().addEntities(entity);
       }
     });
 
-    var menubar = new MenuBar(menu);
-    menubar.setPrefWidth(WIDTH);
-
-    FXGL.addUINode(menubar);
+    FXGL.getGameScene().addUINodes(menubar,treeview);
   }
 
 }
