@@ -60,7 +60,6 @@ public class GameApp extends GameApplication {
     var rightPane = new GridPane(20,20);
     rightPane.setPadding(new Insets(20));
     rightPane.setPrefWidth(300);
-//    rightPane.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, null, null)));
     rightPane.layoutYProperty().bind(menubar.heightProperty());
     rightPane.setLayoutX(WIDTH - rightPane.getPrefWidth());
 
