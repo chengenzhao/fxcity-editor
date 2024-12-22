@@ -1,4 +1,4 @@
-package com.whitewoodcity.fxcityeditor;
+package com.whitewoodcity.control;
 
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;

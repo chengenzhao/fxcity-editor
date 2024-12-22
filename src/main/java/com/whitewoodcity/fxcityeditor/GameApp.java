@@ -4,6 +4,7 @@ import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
+import com.whitewoodcity.control.NumberTextField;
 import javafx.geometry.Insets;
 import javafx.scene.Cursor;
 import javafx.scene.control.*;
@@ -12,7 +13,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
@@ -38,9 +38,9 @@ public class GameApp extends GameApplication {
   protected void initUI() {
     FXGL.getGameScene().setCursor(Cursor.DEFAULT);
 
-    entity.getViewComponent().addChild(new Circle(10, Color.RED));
+    entity.getViewComponent().addDevChild(new Circle(10, Color.RED));
     entity.setX((double) WIDTH /2);
-    entity.setY((double) HEIGHT /2);
+    entity.setY(300);
 
     var menu = new Menu("File");
 
@@ -50,12 +50,13 @@ public class GameApp extends GameApplication {
     var menubar = new MenuBar(menu);
     menubar.setPrefWidth(WIDTH);
 
-    var treeview = new TreeView<String>();
+    var treeview = new TreeView<Label>();
     treeview.translateYProperty().bind(menubar.heightProperty());
     treeview.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT,null,null)));
 
-    var entityTreeItem = new TreeItem<>("Game World");
-    var entityTree = new TreeItem<>("Entity0");
+    var entityTreeItem = new TreeItem<>(new Label("Game World"));
+
+    var entityTree = new TreeItem<>(new Label("Entity0"));
 
     entityTreeItem.getChildren().add(entityTree);
 
@@ -98,7 +99,9 @@ public class GameApp extends GameApplication {
         var image = new Image(file.toURI().toString());
         var view = new ImageView(image);
         entity.getViewComponent().addChild(view);
-        var treeItem = new TreeItem<>(file.getName());
+        var label = new Label(file.getName());
+        label.setOnMouseClicked(_-> System.out.println("o ye"));
+        var treeItem = new TreeItem<>(label);
         entityTree.getChildren().add(treeItem);
         treeview.getSelectionModel().select(treeItem);
       }
