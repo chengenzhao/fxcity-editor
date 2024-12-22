@@ -63,8 +63,8 @@ public class GameApp extends GameApplication {
     rightPane.layoutYProperty().bind(menubar.heightProperty());
     rightPane.setLayoutX(WIDTH - rightPane.getPrefWidth());
 
-    rightPane.add(new Label("X(Layout X):"),0,0);
-    rightPane.add(new Label("Y(Layout Y):"),0,1);
+    rightPane.add(new Label("X:"),0,0);
+    rightPane.add(new Label("Y:"),0,1);
     var x = new NumberTextField(WIDTH);
     var y = new NumberTextField(HEIGHT);
     rightPane.add(x,1,0);
