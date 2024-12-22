@@ -52,8 +52,12 @@ public class GameApp extends GameApplication {
 
     var treeview = new TreeView<String>();
     treeview.translateYProperty().bind(menubar.heightProperty());
+    treeview.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT,null,null)));
 
-    var entityTreeItem = new TreeItem<>("Entity");
+    var entityTreeItem = new TreeItem<>("Game World");
+    var entity0 = new TreeItem<>("Entity0");
+
+    entityTreeItem.getChildren().add(entity0);
 
     treeview.setRoot(entityTreeItem);
 
@@ -95,7 +99,7 @@ public class GameApp extends GameApplication {
         var view = new ImageView(image);
         entity.getViewComponent().addChild(view);
         var treeItem = new TreeItem<>(file.getName());
-        entityTreeItem.getChildren().add(treeItem);
+        entity0.getChildren().add(treeItem);
         treeview.getSelectionModel().select(treeItem);
       }
 
