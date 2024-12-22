@@ -17,6 +17,8 @@ public class GameApp extends GameApplication {
   final int HEIGHT = 1000;
   final int WIDTH = (int) (Screen.getPrimary().getBounds().getWidth() / Screen.getPrimary().getBounds().getHeight() * 1000);
 
+  final Entity entity = new Entity();
+
   @Override
   protected void initSettings(GameSettings settings) {
     settings.setHeight(HEIGHT);
@@ -58,16 +60,18 @@ public class GameApp extends GameApplication {
       if (file != null) {
         var image = new Image(file.toURI().toString());
         var view = new ImageView(image);
-        var entity = new Entity();
         entity.getViewComponent().addChild(view);
         var treeItem = new TreeItem<>(file.getName());
         entityTreeItem.getChildren().add(treeItem);
         treeview.getSelectionModel().select(treeItem);
-        FXGL.getGameWorld().addEntities(entity);
       }
     });
 
     FXGL.getGameScene().addUINodes(menubar,treeview);
   }
 
+  @Override
+  protected void initGame() {
+    FXGL.getGameWorld().addEntities(entity);
+  }
 }
