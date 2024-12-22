@@ -2,7 +2,6 @@ package com.whitewoodcity.fxcityeditor;
 
 import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
-import com.almasb.fxgl.core.collection.grid.Grid;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
 import javafx.geometry.Insets;
@@ -61,7 +60,7 @@ public class GameApp extends GameApplication {
     var rightPane = new GridPane(20,20);
     rightPane.setPadding(new Insets(20));
     rightPane.setPrefWidth(300);
-    rightPane.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, null, null)));
+//    rightPane.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, null, null)));
     rightPane.layoutYProperty().bind(menubar.heightProperty());
     rightPane.setLayoutX(WIDTH - rightPane.getPrefWidth());
 
