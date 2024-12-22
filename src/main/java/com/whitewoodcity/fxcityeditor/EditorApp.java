@@ -1,18 +1,10 @@
 package com.whitewoodcity.fxcityeditor;
 
-import javafx.application.Application;
-import javafx.scene.Cursor;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.stage.FileChooser;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-
-import java.io.File;
 
 
 public class EditorApp extends javafx.application.Application {
