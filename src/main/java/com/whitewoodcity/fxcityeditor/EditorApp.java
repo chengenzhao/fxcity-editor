@@ -21,29 +21,6 @@ public class EditorApp extends javafx.application.Application {
     stage.setTitle("FXCity Editor");
 
     StackPane stackPane = new StackPane();
-//
-//    Button btn = new Button();
-//    btn.setText("choose image");
-//    btn.setOnAction(_ -> {
-//      FileChooser fileChooser = new FileChooser();
-//
-//      //Set extension filter
-//      FileChooser.ExtensionFilter extFilterJPG = new FileChooser.ExtensionFilter("JPG files (*.jpg)", "*.JPG");
-//      FileChooser.ExtensionFilter extFilterPNG = new FileChooser.ExtensionFilter("PNG files (*.png)", "*.PNG");
-//      fileChooser.getExtensionFilters().addAll(extFilterJPG, extFilterPNG);
-//
-//      //Show open file dialog
-//      File file = fileChooser.showOpenDialog(null);
-//
-//      if (file != null) {
-//        var image = new Image(file.toURI().toString());
-//        var view = new ImageView(image);
-//        root.getChildren().addAll(view, root.getChildren().removeLast());
-//      }
-//    });
-//
-//    root.getChildren().add(btn);
-
 
     var gamePane = GameApp.embeddedLaunch(new GameApp());
     gamePane.setRenderFill(Color.TRANSPARENT);
