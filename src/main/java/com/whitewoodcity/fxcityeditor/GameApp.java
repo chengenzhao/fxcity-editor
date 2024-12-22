@@ -2,12 +2,20 @@ package com.whitewoodcity.fxcityeditor;
 
 import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
+import com.almasb.fxgl.core.collection.grid.Grid;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
+import javafx.geometry.Insets;
 import javafx.scene.Cursor;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Screen;
 
@@ -31,6 +39,10 @@ public class GameApp extends GameApplication {
   protected void initUI() {
     FXGL.getGameScene().setCursor(Cursor.DEFAULT);
 
+    entity.getViewComponent().addChild(new Circle(10, Color.RED));
+    entity.setX((double) WIDTH /2);
+    entity.setY((double) HEIGHT /2);
+
     var menu = new Menu("File");
 
     var loadImage = new MenuItem("Load Image");
@@ -45,6 +57,29 @@ public class GameApp extends GameApplication {
     var entityTreeItem = new TreeItem<>("Entity");
 
     treeview.setRoot(entityTreeItem);
+
+    var rightPane = new GridPane(20,20);
+    rightPane.setPadding(new Insets(20));
+    rightPane.setPrefWidth(300);
+    rightPane.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, null, null)));
+    rightPane.layoutYProperty().bind(menubar.heightProperty());
+    rightPane.setLayoutX(WIDTH - rightPane.getPrefWidth());
+
+    rightPane.add(new Label("X(Layout X):"),0,0);
+    rightPane.add(new Label("Y(Layout Y):"),0,1);
+    var x = new NumberTextField(WIDTH);
+    var y = new NumberTextField(HEIGHT);
+    rightPane.add(x,1,0);
+    rightPane.add(y,1,1);
+
+    x.promptTextProperty().bind(entity.xProperty().asString());
+    y.promptTextProperty().bind(entity.yProperty().asString());
+
+    x.setText((int)entity.getX()+"");
+    y.setText((int)entity.getY()+"");
+
+    x.setOnAction(_ -> entity.setX(Integer.parseInt(x.getText().trim())));
+    y.setOnAction(_ -> entity.setY(Integer.parseInt(y.getText().trim())));
 
     loadImage.setOnAction(_ -> {
       FileChooser fileChooser = new FileChooser();
@@ -65,9 +100,10 @@ public class GameApp extends GameApplication {
         entityTreeItem.getChildren().add(treeItem);
         treeview.getSelectionModel().select(treeItem);
       }
+
     });
 
-    FXGL.getGameScene().addUINodes(menubar,treeview);
+    FXGL.getGameScene().addUINodes(menubar,treeview,rightPane);
   }
 
   @Override
