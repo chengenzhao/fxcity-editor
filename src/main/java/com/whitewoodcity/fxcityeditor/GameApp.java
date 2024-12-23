@@ -4,7 +4,6 @@ import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
-import com.almasb.fxgl.entity.components.ViewComponent;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.whitewoodcity.control.NumberTextField;
@@ -68,7 +67,7 @@ public class GameApp extends GameApplication {
     treeview.translateYProperty().bind(menubar.heightProperty());
     treeview.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
 
-    var rightPane = new GridPane(20, 20);
+    var rightPane = new GridPane(20,20);
     rightPane.setPadding(new Insets(20));
     rightPane.setPrefWidth(300);
     rightPane.layoutYProperty().bind(menubar.heightProperty());
@@ -103,8 +102,15 @@ public class GameApp extends GameApplication {
       File file = fileChooser.showOpenDialog(null);
 
       if (file != null) {
-        var image = new Image(file.toURI().toString());
         var label = new Label(file.getName());
+        try{
+          fileBiMap.put(label, file);
+        }catch (Exception e){
+          var node = fileBiMap.inverse().get(file);
+          fireEvent(node, treeview);
+          return;
+        }
+        var image = new Image(file.toURI().toString());
         label.setOnMousePressed(_ -> {
           decorateRightPane(image, rightPane);
           decorateBottomPane(image, bottomPane);
@@ -138,6 +144,28 @@ public class GameApp extends GameApplication {
       n.getLayoutX(), n.getLayoutY(), n.getLayoutX(), n.getLayoutY(), MouseButton.PRIMARY, 1,
       true, true, true, true, true, true, true,
       true, true, true, null));
+  }
+
+  private void fireEvent(Node n, TreeView<Node> treeView) {
+    fireEvent(n);
+    selectTreeItem(n, treeView);
+  }
+
+  private void selectTreeItem(Node n, TreeView<Node> treeView){
+    var treeItem = getTreeItem(n, treeView.getRoot());
+    treeView.getSelectionModel().select(treeItem);
+  }
+
+  private TreeItem<Node> getTreeItem(Node n,TreeItem<Node> treeItem) {
+    if(n == treeItem.getValue())
+      return treeItem;
+    else {
+      for (var item : treeItem.getChildren()) {
+        var childTreeItem = getTreeItem(n, item);
+        if(childTreeItem != null) return childTreeItem;
+      }
+      return null;
+    }
   }
 
   private void decorateRightPane(Object object, GridPane rightPane) {
