@@ -100,7 +100,7 @@ public class GameApp extends GameApplication {
         var view = new ImageView(image);
         entity.getViewComponent().addChild(view);
         var label = new Label(file.getName());
-        label.setOnMouseClicked(_ -> {
+        label.setOnMousePressed(_ -> {
           decorateRightPane(image, rightPane);
         });
         var treeItem = new TreeItem<Node>(label);
@@ -137,7 +137,7 @@ public class GameApp extends GameApplication {
   }
 
   private void fireEvent(Node n){
-    n.fireEvent(new MouseEvent(MouseEvent.MOUSE_CLICKED,
+    n.fireEvent(new MouseEvent(MouseEvent.MOUSE_PRESSED,
       n.getLayoutX(), n.getLayoutY(), n.getLayoutX(), n.getLayoutY(), MouseButton.PRIMARY, 1,
       true, true, true, true, true, true, true,
       true, true, true, null));
@@ -149,14 +149,10 @@ public class GameApp extends GameApplication {
       case Image image -> {
         rightPane.add(new Label("Width:"), 0, 0);
         rightPane.add(new Label("Height:"), 0, 1);
-        var width = new NumberTextField();
-        var height = new NumberTextField();
+        var width = new Label(image.getWidth()+"");
+        var height = new Label(image.getHeight()+"");
         rightPane.add(width, 1, 0);
         rightPane.add(height, 1, 1);
-        width.setText(image.getWidth()+"");
-        height.setText(image.getHeight()+"");
-        width.setEditable(false);
-        height.setEditable(false);
       }
       default -> {
         var gamescene = FXGL.getGameScene();
