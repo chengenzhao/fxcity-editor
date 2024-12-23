@@ -7,8 +7,8 @@ public class NumberTextField extends TextField
 {
   public NumberTextField(int maxValue) {
     this.setTextFormatter(new TextFormatter<>(c -> {
-      var text = c.getControlNewText().trim();
-      if(text.isEmpty()){
+      var text = c.getControlNewText();
+      if(text.trim().isEmpty()){
         c.setText("0");
         return c;
       }
