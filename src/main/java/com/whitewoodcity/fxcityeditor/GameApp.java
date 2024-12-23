@@ -14,12 +14,10 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
@@ -75,6 +73,10 @@ public class GameApp extends GameApplication {
     rightPane.layoutYProperty().bind(menubar.heightProperty());
     rightPane.setLayoutX(WIDTH - rightPane.getPrefWidth());
 
+    var bottomPane = new Pane();
+    bottomPane.setPrefWidth(WIDTH);
+    bottomPane.setLayoutY(600);
+
     var treeviewroot = new TreeItem<Node>();
 
     var hbox = new HBox(10);
@@ -97,11 +99,10 @@ public class GameApp extends GameApplication {
 
       if (file != null) {
         var image = new Image(file.toURI().toString());
-        var view = new ImageView(image);
-        entity.getViewComponent().addChild(view);
         var label = new Label(file.getName());
         label.setOnMousePressed(_ -> {
           decorateRightPane(image, rightPane);
+          decorateBottomPane(image, bottomPane);
         });
         var treeItem = new TreeItem<Node>(label);
         resourcesTree.getChildren().add(treeItem);
@@ -114,6 +115,13 @@ public class GameApp extends GameApplication {
 
     treeview.setRoot(treeviewroot);
     treeview.setShowRoot(false);
+
+    treeview.setOnKeyPressed(e -> {
+      TreeItem<Node> selected = treeview.getSelectionModel().getSelectedItem();
+      if (selected != null && e.getCode() == KeyCode.ENTER) {
+        fireEvent(selected.getValue());
+      }
+    });
 
     rightPane.add(new Label("X:"), 0, 0);
     rightPane.add(new Label("Y:"), 0, 1);
@@ -133,7 +141,7 @@ public class GameApp extends GameApplication {
 
     exit.setOnAction(_ -> System.exit(0));
 
-    FXGL.getGameScene().addUINodes(menubar, treeview, rightPane);
+    FXGL.getGameScene().addUINodes(menubar, treeview, rightPane,bottomPane);
   }
 
   private void fireEvent(Node n){
@@ -147,8 +155,8 @@ public class GameApp extends GameApplication {
     rightPane.getChildren().clear();
     switch (object){
       case Image image -> {
-        rightPane.add(new Label("Width:"), 0, 0);
-        rightPane.add(new Label("Height:"), 0, 1);
+        rightPane.add(new Label("Image Width:"), 0, 0);
+        rightPane.add(new Label("Image Height:"), 0, 1);
         var width = new Label(image.getWidth()+"");
         var height = new Label(image.getHeight()+"");
         rightPane.add(width, 1, 0);
@@ -156,7 +164,26 @@ public class GameApp extends GameApplication {
       }
       default -> {
         var gamescene = FXGL.getGameScene();
+        rightPane.add(new Label("GameScene Width:"), 0, 0);
+        rightPane.add(new Label("GameScene Height:"), 0, 1);
+        var width = new Label(gamescene.getWidth()+"");
+        var height = new Label(gamescene.getHeight()+"");
+        rightPane.add(width, 1, 0);
+        rightPane.add(height, 1, 1);
       }
+    }
+  }
+
+  private void decorateBottomPane(Object object, Pane pane){
+    pane.getChildren().clear();
+    switch (object){
+      case Image image ->{
+        var view = new ImageView(image);
+        var vbox = new VBox(20,new Label("Image Preview:"),view);
+        vbox.setPadding(new Insets(20));
+        pane.getChildren().add(vbox);
+      }
+      default -> {}
     }
   }
 }
