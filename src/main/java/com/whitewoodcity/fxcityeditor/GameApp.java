@@ -22,6 +22,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Screen;
 
 import java.io.File;
+import java.io.UncheckedIOException;
 
 public class GameApp extends GameApplication {
   final int HEIGHT = 1000;
@@ -38,11 +39,12 @@ public class GameApp extends GameApplication {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   protected void initUI() {
     FXGL.getGameScene().setCursor(Cursor.DEFAULT);
 
     entity.getViewComponent().addDevChild(new Circle(10, Color.RED));
-    entity.setX((double) WIDTH /2);
+    entity.setX((double) WIDTH / 2);
     entity.setY(300);
 
     var menu = new Menu("Editor");
@@ -55,7 +57,7 @@ public class GameApp extends GameApplication {
 
     var treeview = new TreeView<Node>();
     treeview.translateYProperty().bind(menubar.heightProperty());
-    treeview.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT,null,null)));
+    treeview.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
 
     var treeviewroot = new TreeItem<Node>();
 
@@ -68,13 +70,11 @@ public class GameApp extends GameApplication {
 
     var entityTree = new TreeItem<Node>(new Label("Entity0"));
 
-    addImageButton.setOnAction(_->{
-            FileChooser fileChooser = new FileChooser();
+    addImageButton.setOnAction(_ -> {
+      FileChooser fileChooser = new FileChooser();
 
       //Set extension filter
-      FileChooser.ExtensionFilter extFilterJPG = new FileChooser.ExtensionFilter("JPG files (*.jpg)", "*.JPG");
-      FileChooser.ExtensionFilter extFilterPNG = new FileChooser.ExtensionFilter("PNG files (*.png)", "*.PNG");
-      fileChooser.getExtensionFilters().addAll(extFilterJPG, extFilterPNG);
+      fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Image files", "*.PNG", "*.JPG"));
 
       //Show open file dialog
       File file = fileChooser.showOpenDialog(null);
@@ -84,37 +84,36 @@ public class GameApp extends GameApplication {
         var view = new ImageView(image);
         entity.getViewComponent().addChild(view);
         var label = new Label(file.getName());
-        label.setOnMouseClicked(_-> System.out.println("o ye"));
+        label.setOnMouseClicked(_ -> System.out.println("o ye"));
         var treeItem = new TreeItem<Node>(label);
         resourcesTree.getChildren().add(treeItem);
         treeview.getSelectionModel().select(treeItem);
       }
     });
 
-
     treeviewroot.getChildren().addAll(resourcesTree, entityTree);
 
     treeview.setRoot(treeviewroot);
     treeview.setShowRoot(false);
 
-    var rightPane = new GridPane(20,20);
+    var rightPane = new GridPane(20, 20);
     rightPane.setPadding(new Insets(20));
     rightPane.setPrefWidth(300);
     rightPane.layoutYProperty().bind(menubar.heightProperty());
     rightPane.setLayoutX(WIDTH - rightPane.getPrefWidth());
 
-    rightPane.add(new Label("X:"),0,0);
-    rightPane.add(new Label("Y:"),0,1);
+    rightPane.add(new Label("X:"), 0, 0);
+    rightPane.add(new Label("Y:"), 0, 1);
     var x = new NumberTextField(WIDTH);
     var y = new NumberTextField(HEIGHT);
-    rightPane.add(x,1,0);
-    rightPane.add(y,1,1);
+    rightPane.add(x, 1, 0);
+    rightPane.add(y, 1, 1);
 
     x.promptTextProperty().bind(entity.xProperty().asString());
     y.promptTextProperty().bind(entity.yProperty().asString());
 
-    x.setText((int)entity.getX()+"");
-    y.setText((int)entity.getY()+"");
+    x.setText((int) entity.getX() + "");
+    y.setText((int) entity.getY() + "");
 
     x.setOnAction(_ -> entity.setX(Integer.parseInt(x.getText())));
     y.setOnAction(_ -> entity.setY(Integer.parseInt(y.getText())));
@@ -123,7 +122,7 @@ public class GameApp extends GameApplication {
       System.exit(0);
     });
 
-    FXGL.getGameScene().addUINodes(menubar,treeview,rightPane);
+    FXGL.getGameScene().addUINodes(menubar, treeview, rightPane);
   }
 
   @Override
