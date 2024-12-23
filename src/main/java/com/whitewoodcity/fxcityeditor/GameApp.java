@@ -4,6 +4,8 @@ import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.whitewoodcity.control.NumberTextField;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -12,6 +14,8 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.GridPane;
@@ -22,13 +26,13 @@ import javafx.stage.FileChooser;
 import javafx.stage.Screen;
 
 import java.io.File;
-import java.io.UncheckedIOException;
 
 public class GameApp extends GameApplication {
   final int HEIGHT = 1000;
   final int WIDTH = (int) (Screen.getPrimary().getBounds().getWidth() / Screen.getPrimary().getBounds().getHeight() * 1000);
 
-  final Entity entity = new Entity();
+  Entity entity;
+  final BiMap<Label, File> fileBiMap = HashBiMap.create();
 
   @Override
   protected void initSettings(GameSettings settings) {
@@ -36,6 +40,12 @@ public class GameApp extends GameApplication {
     settings.setWidth(WIDTH);
     settings.setMainMenuEnabled(false);
     settings.setGameMenuEnabled(false);
+  }
+
+  @Override
+  protected void initGame() {
+    entity = new Entity();
+    FXGL.getGameWorld().addEntities(entity);
   }
 
   @Override
@@ -58,6 +68,12 @@ public class GameApp extends GameApplication {
     var treeview = new TreeView<Node>();
     treeview.translateYProperty().bind(menubar.heightProperty());
     treeview.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
+
+    var rightPane = new GridPane(20, 20);
+    rightPane.setPadding(new Insets(20));
+    rightPane.setPrefWidth(300);
+    rightPane.layoutYProperty().bind(menubar.heightProperty());
+    rightPane.setLayoutX(WIDTH - rightPane.getPrefWidth());
 
     var treeviewroot = new TreeItem<Node>();
 
@@ -84,10 +100,13 @@ public class GameApp extends GameApplication {
         var view = new ImageView(image);
         entity.getViewComponent().addChild(view);
         var label = new Label(file.getName());
-        label.setOnMouseClicked(_ -> System.out.println("o ye"));
+        label.setOnMouseClicked(_ -> {
+          decorateRightPane(image, rightPane);
+        });
         var treeItem = new TreeItem<Node>(label);
         resourcesTree.getChildren().add(treeItem);
         treeview.getSelectionModel().select(treeItem);
+        fireEvent(label);
       }
     });
 
@@ -95,12 +114,6 @@ public class GameApp extends GameApplication {
 
     treeview.setRoot(treeviewroot);
     treeview.setShowRoot(false);
-
-    var rightPane = new GridPane(20, 20);
-    rightPane.setPadding(new Insets(20));
-    rightPane.setPrefWidth(300);
-    rightPane.layoutYProperty().bind(menubar.heightProperty());
-    rightPane.setLayoutX(WIDTH - rightPane.getPrefWidth());
 
     rightPane.add(new Label("X:"), 0, 0);
     rightPane.add(new Label("Y:"), 0, 1);
@@ -118,15 +131,36 @@ public class GameApp extends GameApplication {
     x.setOnAction(_ -> entity.setX(Integer.parseInt(x.getText())));
     y.setOnAction(_ -> entity.setY(Integer.parseInt(y.getText())));
 
-    exit.setOnAction(_ -> {
-      System.exit(0);
-    });
+    exit.setOnAction(_ -> System.exit(0));
 
     FXGL.getGameScene().addUINodes(menubar, treeview, rightPane);
   }
 
-  @Override
-  protected void initGame() {
-    FXGL.getGameWorld().addEntities(entity);
+  private void fireEvent(Node n){
+    n.fireEvent(new MouseEvent(MouseEvent.MOUSE_CLICKED,
+      n.getLayoutX(), n.getLayoutY(), n.getLayoutX(), n.getLayoutY(), MouseButton.PRIMARY, 1,
+      true, true, true, true, true, true, true,
+      true, true, true, null));
+  }
+
+  private void decorateRightPane(Object object, GridPane rightPane){
+    rightPane.getChildren().clear();
+    switch (object){
+      case Image image -> {
+        rightPane.add(new Label("Width:"), 0, 0);
+        rightPane.add(new Label("Height:"), 0, 1);
+        var width = new NumberTextField();
+        var height = new NumberTextField();
+        rightPane.add(width, 1, 0);
+        rightPane.add(height, 1, 1);
+        width.setText(image.getWidth()+"");
+        height.setText(image.getHeight()+"");
+        width.setEditable(false);
+        height.setEditable(false);
+      }
+      default -> {
+        var gamescene = FXGL.getGameScene();
+      }
+    }
   }
 }

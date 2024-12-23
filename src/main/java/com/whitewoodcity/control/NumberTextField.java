@@ -5,6 +5,9 @@ import javafx.scene.control.TextFormatter;
 
 public class NumberTextField extends TextField
 {
+  public NumberTextField() {
+  }
+
   public NumberTextField(int maxValue) {
     this.setTextFormatter(new TextFormatter<>(c -> {
       var text = c.getControlNewText();
