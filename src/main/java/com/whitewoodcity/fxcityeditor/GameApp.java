@@ -4,6 +4,7 @@ import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
+import com.almasb.fxgl.entity.components.ViewComponent;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.whitewoodcity.control.NumberTextField;
@@ -79,22 +80,26 @@ public class GameApp extends GameApplication {
 
     var treeviewroot = new TreeItem<Node>();
 
-    var hbox = new HBox(10);
-    var resourcesTree = new TreeItem<Node>(hbox);
+    var resourceHBox = new HBox(10);
+    var resourceTree = new TreeItem<Node>(resourceHBox);
     var addImageButton = new Button("+");
-    hbox.setAlignment(Pos.BASELINE_LEFT);
+    resourceHBox.setAlignment(Pos.BASELINE_LEFT);
 
-    hbox.getChildren().addAll(new Label("Resources"), addImageButton);
+    var resourceLabel = new Label("Resources");
+    resourceHBox.getChildren().addAll(resourceLabel, addImageButton);
+    resourceHBox.setOnMousePressed(_ -> decorateRightPane(resourceHBox, rightPane));
+    fireEvent(resourceHBox);
 
-    var entityTree = new TreeItem<Node>(new Label("Entity0"));
+    var entityHBox = new HBox(10);
+    var entityTree = new TreeItem<Node>(entityHBox);
+    var addViewComponentButton = new Button("+");
+    entityHBox.setAlignment(Pos.BASELINE_LEFT);
+    entityHBox.getChildren().addAll(new Label("Entity0"), addViewComponentButton);
+    entityHBox.setOnMousePressed(_ -> decorateRightPane(entity, rightPane));
 
     addImageButton.setOnAction(_ -> {
       FileChooser fileChooser = new FileChooser();
-
-      //Set extension filter
-      fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Image files", "*.PNG", "*.JPG"));
-
-      //Show open file dialog
+      fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image files", "*.PNG", "*.JPG"));
       File file = fileChooser.showOpenDialog(null);
 
       if (file != null) {
@@ -105,13 +110,13 @@ public class GameApp extends GameApplication {
           decorateBottomPane(image, bottomPane);
         });
         var treeItem = new TreeItem<Node>(label);
-        resourcesTree.getChildren().add(treeItem);
+        resourceTree.getChildren().add(treeItem);
         treeview.getSelectionModel().select(treeItem);
         fireEvent(label);
       }
     });
 
-    treeviewroot.getChildren().addAll(resourcesTree, entityTree);
+    treeviewroot.getChildren().addAll(resourceTree, entityTree);
 
     treeview.setRoot(treeviewroot);
     treeview.setShowRoot(false);
@@ -123,67 +128,68 @@ public class GameApp extends GameApplication {
       }
     });
 
-    rightPane.add(new Label("X:"), 0, 0);
-    rightPane.add(new Label("Y:"), 0, 1);
-    var x = new NumberTextField(WIDTH);
-    var y = new NumberTextField(HEIGHT);
-    rightPane.add(x, 1, 0);
-    rightPane.add(y, 1, 1);
-
-    x.promptTextProperty().bind(entity.xProperty().asString());
-    y.promptTextProperty().bind(entity.yProperty().asString());
-
-    x.setText((int) entity.getX() + "");
-    y.setText((int) entity.getY() + "");
-
-    x.setOnAction(_ -> entity.setX(Integer.parseInt(x.getText())));
-    y.setOnAction(_ -> entity.setY(Integer.parseInt(y.getText())));
-
     exit.setOnAction(_ -> System.exit(0));
 
-    FXGL.getGameScene().addUINodes(menubar, treeview, rightPane,bottomPane);
+    FXGL.getGameScene().addUINodes(menubar, treeview, rightPane, bottomPane);
   }
 
-  private void fireEvent(Node n){
+  private void fireEvent(Node n) {
     n.fireEvent(new MouseEvent(MouseEvent.MOUSE_PRESSED,
       n.getLayoutX(), n.getLayoutY(), n.getLayoutX(), n.getLayoutY(), MouseButton.PRIMARY, 1,
       true, true, true, true, true, true, true,
       true, true, true, null));
   }
 
-  private void decorateRightPane(Object object, GridPane rightPane){
+  private void decorateRightPane(Object object, GridPane rightPane) {
     rightPane.getChildren().clear();
-    switch (object){
+    switch (object) {
       case Image image -> {
         rightPane.add(new Label("Image Width:"), 0, 0);
         rightPane.add(new Label("Image Height:"), 0, 1);
-        var width = new Label(image.getWidth()+"");
-        var height = new Label(image.getHeight()+"");
+        var width = new Label(image.getWidth() + "");
+        var height = new Label(image.getHeight() + "");
         rightPane.add(width, 1, 0);
         rightPane.add(height, 1, 1);
       }
+      case Entity e ->{
+        rightPane.add(new Label("X:"), 0, 0);
+        rightPane.add(new Label("Y:"), 0, 1);
+        var x = new NumberTextField(WIDTH);
+        var y = new NumberTextField(HEIGHT);
+        rightPane.add(x, 1, 0);
+        rightPane.add(y, 1, 1);
+
+        x.promptTextProperty().bind(e.xProperty().asString());
+        y.promptTextProperty().bind(e.yProperty().asString());
+
+        x.setText((int) e.getX() + "");
+        y.setText((int) e.getY() + "");
+
+        x.setOnAction(_ -> e.setX(Integer.parseInt(x.getText())));
+        y.setOnAction(_ -> e.setY(Integer.parseInt(y.getText())));
+      }
       default -> {
-        var gamescene = FXGL.getGameScene();
-        rightPane.add(new Label("GameScene Width:"), 0, 0);
-        rightPane.add(new Label("GameScene Height:"), 0, 1);
-        var width = new Label(gamescene.getWidth()+"");
-        var height = new Label(gamescene.getHeight()+"");
+        rightPane.add(new Label("Game Width:"), 0, 0);
+        rightPane.add(new Label("Game Height:"), 0, 1);
+        var width = new Label(WIDTH + "");
+        var height = new Label(HEIGHT + "");
         rightPane.add(width, 1, 0);
         rightPane.add(height, 1, 1);
       }
     }
   }
 
-  private void decorateBottomPane(Object object, Pane pane){
+  private void decorateBottomPane(Object object, Pane pane) {
     pane.getChildren().clear();
-    switch (object){
-      case Image image ->{
+    switch (object) {
+      case Image image -> {
         var view = new ImageView(image);
-        var vbox = new VBox(20,new Label("Image Preview:"),view);
+        var vbox = new VBox(20, new Label("Image Preview:"), view);
         vbox.setPadding(new Insets(20));
         pane.getChildren().add(vbox);
       }
-      default -> {}
+      default -> {
+      }
     }
   }
 }
