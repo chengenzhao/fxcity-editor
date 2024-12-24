@@ -15,7 +15,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 
 public class ViewComponentDialog extends Dialog<ViewComponentDialog.Parameters> {
-  public record Parameters(String image, String password){ }
+  public record Parameters(File image, String password){ }
 
   public ViewComponentDialog(Set<File> imageFileSet) {
     setTitle("ViewComponent Dialog");
@@ -26,8 +26,6 @@ public class ViewComponentDialog extends Dialog<ViewComponentDialog.Parameters> 
     GridPane grid = new GridPane(10,10);
     grid.setPadding(new Insets(20, 150, 10, 10));
 
-    TextField username = new TextField();
-    username.setPromptText("Username");
     PasswordField password = new PasswordField();
     password.setPromptText("Password");
 
@@ -46,6 +44,7 @@ public class ViewComponentDialog extends Dialog<ViewComponentDialog.Parameters> 
     });
 
     comboBox.getItems().addAll(imageFileSet);
+    comboBox.getSelectionModel().selectFirst();
 
     grid.add(new Label("Image:"), 0, 0);
     grid.add(comboBox, 1, 0);
@@ -58,11 +57,11 @@ public class ViewComponentDialog extends Dialog<ViewComponentDialog.Parameters> 
 
     getDialogPane().setContent(grid);
 
-    Platform.runLater(username::requestFocus);
+    Platform.runLater(comboBox::requestFocus);
 
     setResultConverter(dialogButton -> {
       if (dialogButton == ButtonType.OK) {
-        return new ViewComponentDialog.Parameters(comboBox.getValue().toString(), password.getText());
+        return new ViewComponentDialog.Parameters(comboBox.getValue(), password.getText());
       }
       return null;
     });
