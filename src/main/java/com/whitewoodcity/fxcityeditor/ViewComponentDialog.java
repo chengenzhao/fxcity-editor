@@ -29,9 +29,9 @@ public class ViewComponentDialog extends Dialog<ViewComponentDialog.Parameters> 
     PasswordField password = new PasswordField();
     password.setPromptText("Password");
 
-    ComboBox<File> comboBox = new ComboBox<>();
+    ComboBox<File> fileComboBox = new ComboBox<>();
 
-    comboBox.setConverter(new StringConverter<>() {
+    fileComboBox.setConverter(new StringConverter<>() {
       @Override
       public String toString(File file) {
         return file == null ? "":file.getName();
@@ -39,29 +39,29 @@ public class ViewComponentDialog extends Dialog<ViewComponentDialog.Parameters> 
 
       @Override
       public File fromString(String s) {
-        return comboBox.getItems().stream().filter(ap -> ap.getName().equals(s)).findFirst().orElse(null);
+        return fileComboBox.getItems().stream().filter(ap -> ap.getName().equals(s)).findFirst().orElse(null);
       }
     });
 
-    comboBox.getItems().addAll(imageFileSet);
-    comboBox.getSelectionModel().selectFirst();
+    fileComboBox.getItems().addAll(imageFileSet);
+    fileComboBox.getSelectionModel().selectFirst();
 
     grid.add(new Label("Image:"), 0, 0);
-    grid.add(comboBox, 1, 0);
+    grid.add(fileComboBox, 1, 0);
     grid.add(new Label("Password:"), 0, 1);
     grid.add(password, 1, 1);
 
     Node okButton = getDialogPane().lookupButton(ButtonType.OK);
     okButton.setDisable(true);
-    comboBox.valueProperty().addListener((_, _, newValue) -> okButton.setDisable(newValue==null));
+    fileComboBox.valueProperty().addListener((_, _, newValue) -> okButton.setDisable(newValue==null));
 
     getDialogPane().setContent(grid);
 
-    Platform.runLater(comboBox::requestFocus);
+    Platform.runLater(fileComboBox::requestFocus);
 
     setResultConverter(dialogButton -> {
       if (dialogButton == ButtonType.OK) {
-        return new ViewComponentDialog.Parameters(comboBox.getValue(), password.getText());
+        return new ViewComponentDialog.Parameters(fileComboBox.getValue(), password.getText());
       }
       return null;
     });

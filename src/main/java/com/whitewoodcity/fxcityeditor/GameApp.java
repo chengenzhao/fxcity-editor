@@ -197,8 +197,8 @@ public class GameApp extends GameApplication {
         x.setText((int) e.getX() + "");
         y.setText((int) e.getY() + "");
 
-        x.setOnAction(_ -> e.setX(Integer.parseInt(x.getText())));
-        y.setOnAction(_ -> e.setY(Integer.parseInt(y.getText())));
+        x.setOnAction(_ -> e.setX(Double.parseDouble(x.getText())));
+        y.setOnAction(_ -> e.setY(Double.parseDouble(y.getText())));
       }
       default -> {
         rightPane.add(new Label("Game Width:"), 0, 0);
