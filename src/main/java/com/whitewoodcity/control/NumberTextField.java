@@ -31,12 +31,16 @@ public class NumberTextField extends TextField {
     ));
   }
 
-  private boolean validate(String s) {
+  protected boolean validate(String s) {
     try {
       Double.parseDouble(s);
       return true;
     } catch (Throwable throwable) {
       return false;
     }
+  }
+
+  public double getDouble(){
+    return Double.parseDouble(getText());
   }
 }

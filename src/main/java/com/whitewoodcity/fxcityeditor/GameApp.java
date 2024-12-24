@@ -7,7 +7,6 @@ import com.almasb.fxgl.entity.Entity;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.whitewoodcity.control.NumberTextField;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -23,7 +22,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Screen;
-import javafx.util.Pair;
 
 import java.io.File;
 
@@ -197,8 +195,8 @@ public class GameApp extends GameApplication {
         x.setText((int) e.getX() + "");
         y.setText((int) e.getY() + "");
 
-        x.setOnAction(_ -> e.setX(Double.parseDouble(x.getText())));
-        y.setOnAction(_ -> e.setY(Double.parseDouble(y.getText())));
+        x.setOnAction(_ -> e.setX(x.getDouble()));
+        y.setOnAction(_ -> e.setY(y.getDouble()));
       }
       default -> {
         rightPane.add(new Label("Game Width:"), 0, 0);
