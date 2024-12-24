@@ -5,11 +5,11 @@ import javafx.scene.control.TextFormatter;
 
 public class NumberTextField extends TextField {
 
-  public NumberTextField( int maxValue) {
+  public NumberTextField(int maxValue) {
     this(0, maxValue);
   }
 
-  public NumberTextField(int minValue,int maxValue) {
+  public NumberTextField(int minValue, int maxValue) {
     this.setTextFormatter(new TextFormatter<>(c -> {
       var newText = c.getControlNewText();
       if (newText.trim().isEmpty()) {
@@ -22,7 +22,7 @@ public class NumberTextField extends TextField {
         setText(maxValue + "");
         return null;
       } else if (Double.parseDouble(newText) < minValue) {
-        setText("0");
+        setText(minValue + "");
         return null;
       } else {
         return c;
