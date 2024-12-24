@@ -44,7 +44,6 @@ public class ViewComponentDialog extends Dialog<ViewComponentDialog.Parameters> 
     });
 
     fileComboBox.getItems().addAll(imageFileSet);
-    fileComboBox.getSelectionModel().selectFirst();
 
     grid.add(new Label("Image:"), 0, 0);
     grid.add(fileComboBox, 1, 0);
