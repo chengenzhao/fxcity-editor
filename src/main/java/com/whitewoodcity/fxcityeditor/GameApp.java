@@ -7,6 +7,7 @@ import com.almasb.fxgl.entity.Entity;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.whitewoodcity.control.NumberTextField;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -22,6 +23,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Screen;
+import javafx.util.Pair;
 
 import java.io.File;
 
@@ -58,7 +60,6 @@ public class GameApp extends GameApplication {
     var menu = new Menu("Editor");
 
     var exit = new MenuItem("Exit");
-    menu.getItems().add(exit);
 
     var menubar = new MenuBar(menu);
     menubar.setPrefWidth(WIDTH);
@@ -67,7 +68,7 @@ public class GameApp extends GameApplication {
     treeview.translateYProperty().bind(menubar.heightProperty());
     treeview.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
 
-    var rightPane = new GridPane(20,20);
+    var rightPane = new GridPane(20, 20);
     rightPane.setPadding(new Insets(20));
     rightPane.setPrefWidth(300);
     rightPane.layoutYProperty().bind(menubar.heightProperty());
@@ -92,6 +93,10 @@ public class GameApp extends GameApplication {
     var entityHBox = new HBox(10);
     var entityTree = new TreeItem<Node>(entityHBox);
     var addViewComponentButton = new Button("+");
+    addViewComponentButton.setOnAction(_ ->
+      new ViewComponentDialog().showAndWait().ifPresent(usernamePassword ->
+        System.out.println("Username=" + usernamePassword.username() + ", Password=" + usernamePassword.password()))
+    );
     entityHBox.setAlignment(Pos.BASELINE_LEFT);
     entityHBox.getChildren().addAll(new Label("Entity0"), addViewComponentButton);
     entityHBox.setOnMousePressed(_ -> decorateRightPane(entity, rightPane));
@@ -103,9 +108,9 @@ public class GameApp extends GameApplication {
 
       if (file != null) {
         var label = new Label(file.getName());
-        try{
+        try {
           fileBiMap.put(label, file);
-        }catch (Exception e){
+        } catch (Exception e) {
           var node = fileBiMap.inverse().get(file);
           fireEvent(node, treeview);
           return;
@@ -151,18 +156,18 @@ public class GameApp extends GameApplication {
     selectTreeItem(n, treeView);
   }
 
-  private void selectTreeItem(Node n, TreeView<Node> treeView){
+  private void selectTreeItem(Node n, TreeView<Node> treeView) {
     var treeItem = getTreeItem(n, treeView.getRoot());
     treeView.getSelectionModel().select(treeItem);
   }
 
-  private TreeItem<Node> getTreeItem(Node n,TreeItem<Node> treeItem) {
-    if(n == treeItem.getValue())
+  private TreeItem<Node> getTreeItem(Node n, TreeItem<Node> treeItem) {
+    if (n == treeItem.getValue())
       return treeItem;
     else {
       for (var item : treeItem.getChildren()) {
         var childTreeItem = getTreeItem(n, item);
-        if(childTreeItem != null) return childTreeItem;
+        if (childTreeItem != null) return childTreeItem;
       }
       return null;
     }
@@ -179,7 +184,7 @@ public class GameApp extends GameApplication {
         rightPane.add(width, 1, 0);
         rightPane.add(height, 1, 1);
       }
-      case Entity e ->{
+      case Entity e -> {
         rightPane.add(new Label("X:"), 0, 0);
         rightPane.add(new Label("Y:"), 0, 1);
         var x = new NumberTextField(WIDTH);
