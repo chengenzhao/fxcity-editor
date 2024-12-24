@@ -94,8 +94,7 @@ public class GameApp extends GameApplication {
     var entityTree = new TreeItem<Node>(entityHBox);
     var addViewComponentButton = new Button("+");
     addViewComponentButton.setOnAction(_ ->
-      new ViewComponentDialog().showAndWait().ifPresent(usernamePassword ->
-        System.out.println("Username=" + usernamePassword.username() + ", Password=" + usernamePassword.password()))
+      new ViewComponentDialog(fileBiMap.values()).showAndWait().ifPresent(System.out::println)
     );
     entityHBox.setAlignment(Pos.BASELINE_LEFT);
     entityHBox.getChildren().addAll(new Label("Entity0"), addViewComponentButton);
