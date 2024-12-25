@@ -1,21 +1,18 @@
 package com.whitewoodcity.fxcityeditor;
 
-import com.google.common.collect.BiMap;
+import com.whitewoodcity.control.IntTextField;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.util.StringConverter;
 
 import java.io.File;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 public class ViewComponentDialog extends Dialog<ViewComponentDialog.Parameters> {
-  public record Parameters(File image, String password){ }
+  public record Parameters(File image, int framesPerRow){ }
 
   public ViewComponentDialog(Set<File> imageFileSet) {
     setTitle("ViewComponent Dialog");
@@ -26,8 +23,8 @@ public class ViewComponentDialog extends Dialog<ViewComponentDialog.Parameters> 
     GridPane grid = new GridPane(10,10);
     grid.setPadding(new Insets(20, 150, 10, 10));
 
-    PasswordField password = new PasswordField();
-    password.setPromptText("Password");
+    var framesPerRowField = new IntTextField(1,500);
+    framesPerRowField.setPromptText("How many frames in the row?");
 
     ComboBox<File> fileComboBox = new ComboBox<>();
 
@@ -47,8 +44,8 @@ public class ViewComponentDialog extends Dialog<ViewComponentDialog.Parameters> 
 
     grid.add(new Label("Image:"), 0, 0);
     grid.add(fileComboBox, 1, 0);
-    grid.add(new Label("Password:"), 0, 1);
-    grid.add(password, 1, 1);
+    grid.add(new Label("Frames/Row:"), 0, 1);
+    grid.add(framesPerRowField, 1, 1);
 
     Node okButton = getDialogPane().lookupButton(ButtonType.OK);
     okButton.setDisable(true);
@@ -60,7 +57,7 @@ public class ViewComponentDialog extends Dialog<ViewComponentDialog.Parameters> 
 
     setResultConverter(dialogButton -> {
       if (dialogButton == ButtonType.OK) {
-        return new ViewComponentDialog.Parameters(fileComboBox.getValue(), password.getText());
+        return new ViewComponentDialog.Parameters(fileComboBox.getValue(), framesPerRowField.getInt());
       }
       return null;
     });
