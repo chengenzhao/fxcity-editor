@@ -1,6 +1,6 @@
 package com.whitewoodcity.fxcityeditor;
 
-import com.whitewoodcity.control.IntTextField;
+import com.whitewoodcity.control.IntField;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -23,7 +23,7 @@ public class ViewComponentDialog extends Dialog<ViewComponentDialog.Parameters> 
     GridPane grid = new GridPane(10,10);
     grid.setPadding(new Insets(20, 150, 10, 10));
 
-    var framesPerRowField = new IntTextField(1,500);
+    var framesPerRowField = new IntField(1,500);
     framesPerRowField.setPromptText("How many frames in the row?");
 
     ComboBox<File> fileComboBox = new ComboBox<>();

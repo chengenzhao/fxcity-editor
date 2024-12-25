@@ -6,7 +6,7 @@ import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.whitewoodcity.control.NumberTextField;
+import com.whitewoodcity.control.NumberField;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -184,8 +184,8 @@ public class GameApp extends GameApplication {
       case Entity e -> {
         rightPane.add(new Label("X:"), 0, 0);
         rightPane.add(new Label("Y:"), 0, 1);
-        var x = new NumberTextField(WIDTH);
-        var y = new NumberTextField(HEIGHT);
+        var x = new NumberField(WIDTH);
+        var y = new NumberField(HEIGHT);
         rightPane.add(x, 1, 0);
         rightPane.add(y, 1, 1);
 

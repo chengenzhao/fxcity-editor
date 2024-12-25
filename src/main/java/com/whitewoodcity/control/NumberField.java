@@ -3,13 +3,13 @@ package com.whitewoodcity.control;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 
-public class NumberTextField extends TextField {
+public class NumberField extends TextField {
 
-  public NumberTextField(int maxValue) {
+  public NumberField(int maxValue) {
     this(0, maxValue);
   }
 
-  public NumberTextField(int minValue, int maxValue) {
+  public NumberField(int minValue, int maxValue) {
     this.setTextFormatter(new TextFormatter<>(c -> {
       var newText = c.getControlNewText();
       if (newText.trim().isEmpty()) {

@@ -1,11 +1,11 @@
 package com.whitewoodcity.control;
 
-public class IntTextField extends NumberTextField{
-  public IntTextField(int maxValue) {
+public class IntField extends NumberField {
+  public IntField(int maxValue) {
     super(maxValue);
   }
 
-  public IntTextField(int minValue, int maxValue) {
+  public IntField(int minValue, int maxValue) {
     super(minValue, maxValue);
   }
 
