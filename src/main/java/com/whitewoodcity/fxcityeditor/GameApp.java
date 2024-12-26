@@ -4,6 +4,7 @@ import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
+import com.almasb.fxgl.entity.components.ViewComponent;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.whitewoodcity.control.NumberField;
@@ -113,7 +114,7 @@ public class GameApp extends GameApplication {
         region.translateYProperty().bind(animatedTexture.translateYProperty());
         String cssBordering = "-fx-border-color:#039ED3;";
         region.setStyle(cssBordering);
-
+        decorateRightPane(animatedTexture, rightPane);
         animatedTexture.setOnMousePressed(originalE -> {
           entity.getViewComponent().addChild(region);
 
@@ -234,6 +235,23 @@ public class GameApp extends GameApplication {
 
         x.setOnAction(_ -> e.setX(x.getDouble()));
         y.setOnAction(_ -> e.setY(y.getDouble()));
+      }
+      case AnimatedTexture animatedTexture ->{
+        rightPane.add(new Label("Translate X:"), 0, 0);
+        rightPane.add(new Label("Translate Y:"), 0, 1);
+        var x = new NumberField(-WIDTH/2, WIDTH/2);
+        var y = new NumberField(-HEIGHT/2, HEIGHT/2);
+        rightPane.add(x, 1, 0);
+        rightPane.add(y, 1, 1);
+
+        Bindings.bindBidirectional(x.textProperty(), animatedTexture.translateXProperty(), new NumberStringConverter());
+        Bindings.bindBidirectional(y.textProperty(), animatedTexture.translateYProperty(), new NumberStringConverter());
+
+        x.setText(animatedTexture.getTranslateX() + "");
+        y.setText(animatedTexture.getTranslateY() + "");
+
+        x.setOnAction(_ -> animatedTexture.setTranslateX(x.getDouble()));
+        y.setOnAction(_ -> animatedTexture.setTranslateY(y.getDouble()));
       }
       default -> {
         rightPane.add(new Label("Game Width:"), 0, 0);
