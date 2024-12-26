@@ -11,12 +11,14 @@ import com.whitewoodcity.fxgl.texture.AnimationChannel;
 import com.whitewoodcity.fxgl.texture.Texture;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -116,25 +118,36 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         var textureHBox = new HBox(20, textureLabel, delTextureButton);
         textureHBox.setAlignment(Pos.BASELINE_LEFT);
         textureItem.setValue(textureHBox);
+
+        textureHBox.setOnMousePressed(_->{
+          decorateRightPane(animatedTexture, rightPane);
+          entity.getViewComponent().removeChild(region);
+          entity.getViewComponent().addChild(region);
+
+//          var originalPoint = new Point2D(0,0);
+//          var originalTranslation = new Point2D(animatedTexture.getTranslateX(), animatedTexture.getTranslateY());
+          region.setOnMousePressed(originalE -> {
+            fireEvent(textureHBox, treeview);
+            var ox = originalE.getSceneX();
+            var oy = originalE.getSceneY();
+            var tx = animatedTexture.getTranslateX();
+            var ty = animatedTexture.getTranslateY();
+            region.setOnMouseDragged(e -> {
+              double changeInX = e.getSceneX() - ox;
+              double changeInY = e.getSceneY() - oy;
+              animatedTexture.setTranslateX(tx + changeInX);
+              animatedTexture.setTranslateY(ty + changeInY);
+            });
+          });
+        });
+        textureHBox.setOnMouseReleased(e ->{//freeze event
+          if(e.getButton()== MouseButton.SECONDARY){
+            entity.getViewComponent().removeChild(region);
+          }
+        });
         entityTree.getChildren().add(textureItem);
         fireEvent(textureHBox, treeview);
 
-        animatedTexture.setOnMousePressed(originalE -> {
-          entity.getViewComponent().addChild(region);
-
-          var ox = originalE.getSceneX();
-          var oy = originalE.getSceneY();
-          var tx = animatedTexture.getTranslateX();
-          var ty = animatedTexture.getTranslateY();
-          animatedTexture.setOnMouseDragged(e -> {
-            double changeInX = e.getSceneX() - ox;
-            double changeInY = e.getSceneY() - oy;
-            animatedTexture.setTranslateX(tx + changeInX);
-            animatedTexture.setTranslateY(ty + changeInY);
-          });
-          decorateRightPane(animatedTexture, rightPane);
-        });
-        animatedTexture.setOnMouseReleased(_ -> entity.getViewComponent().removeChild(region));
       })
     );
     entityHBox.setAlignment(Pos.BASELINE_LEFT);
