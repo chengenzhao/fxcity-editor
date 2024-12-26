@@ -4,37 +4,27 @@ import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
-import com.almasb.fxgl.entity.components.ViewComponent;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.whitewoodcity.control.NumberField;
 import com.whitewoodcity.fxgl.texture.AnimatedTexture;
 import com.whitewoodcity.fxgl.texture.AnimationChannel;
 import com.whitewoodcity.fxgl.texture.Texture;
-import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
-import javafx.stage.Screen;
 import javafx.util.Duration;
-import javafx.util.converter.NumberStringConverter;
 
 import java.io.File;
 
-public class GameApp extends GameApplication {
-  final int HEIGHT = 1000;
-  final int WIDTH = (int) (Screen.getPrimary().getBounds().getWidth() / Screen.getPrimary().getBounds().getHeight() * 1000);
+public class GameApp extends GameApplication implements GameAppDecorator{
 
   Entity entity;
   final BiMap<Label, File> fileBiMap = HashBiMap.create();
@@ -190,105 +180,5 @@ public class GameApp extends GameApplication {
     exit.setOnAction(_ -> System.exit(0));
 
     FXGL.getGameScene().addUINodes(menubar, treeview, rightPane, bottomPane);
-  }
-
-  private void fireEvent(Node n) {
-    n.fireEvent(new MouseEvent(MouseEvent.MOUSE_PRESSED,
-      n.getLayoutX(), n.getLayoutY(), n.getLayoutX(), n.getLayoutY(), MouseButton.PRIMARY, 1,
-      true, true, true, true, true, true, true,
-      true, true, true, null));
-  }
-
-  private void fireEvent(Node n, TreeView<Node> treeView) {
-    treeView.requestFocus();
-    selectTreeItem(n, treeView);
-    fireEvent(n);
-  }
-
-  private void selectTreeItem(Node n, TreeView<Node> treeView) {
-    var treeItem = getTreeItem(n, treeView.getRoot());
-    treeView.getSelectionModel().select(treeItem);
-  }
-
-  private TreeItem<Node> getTreeItem(Node n, TreeItem<Node> treeItem) {
-    if (n == treeItem.getValue())
-      return treeItem;
-    else {
-      for (var item : treeItem.getChildren()) {
-        var childTreeItem = getTreeItem(n, item);
-        if (childTreeItem != null) return childTreeItem;
-      }
-      return null;
-    }
-  }
-
-  private void decorateRightPane(Object object, GridPane rightPane) {
-    rightPane.getChildren().clear();
-    switch (object) {
-      case Image image -> {
-        rightPane.add(new Label("Image Width:"), 0, 0);
-        rightPane.add(new Label("Image Height:"), 0, 1);
-        var width = new Label(image.getWidth() + "");
-        var height = new Label(image.getHeight() + "");
-        rightPane.add(width, 1, 0);
-        rightPane.add(height, 1, 1);
-      }
-      case Entity e -> {
-        rightPane.add(new Label("X:"), 0, 0);
-        rightPane.add(new Label("Y:"), 0, 1);
-        var x = new NumberField(WIDTH);
-        var y = new NumberField(HEIGHT);
-        rightPane.add(x, 1, 0);
-        rightPane.add(y, 1, 1);
-
-        Bindings.bindBidirectional(x.textProperty(), e.xProperty(), new NumberStringConverter());
-        Bindings.bindBidirectional(y.textProperty(), e.yProperty(), new NumberStringConverter());
-
-        x.setText((int) e.getX() + "");
-        y.setText((int) e.getY() + "");
-
-        x.setOnAction(_ -> e.setX(x.getDouble()));
-        y.setOnAction(_ -> e.setY(y.getDouble()));
-      }
-      case AnimatedTexture animatedTexture -> {
-        rightPane.add(new Label("Translate X:"), 0, 0);
-        rightPane.add(new Label("Translate Y:"), 0, 1);
-        var x = new NumberField(-WIDTH / 2, WIDTH / 2);
-        var y = new NumberField(-HEIGHT / 2, HEIGHT / 2);
-        rightPane.add(x, 1, 0);
-        rightPane.add(y, 1, 1);
-
-        Bindings.bindBidirectional(x.textProperty(), animatedTexture.translateXProperty(), new NumberStringConverter());
-        Bindings.bindBidirectional(y.textProperty(), animatedTexture.translateYProperty(), new NumberStringConverter());
-
-        x.setText(animatedTexture.getTranslateX() + "");
-        y.setText(animatedTexture.getTranslateY() + "");
-
-        x.setOnAction(_ -> animatedTexture.setTranslateX(x.getDouble()));
-        y.setOnAction(_ -> animatedTexture.setTranslateY(y.getDouble()));
-      }
-      default -> {
-        rightPane.add(new Label("Game Width:"), 0, 0);
-        rightPane.add(new Label("Game Height:"), 0, 1);
-        var width = new Label(WIDTH + "");
-        var height = new Label(HEIGHT + "");
-        rightPane.add(width, 1, 0);
-        rightPane.add(height, 1, 1);
-      }
-    }
-  }
-
-  private void decorateBottomPane(Object object, Pane pane) {
-    pane.getChildren().clear();
-    switch (object) {
-      case Image image -> {
-        var view = new ImageView(image);
-        var vbox = new VBox(20, new Label("Image Preview:"), view);
-        vbox.setPadding(new Insets(20));
-        pane.getChildren().add(vbox);
-      }
-      default -> {
-      }
-    }
   }
 }
