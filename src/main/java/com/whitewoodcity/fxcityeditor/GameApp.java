@@ -10,7 +10,7 @@ import com.google.common.collect.HashBiMap;
 import com.whitewoodcity.control.NumberField;
 import com.whitewoodcity.fxgl.texture.AnimatedTexture;
 import com.whitewoodcity.fxgl.texture.AnimationChannel;
-import javafx.beans.binding.Binding;
+import com.whitewoodcity.fxgl.texture.Texture;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -38,6 +38,7 @@ public class GameApp extends GameApplication {
 
   Entity entity;
   final BiMap<Label, File> fileBiMap = HashBiMap.create();
+  final BiMap<Label, Texture> textureBiMap = HashBiMap.create();
 
   @Override
   protected void initSettings(GameSettings settings) {
@@ -115,6 +116,18 @@ public class GameApp extends GameApplication {
         String cssBordering = "-fx-border-color:#039ED3;";
         region.setStyle(cssBordering);
         decorateRightPane(animatedTexture, rightPane);
+
+        var textureItem = new TreeItem<Node>();
+        var textureName = view.image().getName();
+        textureName = textureName.substring(0, textureName.indexOf("."));
+        var textureLabel = new Label(textureName);
+        var delTextureButton = new Button("×");
+        var textureHBox = new HBox(20,textureLabel, delTextureButton);
+        textureHBox.setAlignment(Pos.BASELINE_LEFT);
+        textureItem.setValue(textureHBox);
+        entityTree.getChildren().add(textureItem);
+        fireEvent(textureHBox,treeview);
+
         animatedTexture.setOnMousePressed(originalE -> {
           entity.getViewComponent().addChild(region);
 
@@ -122,12 +135,13 @@ public class GameApp extends GameApplication {
           var oy = originalE.getSceneY();
           var tx = animatedTexture.getTranslateX();
           var ty = animatedTexture.getTranslateY();
-          animatedTexture.setOnMouseDragged( e -> {
+          animatedTexture.setOnMouseDragged(e -> {
             double changeInX = e.getSceneX() - ox;
             double changeInY = e.getSceneY() - oy;
             animatedTexture.setTranslateX(tx + changeInX);
-            animatedTexture.setTranslateY(ty+ changeInY);
+            animatedTexture.setTranslateY(ty + changeInY);
           });
+          decorateRightPane(animatedTexture, rightPane);
         });
         animatedTexture.setOnMouseReleased(_ -> entity.getViewComponent().removeChild(region));
       })
@@ -157,8 +171,7 @@ public class GameApp extends GameApplication {
         });
         var treeItem = new TreeItem<Node>(label);
         resourceTree.getChildren().add(treeItem);
-        treeview.getSelectionModel().select(treeItem);
-        fireEvent(label);
+        fireEvent(label, treeview);
       }
     });
 
@@ -187,8 +200,9 @@ public class GameApp extends GameApplication {
   }
 
   private void fireEvent(Node n, TreeView<Node> treeView) {
-    fireEvent(n);
+    treeView.requestFocus();
     selectTreeItem(n, treeView);
+    fireEvent(n);
   }
 
   private void selectTreeItem(Node n, TreeView<Node> treeView) {
@@ -236,11 +250,11 @@ public class GameApp extends GameApplication {
         x.setOnAction(_ -> e.setX(x.getDouble()));
         y.setOnAction(_ -> e.setY(y.getDouble()));
       }
-      case AnimatedTexture animatedTexture ->{
+      case AnimatedTexture animatedTexture -> {
         rightPane.add(new Label("Translate X:"), 0, 0);
         rightPane.add(new Label("Translate Y:"), 0, 1);
-        var x = new NumberField(-WIDTH/2, WIDTH/2);
-        var y = new NumberField(-HEIGHT/2, HEIGHT/2);
+        var x = new NumberField(-WIDTH / 2, WIDTH / 2);
+        var y = new NumberField(-HEIGHT / 2, HEIGHT / 2);
         rightPane.add(x, 1, 0);
         rightPane.add(y, 1, 1);
 
