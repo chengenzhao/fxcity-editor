@@ -7,6 +7,8 @@ import com.almasb.fxgl.entity.Entity;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.whitewoodcity.control.NumberField;
+import com.whitewoodcity.fxgl.texture.AnimatedTexture;
+import com.whitewoodcity.fxgl.texture.AnimationChannel;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -22,6 +24,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Screen;
+import javafx.util.Duration;
 
 import java.io.File;
 
@@ -76,7 +79,7 @@ public class GameApp extends GameApplication {
     bottomPane.setPrefWidth(WIDTH);
     bottomPane.setLayoutY(600);
 
-    var treeviewroot = new TreeItem<Node>();
+    var treeviewRoot = new TreeItem<Node>();
 
     var resourceHBox = new HBox(10);
     var resourceTree = new TreeItem<Node>(resourceHBox);
@@ -92,7 +95,38 @@ public class GameApp extends GameApplication {
     var entityTree = new TreeItem<Node>(entityHBox);
     var addViewComponentButton = new Button("+");
     addViewComponentButton.setOnAction(_ ->
-      new ViewComponentDialog(fileBiMap.values()).showAndWait().ifPresent(System.out::println)
+      new ViewComponentDialog(fileBiMap.values()).showAndWait().ifPresent(view -> {
+        var image = new Image(view.image().toURI().toString());//file -> image
+        var imageChannel = new AnimationChannel(image, view.framesPerRow(), Duration.seconds(view.duration()));
+        var animatedTexture = new AnimatedTexture(imageChannel);
+        animatedTexture.loop();
+
+        entity.getViewComponent().addChild(animatedTexture);
+
+        var region = new Region();
+        region.prefWidthProperty().bind(animatedTexture.fitWidthProperty());
+        region.prefHeightProperty().bind(animatedTexture.fitHeightProperty());
+        region.translateXProperty().bind(animatedTexture.translateXProperty());
+        region.translateYProperty().bind(animatedTexture.translateYProperty());
+        String cssBordering = "-fx-border-color:#039ED3;";
+        region.setStyle(cssBordering);
+
+        animatedTexture.setOnMousePressed(originalE -> {
+          entity.getViewComponent().addChild(region);
+
+          var ox = originalE.getSceneX();
+          var oy = originalE.getSceneY();
+          var tx = animatedTexture.getTranslateX();
+          var ty = animatedTexture.getTranslateY();
+          animatedTexture.setOnMouseDragged( e -> {
+            double changeInX = e.getSceneX() - ox;
+            double changeInY = e.getSceneY() - oy;
+            animatedTexture.setTranslateX(tx + changeInX);
+            animatedTexture.setTranslateY(ty+ changeInY);
+          });
+        });
+        animatedTexture.setOnMouseReleased(_ -> entity.getViewComponent().removeChild(region));
+      })
     );
     entityHBox.setAlignment(Pos.BASELINE_LEFT);
     entityHBox.getChildren().addAll(new Label("Entity0"), addViewComponentButton);
@@ -124,9 +158,9 @@ public class GameApp extends GameApplication {
       }
     });
 
-    treeviewroot.getChildren().addAll(resourceTree, entityTree);
+    treeviewRoot.getChildren().addAll(resourceTree, entityTree);
 
-    treeview.setRoot(treeviewroot);
+    treeview.setRoot(treeviewRoot);
     treeview.setShowRoot(false);
 
     treeview.setOnKeyPressed(e -> {

@@ -1,6 +1,7 @@
 package com.whitewoodcity.fxcityeditor;
 
 import com.whitewoodcity.control.IntField;
+import com.whitewoodcity.control.NumberField;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -12,7 +13,7 @@ import java.io.File;
 import java.util.Set;
 
 public class ViewComponentDialog extends Dialog<ViewComponentDialog.Parameters> {
-  public record Parameters(File image, int framesPerRow){ }
+  public record Parameters(File image, int framesPerRow, double duration){ }
 
   public ViewComponentDialog(Set<File> imageFileSet) {
     setTitle("ViewComponent Dialog");
@@ -23,8 +24,12 @@ public class ViewComponentDialog extends Dialog<ViewComponentDialog.Parameters> 
     GridPane grid = new GridPane(10,10);
     grid.setPadding(new Insets(20, 150, 10, 10));
 
-    var framesPerRowField = new IntField(1,500);
+    var framesPerRowField = new IntField(1,100);
     framesPerRowField.setPromptText("How many frames in the row?");
+
+    var durationField = new NumberField(0,100);
+    durationField.setPromptText("How long the animation endure?");
+    durationField.setText("1");
 
     ComboBox<File> fileComboBox = new ComboBox<>();
 
@@ -36,7 +41,7 @@ public class ViewComponentDialog extends Dialog<ViewComponentDialog.Parameters> 
 
       @Override
       public File fromString(String s) {
-        return fileComboBox.getItems().stream().filter(ap -> ap.getName().equals(s)).findFirst().orElse(null);
+        return fileComboBox.getItems().stream().filter(file -> file.getName().equals(s)).findFirst().orElse(null);
       }
     });
 
@@ -44,8 +49,10 @@ public class ViewComponentDialog extends Dialog<ViewComponentDialog.Parameters> 
 
     grid.add(new Label("Image:"), 0, 0);
     grid.add(fileComboBox, 1, 0);
-    grid.add(new Label("Frames/Row:"), 0, 1);
+    grid.add(new Label("Frames per Row:"), 0, 1);
     grid.add(framesPerRowField, 1, 1);
+    grid.add(new Label("Duration(in seconds):"), 0, 2);
+    grid.add(durationField, 1, 2);
 
     Node okButton = getDialogPane().lookupButton(ButtonType.OK);
     okButton.setDisable(true);
@@ -57,7 +64,7 @@ public class ViewComponentDialog extends Dialog<ViewComponentDialog.Parameters> 
 
     setResultConverter(dialogButton -> {
       if (dialogButton == ButtonType.OK) {
-        return new ViewComponentDialog.Parameters(fileComboBox.getValue(), framesPerRowField.getInt());
+        return new ViewComponentDialog.Parameters(fileComboBox.getValue(), framesPerRowField.getInt(), durationField.getDouble());
       }
       return null;
     });

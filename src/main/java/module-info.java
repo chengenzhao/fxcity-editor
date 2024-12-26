@@ -3,4 +3,5 @@ open module com.whitewoodcity.fxcityeditor {
   requires com.whitewoodcity.fxcity;
   requires com.almasb.fxgl.all;
   requires com.google.common;
+  requires annotations;
 }
