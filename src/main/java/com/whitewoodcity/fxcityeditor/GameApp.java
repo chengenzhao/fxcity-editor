@@ -139,7 +139,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
           });
         });
         animatedTexture.setOnMouseClicked( _ -> fireEvent(textureHBox, treeview));
-        region.setOnMouseReleased( e -> {
+        region.setOnMouseReleased( e -> {//deselect the view component
           if(e.getButton()==MouseButton.SECONDARY)
             freezeEvent(textureHBox, treeview);
         });
