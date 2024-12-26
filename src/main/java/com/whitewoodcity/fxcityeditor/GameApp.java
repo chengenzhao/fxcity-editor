@@ -121,11 +121,9 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 
         textureHBox.setOnMousePressed(_->{
           decorateRightPane(animatedTexture, rightPane);
-          entity.getViewComponent().removeChild(region);
-          entity.getViewComponent().addChild(region);
+          entity.getViewComponent().removeDevChild(region);
+          entity.getViewComponent().addDevChild(region);
 
-//          var originalPoint = new Point2D(0,0);
-//          var originalTranslation = new Point2D(animatedTexture.getTranslateX(), animatedTexture.getTranslateY());
           region.setOnMousePressed(originalE -> {
             fireEvent(textureHBox, treeview);
             var ox = originalE.getSceneX();
@@ -140,9 +138,14 @@ public class GameApp extends GameApplication implements GameAppDecorator {
             });
           });
         });
+        animatedTexture.setOnMouseClicked( _ -> fireEvent(textureHBox, treeview));
+        region.setOnMouseReleased( e -> {
+          if(e.getButton()==MouseButton.SECONDARY)
+            freezeEvent(textureHBox, treeview);
+        });
         textureHBox.setOnMouseReleased(e ->{//freeze event
           if(e.getButton()== MouseButton.SECONDARY){
-            entity.getViewComponent().removeChild(region);
+            entity.getViewComponent().removeDevChild(region);
           }
         });
         entityTree.getChildren().add(textureItem);
