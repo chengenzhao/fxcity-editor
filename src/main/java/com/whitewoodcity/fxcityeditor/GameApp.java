@@ -9,6 +9,7 @@ import com.google.common.collect.HashBiMap;
 import com.whitewoodcity.fxgl.texture.AnimatedTexture;
 import com.whitewoodcity.fxgl.texture.AnimationChannel;
 import com.whitewoodcity.fxgl.texture.Texture;
+import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -24,7 +25,7 @@ import javafx.util.Duration;
 
 import java.io.File;
 
-public class GameApp extends GameApplication implements GameAppDecorator{
+public class GameApp extends GameApplication implements GameAppDecorator {
 
   Entity entity;
   final BiMap<Label, File> fileBiMap = HashBiMap.create();
@@ -112,11 +113,11 @@ public class GameApp extends GameApplication implements GameAppDecorator{
         textureName = textureName.substring(0, textureName.indexOf("."));
         var textureLabel = new Label(textureName);
         var delTextureButton = new Button("×");
-        var textureHBox = new HBox(20,textureLabel, delTextureButton);
+        var textureHBox = new HBox(20, textureLabel, delTextureButton);
         textureHBox.setAlignment(Pos.BASELINE_LEFT);
         textureItem.setValue(textureHBox);
         entityTree.getChildren().add(textureItem);
-        fireEvent(textureHBox,treeview);
+        fireEvent(textureHBox, treeview);
 
         animatedTexture.setOnMousePressed(originalE -> {
           entity.getViewComponent().addChild(region);
@@ -170,12 +171,11 @@ public class GameApp extends GameApplication implements GameAppDecorator{
     treeview.setRoot(treeviewRoot);
     treeview.setShowRoot(false);
 
-    treeview.setOnKeyPressed(e -> {
-      TreeItem<Node> selected = treeview.getSelectionModel().getSelectedItem();
-      if (selected != null && e.getCode() == KeyCode.ENTER) {
-        fireEvent(selected.getValue());
-      }
-    });
+    treeview.getSelectionModel().selectedItemProperty().addListener(
+      (_, oldValue, newValue) -> {
+        if (oldValue != null) freezeEvent(oldValue.getValue());
+        if (newValue != null) fireEvent(newValue.getValue());
+      });
 
     exit.setOnAction(_ -> System.exit(0));
 

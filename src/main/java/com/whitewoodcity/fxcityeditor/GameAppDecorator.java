@@ -31,10 +31,23 @@ public interface GameAppDecorator {
       true, true, true, null));
   }
 
+  default void freezeEvent(Node n){
+    n.fireEvent(new MouseEvent(MouseEvent.MOUSE_RELEASED,
+      n.getLayoutX(), n.getLayoutY(), n.getLayoutX(), n.getLayoutY(), MouseButton.SECONDARY, 1,
+      true, true, true, true, true, true, true,
+      true, true, true, null));
+  }
+
   default void fireEvent(Node n, TreeView<Node> treeView) {
     treeView.requestFocus();
     selectTreeItem(n, treeView);
     fireEvent(n);
+  }
+
+  default void freezeEvent(Node n, TreeView<Node> treeView) {
+    treeView.requestFocus();
+    selectTreeItem(n, treeView);
+    freezeEvent(n);
   }
 
   default void selectTreeItem(Node n, TreeView<Node> treeView) {
