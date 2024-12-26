@@ -9,6 +9,8 @@ import com.google.common.collect.HashBiMap;
 import com.whitewoodcity.control.NumberField;
 import com.whitewoodcity.fxgl.texture.AnimatedTexture;
 import com.whitewoodcity.fxgl.texture.AnimationChannel;
+import javafx.beans.binding.Binding;
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -25,6 +27,7 @@ import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Screen;
 import javafx.util.Duration;
+import javafx.util.converter.NumberStringConverter;
 
 import java.io.File;
 
@@ -223,8 +226,8 @@ public class GameApp extends GameApplication {
         rightPane.add(x, 1, 0);
         rightPane.add(y, 1, 1);
 
-        x.promptTextProperty().bind(e.xProperty().asString());
-        y.promptTextProperty().bind(e.yProperty().asString());
+        Bindings.bindBidirectional(x.textProperty(), e.xProperty(), new NumberStringConverter());
+        Bindings.bindBidirectional(y.textProperty(), e.yProperty(), new NumberStringConverter());
 
         x.setText((int) e.getX() + "");
         y.setText((int) e.getY() + "");
