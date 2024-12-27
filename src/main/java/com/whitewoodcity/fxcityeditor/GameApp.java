@@ -119,7 +119,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         textureHBox.setAlignment(Pos.BASELINE_LEFT);
         textureItem.setValue(textureHBox);
 
-        textureHBox.setOnMousePressed(_->{
+        textureHBox.setOnMousePressed(_ -> {
           decorateRightPane(animatedTexture, rightPane);
           entity.getViewComponent().removeDevChild(region);
           entity.getViewComponent().addDevChild(region);
@@ -138,21 +138,20 @@ public class GameApp extends GameApplication implements GameAppDecorator {
             });
           });
         });
-        animatedTexture.setOnMouseClicked( _ -> fireEvent(textureHBox, treeview));
-        region.setOnMouseReleased( e -> {//deselect the view component
-          if(e.getButton()==MouseButton.SECONDARY)
+        animatedTexture.setOnMouseClicked(_ -> fireEvent(textureHBox, treeview));
+        region.setOnMouseReleased(e -> {//deselect the view component
+          if (e.getButton() == MouseButton.SECONDARY)
             freezeEvent(textureHBox, treeview);
         });
-        textureHBox.setOnMouseReleased(e ->{//freeze event
-          if(e.getButton()== MouseButton.SECONDARY){
+        textureHBox.setOnMouseReleased(e -> {//freeze event
+          if (e.getButton() == MouseButton.SECONDARY) {
             entity.getViewComponent().removeDevChild(region);
           }
         });
 
-        delTextureButton.setOnAction(_->{
-          var nextSelected = textureItem.nextSibling();
-          if(nextSelected==null) nextSelected = textureItem.previousSibling();
-          if(nextSelected==null) nextSelected = textureItem.getParent();
+        delTextureButton.setOnAction(_ -> {
+          var nextSelected = textureItem.nextSibling() == null ? textureItem.previousSibling() == null ?
+            textureItem.getParent() : textureItem.previousSibling() : textureItem.nextSibling();
           fireEvent(nextSelected.getValue(), treeview);
           freezeEvent(textureHBox);
           entity.getViewComponent().removeChild(animatedTexture);
