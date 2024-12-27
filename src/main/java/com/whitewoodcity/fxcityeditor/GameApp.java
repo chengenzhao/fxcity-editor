@@ -148,9 +148,19 @@ public class GameApp extends GameApplication implements GameAppDecorator {
             entity.getViewComponent().removeDevChild(region);
           }
         });
+
+        delTextureButton.setOnAction(_->{
+          var nextSelected = textureItem.nextSibling();
+          if(nextSelected==null) nextSelected = textureItem.previousSibling();
+          if(nextSelected==null) nextSelected = textureItem.getParent();
+          fireEvent(nextSelected.getValue(), treeview);
+          freezeEvent(textureHBox);
+          entity.getViewComponent().removeChild(animatedTexture);
+          entityTree.getChildren().remove(textureItem);
+        });
+
         entityTree.getChildren().add(textureItem);
         fireEvent(textureHBox, treeview);
-
       })
     );
     entityHBox.setAlignment(Pos.BASELINE_LEFT);
