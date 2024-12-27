@@ -150,12 +150,8 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         });
 
         delTextureButton.setOnAction(_ -> {
-          var nextSelected = textureItem.nextSibling() == null ? textureItem.previousSibling() == null ?
-            textureItem.getParent() : textureItem.previousSibling() : textureItem.nextSibling();
-          fireEvent(nextSelected.getValue(), treeview);
-          freezeEvent(textureHBox);
+          removeTreeItem(textureHBox,treeview);
           entity.getViewComponent().removeChild(animatedTexture);
-          entityTree.getChildren().remove(textureItem);
         });
 
         entityTree.getChildren().add(textureItem);

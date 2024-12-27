@@ -67,6 +67,15 @@ public interface GameAppDecorator {
     }
   }
 
+  default void removeTreeItem(Node n, TreeView<Node> treeView){
+    var treeItem = getTreeItem(n, treeView.getRoot());
+    var nextItem = treeItem.nextSibling() == null ? treeItem.previousSibling() == null ?
+      treeItem.getParent() : treeItem.previousSibling() : treeItem.nextSibling();
+    fireEvent(nextItem.getValue(), treeView);
+    freezeEvent(n);
+    treeItem.getParent().getChildren().remove(treeItem);
+  }
+
   default void decorateRightPane(Object object, GridPane rightPane) {
     rightPane.getChildren().clear();
     switch (object) {
