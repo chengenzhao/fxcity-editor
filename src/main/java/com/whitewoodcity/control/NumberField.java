@@ -15,7 +15,11 @@ public class NumberField extends TextField {
       if (newText.trim().isEmpty()) {
         setText("0");
         return null;
-      } else if (!validate(newText)) {
+      }if (newText.trim().equals(".")) {
+        setText("0.");
+        positionCaret(2);
+        return null;
+      }  else if (!validate(newText)) {
         setText(c.getControlText());
         return null;
       } else if (Double.parseDouble(newText) > maxValue) {
