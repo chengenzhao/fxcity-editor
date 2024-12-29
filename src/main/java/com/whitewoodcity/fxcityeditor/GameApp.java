@@ -8,7 +8,6 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.whitewoodcity.fxgl.texture.AnimatedTexture;
 import com.whitewoodcity.fxgl.texture.AnimationChannel;
-import com.whitewoodcity.fxgl.texture.Texture;
 import com.whitewoodcity.model.View;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -95,7 +94,6 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         var image = new Image(view.image().toURI().toString());//file -> image
         var imageChannel = new AnimationChannel(image, view.framesPerRow(), Duration.seconds(view.duration()));
         var animatedTexture = new AnimatedTexture(imageChannel);
-        animatedTexture.loop();
 
         entity.getViewComponent().addChild(animatedTexture);
 
@@ -106,7 +104,6 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         region.translateYProperty().bind(animatedTexture.translateYProperty());
         String cssBordering = "-fx-border-color:#039ED3;";
         region.setStyle(cssBordering);
-        decorateRightPane(animatedTexture, rightPane);
 
         var textureItem = new TreeItem<Node>();
         var textureName = view.image().getName();
@@ -118,7 +115,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         textureItem.setValue(textureHBox);
 
         textureHBox.setOnMousePressed(_ -> {
-          decorateRightPane(animatedTexture, rightPane);
+          decorateBottomAndRightPane(animatedTexture, bottomPane, rightPane);
           entity.getViewComponent().removeDevChild(region);
           entity.getViewComponent().addDevChild(region);
 
@@ -176,8 +173,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         }
         var image = new Image(file.toURI().toString());
         label.setOnMousePressed(_ -> {
-          decorateRightPane(image, rightPane);
-          decorateBottomPane(image, bottomPane);
+          decorateBottomAndRightPane(image, bottomPane, rightPane);
         });
         var treeItem = new TreeItem<Node>(label);
         resourceTree.getChildren().add(treeItem);

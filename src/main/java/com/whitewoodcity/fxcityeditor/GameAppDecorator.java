@@ -5,7 +5,9 @@ import com.whitewoodcity.control.NumberField;
 import com.whitewoodcity.fxgl.texture.AnimatedTexture;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -14,6 +16,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
@@ -132,7 +135,7 @@ public interface GameAppDecorator {
     }
   }
 
-  default void decorateBottomPane(Object object, Pane pane) {
+  default void decorateBottomAndRightPane(Object object, Pane pane, GridPane rightPane) {
     pane.getChildren().clear();
     switch (object) {
       case Image image -> {
@@ -140,10 +143,32 @@ public interface GameAppDecorator {
         var vbox = new VBox(20, new Label("Image Preview:"), view);
         vbox.setPadding(new Insets(20));
         pane.getChildren().add(vbox);
+
+        decorateRightPane(image, rightPane);
       }
+      case AnimatedTexture animatedTexture ->{
+        var hbox = new HBox(20);
+        hbox.setAlignment(Pos.TOP_RIGHT);
+        hbox.setPadding(new Insets(20));
+        var playButton = new Button("⏯");
+        var stopButton = new Button("⏹");
+        hbox.layoutXProperty().bind(pane.widthProperty().subtract(hbox.widthProperty()));
+        hbox.getChildren().addAll(playButton, stopButton);
+        pane.getChildren().add(hbox);
 
+        playButton.setOnAction(_ ->{
+          if(!animatedTexture.isAnimating())
+            animatedTexture.loop();
+          else if(animatedTexture.isPaused())
+            animatedTexture.resume();
+          else
+            animatedTexture.pause();
+        });
 
+        stopButton.setOnAction(_->animatedTexture.stop());
 
+        decorateRightPane(animatedTexture, rightPane);
+      }
       default -> {
       }
     }
