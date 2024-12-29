@@ -10,6 +10,8 @@ public class NumberField extends TextField {
   }
 
   public NumberField(int minValue, int maxValue) {
+    assert(minValue <= maxValue);
+
     this.setTextFormatter(new TextFormatter<>(c -> {
       var newText = c.getControlNewText();
       if (newText.trim().isEmpty()) {

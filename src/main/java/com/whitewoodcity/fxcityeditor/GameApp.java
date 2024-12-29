@@ -9,6 +9,7 @@ import com.google.common.collect.HashBiMap;
 import com.whitewoodcity.fxgl.texture.AnimatedTexture;
 import com.whitewoodcity.fxgl.texture.AnimationChannel;
 import com.whitewoodcity.fxgl.texture.Texture;
+import com.whitewoodcity.model.View;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -28,7 +29,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 
   Entity entity;
   final BiMap<Label, File> fileBiMap = HashBiMap.create();
-  final BiMap<Label, Texture> textureBiMap = HashBiMap.create();
+  final BiMap<Label, View> textureBiMap = HashBiMap.create();
 
   @Override
   protected void initSettings(GameSettings settings) {

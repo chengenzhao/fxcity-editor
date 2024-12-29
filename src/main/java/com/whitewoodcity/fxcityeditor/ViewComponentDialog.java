@@ -2,6 +2,7 @@ package com.whitewoodcity.fxcityeditor;
 
 import com.whitewoodcity.control.IntField;
 import com.whitewoodcity.control.NumberField;
+import com.whitewoodcity.model.View;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -12,8 +13,7 @@ import javafx.util.StringConverter;
 import java.io.File;
 import java.util.Set;
 
-public class ViewComponentDialog extends Dialog<ViewComponentDialog.Parameters> {
-  public record Parameters(File image, int framesPerRow, double duration){ }
+public class ViewComponentDialog extends Dialog<View> {
 
   public ViewComponentDialog(Set<File> imageFileSet) {
     setTitle("ViewComponent Dialog");
@@ -64,7 +64,7 @@ public class ViewComponentDialog extends Dialog<ViewComponentDialog.Parameters> 
 
     setResultConverter(dialogButton -> {
       if (dialogButton == ButtonType.OK) {
-        return new ViewComponentDialog.Parameters(fileComboBox.getValue(), framesPerRowField.getInt(), durationField.getDouble());
+        return new View(fileComboBox.getValue(), framesPerRowField.getInt(), durationField.getDouble());
       }
       return null;
     });

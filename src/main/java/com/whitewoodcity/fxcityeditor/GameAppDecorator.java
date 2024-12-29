@@ -141,6 +141,9 @@ public interface GameAppDecorator {
         vbox.setPadding(new Insets(20));
         pane.getChildren().add(vbox);
       }
+
+
+
       default -> {
       }
     }
