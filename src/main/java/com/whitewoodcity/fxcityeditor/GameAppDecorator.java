@@ -173,13 +173,12 @@ public interface GameAppDecorator {
         anchor.setStrokeWidth(20);
         anchor.setStroke(Color.RED);
         anchor.endXProperty().bind(anchor.startXProperty());
-        anchor.startXProperty().bind(XBindings.reduce(line.startXProperty(), line.endXProperty(), animatedTexture.timeProperty(),
-          (startX, endX, time) -> {
-            var s = startX.doubleValue();
-            var e = endX.doubleValue();
-            var t = time.doubleValue();
-            return s + (e - s) / animatedTexture.getAnimationChannel().getChannelDuration().toSeconds() * t;
-          }));
+        anchor.startXProperty().bind(
+          XBindings.reduce(
+            line.startXProperty().map(Number::doubleValue),
+            line.endXProperty().map(Number::doubleValue),
+            animatedTexture.timeProperty().map(Number::doubleValue),
+            (s, e, t) -> s + (e - s) / animatedTexture.getAnimationChannel().getChannelDuration().toSeconds() * t));
         anchor.startYProperty().bind(line.startYProperty().subtract(25));
         anchor.endYProperty().bind(anchor.startYProperty().add(50));
 
