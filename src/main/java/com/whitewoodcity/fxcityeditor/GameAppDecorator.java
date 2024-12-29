@@ -3,6 +3,7 @@ package com.whitewoodcity.fxcityeditor;
 import com.almasb.fxgl.entity.Entity;
 import com.whitewoodcity.control.NumberField;
 import com.whitewoodcity.fxgl.texture.AnimatedTexture;
+import com.whitewoodcity.javafx.binding.XBindings;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -19,6 +20,9 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
+import javafx.scene.shape.StrokeLineCap;
 import javafx.stage.Screen;
 import javafx.util.converter.NumberStringConverter;
 
@@ -34,7 +38,7 @@ public interface GameAppDecorator {
       true, true, true, null));
   }
 
-  default void freezeEvent(Node n){
+  default void freezeEvent(Node n) {
     n.fireEvent(new MouseEvent(MouseEvent.MOUSE_RELEASED,
       n.getLayoutX(), n.getLayoutY(), n.getLayoutX(), n.getLayoutY(), MouseButton.SECONDARY, 1,
       true, true, true, true, true, true, true,
@@ -70,7 +74,7 @@ public interface GameAppDecorator {
     }
   }
 
-  default void removeTreeItem(Node n, TreeView<Node> treeView){
+  default void removeTreeItem(Node n, TreeView<Node> treeView) {
     var treeItem = getTreeItem(n, treeView.getRoot());
     var nextItem = treeItem.nextSibling() == null ? treeItem.previousSibling() == null ?
       treeItem.getParent() : treeItem.previousSibling() : treeItem.nextSibling();
@@ -146,7 +150,7 @@ public interface GameAppDecorator {
 
         decorateRightPane(image, rightPane);
       }
-      case AnimatedTexture animatedTexture ->{
+      case AnimatedTexture animatedTexture -> {
         var hbox = new HBox(20);
         hbox.setAlignment(Pos.TOP_RIGHT);
         hbox.setPadding(new Insets(20));
@@ -154,18 +158,43 @@ public interface GameAppDecorator {
         var stopButton = new Button("⏹");
         hbox.layoutXProperty().bind(pane.widthProperty().subtract(hbox.widthProperty()));
         hbox.getChildren().addAll(playButton, stopButton);
-        pane.getChildren().add(hbox);
 
-        playButton.setOnAction(_ ->{
-          if(!animatedTexture.isAnimating())
+        var line = new Line();
+        line.setStroke(Color.DARKCYAN);
+        line.setStrokeWidth(10);
+        line.setStrokeLineCap(StrokeLineCap.ROUND);
+        line.setStartX((pane.getWidth() - 1200) / 2);
+        line.startYProperty().bind(hbox.layoutYProperty().add(hbox.heightProperty().multiply(2)));
+        line.setEndX(line.getStartX() + 1200);
+        line.endYProperty().bind(line.startYProperty());
+
+        var anchor = new Line();
+        anchor.setStrokeLineCap(StrokeLineCap.ROUND);
+        anchor.setStrokeWidth(20);
+        anchor.setStroke(Color.RED);
+        anchor.endXProperty().bind(anchor.startXProperty());
+        anchor.startXProperty().bind(XBindings.reduce(line.startXProperty(), line.endXProperty(), animatedTexture.timeProperty(),
+          (startX, endX, time) -> {
+            var s = startX.doubleValue();
+            var e = endX.doubleValue();
+            var t = time.doubleValue();
+            return s + (e - s) / animatedTexture.getAnimationChannel().getChannelDuration().toSeconds() * t;
+          }));
+        anchor.startYProperty().bind(line.startYProperty().subtract(25));
+        anchor.endYProperty().bind(anchor.startYProperty().add(50));
+
+        pane.getChildren().addAll(hbox, line, anchor);
+
+        playButton.setOnAction(_ -> {
+          if (!animatedTexture.isAnimating())
             animatedTexture.loop();
-          else if(animatedTexture.isPaused())
+          else if (animatedTexture.isPaused())
             animatedTexture.resume();
           else
             animatedTexture.pause();
         });
 
-        stopButton.setOnAction(_->animatedTexture.stop());
+        stopButton.setOnAction(_ -> animatedTexture.stop());
 
         decorateRightPane(animatedTexture, rightPane);
       }
