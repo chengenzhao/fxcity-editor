@@ -150,6 +150,43 @@ public interface GameAppDecorator {
 
         decorateRightPane(image, rightPane);
       }
+
+      case Entity entity ->{
+        var hbox = new HBox(20);
+        hbox.setAlignment(Pos.TOP_RIGHT);
+        hbox.setPadding(new Insets(20));
+        var playButton = new Button("⏯");
+        var stopButton = new Button("⏹");
+        hbox.layoutXProperty().bind(pane.widthProperty().subtract(hbox.widthProperty()));
+        hbox.getChildren().addAll(playButton, stopButton);
+
+        var line = new Line();
+        line.setStroke(Color.DARKCYAN);
+        line.setStrokeWidth(10);
+        line.setStrokeLineCap(StrokeLineCap.ROUND);
+        line.setStartX((pane.getWidth() - 1200) / 2);
+        line.startYProperty().bind(hbox.layoutYProperty().add(hbox.heightProperty().multiply(2)));
+        line.setEndX(line.getStartX() + 1200);
+        line.endYProperty().bind(line.startYProperty());
+
+        var anchor = new Line();
+        anchor.setStrokeLineCap(StrokeLineCap.ROUND);
+        anchor.setStrokeWidth(20);
+        anchor.setStroke(Color.RED);
+        anchor.endXProperty().bind(anchor.startXProperty());
+        anchor.startXProperty().bind(line.startXProperty());
+        anchor.startYProperty().bind(line.startYProperty().subtract(25));
+        anchor.endYProperty().bind(anchor.startYProperty().add(50));
+
+        pane.getChildren().addAll(hbox, line, anchor);
+
+        playButton.setOnAction(_ -> entity.getViewComponent().getChildren().forEach(this::startAnimations));
+
+        stopButton.setOnAction(_ -> entity.getViewComponent().getChildren().forEach(this::stopAnimations));
+
+        decorateRightPane(entity, rightPane);
+      }
+
       case AnimatedTexture animatedTexture -> {
         var hbox = new HBox(20);
         hbox.setAlignment(Pos.TOP_RIGHT);
@@ -184,21 +221,35 @@ public interface GameAppDecorator {
 
         pane.getChildren().addAll(hbox, line, anchor);
 
-        playButton.setOnAction(_ -> {
-          if (!animatedTexture.isAnimating())
-            animatedTexture.loop();
-          else if (animatedTexture.isPaused())
-            animatedTexture.resume();
-          else
-            animatedTexture.pause();
-        });
+        playButton.setOnAction(_ -> startAnimations(animatedTexture));
 
-        stopButton.setOnAction(_ -> animatedTexture.stop());
+        stopButton.setOnAction(_ -> stopAnimations(animatedTexture));
 
         decorateRightPane(animatedTexture, rightPane);
       }
       default -> {
       }
+    }
+  }
+
+  private void startAnimations(Node component){
+    switch (component){
+      case AnimatedTexture animatedTexture ->{
+        if (!animatedTexture.isAnimating())
+          animatedTexture.loop();
+        else if (animatedTexture.isPaused())
+          animatedTexture.resume();
+        else
+          animatedTexture.pause();
+      }
+      default -> {}
+    }
+  }
+
+  private void stopAnimations(Node component){
+    switch (component){
+      case AnimatedTexture animatedTexture -> animatedTexture.stop();
+      default -> {}
     }
   }
 }

@@ -155,7 +155,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     );
     entityHBox.setAlignment(Pos.BASELINE_LEFT);
     entityHBox.getChildren().addAll(new Label("Entity0"), addViewComponentButton);
-    entityHBox.setOnMousePressed(_ -> decorateRightPane(entity, rightPane));
+    entityHBox.setOnMousePressed(_ -> decorateBottomAndRightPane(entity, bottomPane, rightPane));
 
     addImageButton.setOnAction(_ -> {
       FileChooser fileChooser = new FileChooser();
