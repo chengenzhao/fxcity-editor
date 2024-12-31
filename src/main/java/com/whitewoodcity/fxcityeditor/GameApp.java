@@ -6,6 +6,7 @@ import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.whitewoodcity.control.TransitTexture;
 import com.whitewoodcity.fxgl.texture.AnimatedTexture;
 import com.whitewoodcity.fxgl.texture.AnimationChannel;
 import com.whitewoodcity.model.View;
@@ -92,15 +93,18 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     addViewComponentButton.setOnAction(_ ->
       new ViewComponentDialog(fileBiMap.values()).showAndWait().ifPresent(view -> {
         var image = new Image(view.image().toURI().toString());//file -> image
-        var animatedTexture = new AnimatedTexture(new AnimationChannel(image,1,Duration.seconds(1)));
+        var texture = switch (view.textureType()){
+          case TRANSIT -> new TransitTexture(image);
+          default -> new AnimatedTexture(new AnimationChannel(image,1,Duration.seconds(1)));
+        };
 
-        entity.getViewComponent().addChild(animatedTexture);
+        entity.getViewComponent().addChild(texture);
 
         var region = new Region();
-        region.prefWidthProperty().bind(animatedTexture.fitWidthProperty());
-        region.prefHeightProperty().bind(animatedTexture.fitHeightProperty());
-        region.translateXProperty().bind(animatedTexture.translateXProperty());
-        region.translateYProperty().bind(animatedTexture.translateYProperty());
+        region.prefWidthProperty().bind(texture.fitWidthProperty());
+        region.prefHeightProperty().bind(texture.fitHeightProperty());
+        region.translateXProperty().bind(texture.translateXProperty());
+        region.translateYProperty().bind(texture.translateYProperty());
         String cssBordering = "-fx-border-color:#039ED3;";
         region.setStyle(cssBordering);
 
@@ -114,7 +118,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         textureItem.setValue(textureHBox);
 
         textureHBox.setOnMousePressed(_ -> {
-          decorateBottomAndRightPane(animatedTexture, bottomPane, rightPane);
+          decorateBottomAndRightPane(texture, bottomPane, rightPane);
           entity.getViewComponent().removeDevChild(region);
           entity.getViewComponent().addDevChild(region);
 
@@ -122,17 +126,17 @@ public class GameApp extends GameApplication implements GameAppDecorator {
             selectTreeItem(textureHBox, treeview);
             var ox = originalE.getSceneX();
             var oy = originalE.getSceneY();
-            var tx = animatedTexture.getTranslateX();
-            var ty = animatedTexture.getTranslateY();
+            var tx = texture.getTranslateX();
+            var ty = texture.getTranslateY();
             region.setOnMouseDragged(e -> {
               double changeInX = e.getSceneX() - ox;
               double changeInY = e.getSceneY() - oy;
-              animatedTexture.setTranslateX(tx + changeInX);
-              animatedTexture.setTranslateY(ty + changeInY);
+              texture.setTranslateX(tx + changeInX);
+              texture.setTranslateY(ty + changeInY);
             });
           });
         });
-        animatedTexture.setOnMouseClicked(_ -> selectTreeItem(textureHBox, treeview));
+        texture.setOnMouseClicked(_ -> selectTreeItem(textureHBox, treeview));
         region.setOnMouseReleased(e -> {//deselect the view component
           if (e.getButton() == MouseButton.SECONDARY)
             freezeEvent(textureHBox);
@@ -145,7 +149,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 
         delTextureButton.setOnAction(_ -> {
           removeTreeItem(textureHBox,treeview);
-          entity.getViewComponent().removeChild(animatedTexture);
+          entity.getViewComponent().removeChild(texture);
         });
 
         entityTree.getChildren().add(textureItem);

@@ -12,6 +12,9 @@ public class TransitTexture extends Texture {
     super(image);
 
     this.getTransforms().add(rotation);
+
+    this.setFitWidth(image.getWidth());
+    this.setFitHeight(image.getHeight());
   }
 
   public Rotate getRotation() {
