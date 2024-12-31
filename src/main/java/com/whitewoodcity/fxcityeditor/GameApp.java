@@ -160,29 +160,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     entityHBox.getChildren().addAll(new Label("Entity0"), addViewComponentButton);
     entityHBox.setOnMousePressed(_ -> decorateBottomAndRightPane(entity, bottomPane, rightPane));
 
-    addImageButton.setOnAction(_ -> {
-      FileChooser fileChooser = new FileChooser();
-      fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image files", "*.PNG", "*.JPG"));
-      File file = fileChooser.showOpenDialog(null);
-
-      if (file != null) {
-        var label = new Label(file.getName());
-        try {
-          fileBiMap.put(label, file);
-        } catch (Exception e) {
-          var node = fileBiMap.inverse().get(file);
-          selectTreeItem(node, treeview);
-          return;
-        }
-        var image = new Image(file.toURI().toString());
-        label.setOnMousePressed(_ -> {
-          decorateBottomAndRightPane(image, bottomPane, rightPane);
-        });
-        var treeItem = new TreeItem<Node>(label);
-        resourceTree.getChildren().add(treeItem);
-        selectTreeItem(label, treeview);
-      }
-    });
+    addImageButton.setOnAction(_ -> addImage(treeview,bottomPane,rightPane));
 
     treeviewRoot.getChildren().addAll(resourceTree, entityTree);
 
@@ -198,5 +176,29 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     exit.setOnAction(_ -> System.exit(0));
 
     FXGL.getGameScene().addUINodes(menubar, treeview, rightPane, bottomPane);
+  }
+
+  private void addImage(TreeView<Node> treeView, Pane bottomPane, GridPane rightPane){
+    FileChooser fileChooser = new FileChooser();
+    fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image files", "*.PNG", "*.JPG"));
+    File file = fileChooser.showOpenDialog(null);
+
+    if (file != null) {
+      var label = new Label(file.getName());
+      try {
+        fileBiMap.put(label, file);
+      } catch (Exception e) {
+        var node = fileBiMap.inverse().get(file);
+        selectTreeItem(node, treeView);
+        return;
+      }
+      var image = new Image(file.toURI().toString());
+      label.setOnMousePressed(_ -> {
+        decorateBottomAndRightPane(image, bottomPane, rightPane);
+      });
+      var treeItem = new TreeItem<Node>(label);
+      treeView.getTreeItem(0).getChildren().add(treeItem);//row 0 is resources tree item
+      selectTreeItem(label, treeView);
+    }
   }
 }
