@@ -1,17 +1,16 @@
 package com.whitewoodcity.fxcityeditor;
 
 import com.almasb.fxgl.entity.Entity;
+import com.whitewoodcity.control.IntField;
 import com.whitewoodcity.control.NumberField;
 import com.whitewoodcity.fxgl.texture.AnimatedTexture;
+import com.whitewoodcity.fxgl.texture.AnimationChannel;
 import com.whitewoodcity.javafx.binding.XBindings;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
@@ -25,7 +24,10 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Screen;
+import javafx.util.Duration;
 import javafx.util.converter.NumberStringConverter;
+
+import java.text.DecimalFormat;
 
 public interface GameAppDecorator {
 
@@ -48,8 +50,8 @@ public interface GameAppDecorator {
 
   default void selectTreeItem(Node n, TreeView<Node> treeView) {
     var treeItem = getTreeItem(n, treeView.getRoot());
-    var selectedItem =treeView.getSelectionModel().getSelectedItem();
-    if(selectedItem!=null && selectedItem.getValue() == n)
+    var selectedItem = treeView.getSelectionModel().getSelectedItem();
+    if (selectedItem != null && selectedItem.getValue() == n)
       fireEvent(n);
     else
       treeView.getSelectionModel().select(treeItem);
@@ -145,7 +147,7 @@ public interface GameAppDecorator {
         decorateRightPane(image, rightPane);
       }
 
-      case Entity entity ->{
+      case Entity entity -> {
         var hbox = new HBox(20);
         hbox.setAlignment(Pos.TOP_RIGHT);
         hbox.setPadding(new Insets(20));
@@ -185,10 +187,25 @@ public interface GameAppDecorator {
         var hbox = new HBox(20);
         hbox.setAlignment(Pos.TOP_RIGHT);
         hbox.setPadding(new Insets(20));
+        var currentFrame = new TextField();
+        currentFrame.setEditable(false);
+        var currentTime = new TextField();
+        currentTime.setEditable(false);
+        var framesPerRow = new IntField(1, 50);
+        framesPerRow.setPromptText("How many frames per row?");
+        framesPerRow.setText(animatedTexture.getAnimationChannel().getSequence().size()+"");
         var playButton = new Button("⏯");
         var stopButton = new Button("⏹");
         hbox.layoutXProperty().bind(pane.widthProperty().subtract(hbox.widthProperty()));
-        hbox.getChildren().addAll(playButton, stopButton);
+        hbox.getChildren().addAll(currentFrame, currentTime, framesPerRow, playButton, stopButton);
+
+        framesPerRow.textProperty().addListener((_, _, value) -> {
+          var animatedChannel = animatedTexture.getAnimationChannel();
+          var image = animatedChannel.getImage();
+          animatedChannel = new AnimationChannel(image, Duration.seconds(1), Integer.parseInt(value));
+          animatedTexture.updateAnimatedTexture(animatedChannel);
+        });
+        framesPerRow.setOnAction(_ -> playButton.fire());
 
         var line = new Line();
         line.setStroke(Color.DARKCYAN);
@@ -211,7 +228,10 @@ public interface GameAppDecorator {
             animatedTexture.timeProperty().map(Number::doubleValue),
             (s, e, t) -> s + (e - s) / animatedTexture.getAnimationChannel().getChannelDuration().toSeconds() * t));
         anchor.startYProperty().bind(line.startYProperty().subtract(25));
-        anchor.endYProperty().bind(anchor.startYProperty().add(50));
+        anchor.endYProperty().bind(anchor.startYProperty().add(60));
+
+        currentFrame.textProperty().bind(animatedTexture.currentFrameProperty().map(f -> "Current Frame: "+f));
+        currentTime.textProperty().bind(animatedTexture.timeProperty().map(Number::doubleValue).map(t -> " Duration: "+new DecimalFormat("0.000").format(t)));
 
         pane.getChildren().addAll(hbox, line, anchor);
 
@@ -226,9 +246,9 @@ public interface GameAppDecorator {
     }
   }
 
-  private void startAnimations(Node component){
-    switch (component){
-      case AnimatedTexture animatedTexture ->{
+  private void startAnimations(Node component) {
+    switch (component) {
+      case AnimatedTexture animatedTexture -> {
         if (!animatedTexture.isAnimating())
           animatedTexture.loop();
         else if (animatedTexture.isPaused())
@@ -236,14 +256,16 @@ public interface GameAppDecorator {
         else
           animatedTexture.pause();
       }
-      default -> {}
+      default -> {
+      }
     }
   }
 
-  private void stopAnimations(Node component){
-    switch (component){
+  private void stopAnimations(Node component) {
+    switch (component) {
       case AnimatedTexture animatedTexture -> animatedTexture.stop();
-      default -> {}
+      default -> {
+      }
     }
   }
 }
