@@ -120,7 +120,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
           entity.getViewComponent().addDevChild(region);
 
           region.setOnMousePressed(originalE -> {
-            fireEvent(textureHBox, treeview);
+            selectTreeItem(textureHBox, treeview);
             var ox = originalE.getSceneX();
             var oy = originalE.getSceneY();
             var tx = animatedTexture.getTranslateX();
@@ -133,10 +133,10 @@ public class GameApp extends GameApplication implements GameAppDecorator {
             });
           });
         });
-        animatedTexture.setOnMouseClicked(_ -> fireEvent(textureHBox, treeview));
+        animatedTexture.setOnMouseClicked(_ -> selectTreeItem(textureHBox, treeview));
         region.setOnMouseReleased(e -> {//deselect the view component
           if (e.getButton() == MouseButton.SECONDARY)
-            freezeEvent(textureHBox, treeview);
+            freezeEvent(textureHBox);
         });
         textureHBox.setOnMouseReleased(e -> {//freeze event
           if (e.getButton() == MouseButton.SECONDARY) {
@@ -150,7 +150,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         });
 
         entityTree.getChildren().add(textureItem);
-        fireEvent(textureHBox, treeview);
+        selectTreeItem(textureHBox, treeview);
       })
     );
     entityHBox.setAlignment(Pos.BASELINE_LEFT);
@@ -168,7 +168,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
           fileBiMap.put(label, file);
         } catch (Exception e) {
           var node = fileBiMap.inverse().get(file);
-          fireEvent(node, treeview);
+          selectTreeItem(node, treeview);
           return;
         }
         var image = new Image(file.toURI().toString());
@@ -177,7 +177,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         });
         var treeItem = new TreeItem<Node>(label);
         resourceTree.getChildren().add(treeItem);
-        fireEvent(label, treeview);
+        selectTreeItem(label, treeview);
       }
     });
 

@@ -23,6 +23,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.StrokeLineCap;
+import javafx.scene.transform.Rotate;
 import javafx.stage.Screen;
 import javafx.util.converter.NumberStringConverter;
 
@@ -45,21 +46,13 @@ public interface GameAppDecorator {
       true, true, true, null));
   }
 
-  default void fireEvent(Node n, TreeView<Node> treeView) {
-    treeView.requestFocus();
-    selectTreeItem(n, treeView);
-    fireEvent(n);
-  }
-
-  default void freezeEvent(Node n, TreeView<Node> treeView) {
-    treeView.requestFocus();
-    selectTreeItem(n, treeView);
-    freezeEvent(n);
-  }
-
   default void selectTreeItem(Node n, TreeView<Node> treeView) {
     var treeItem = getTreeItem(n, treeView.getRoot());
-    treeView.getSelectionModel().select(treeItem);
+    var selectedItem =treeView.getSelectionModel().getSelectedItem();
+    if(selectedItem!=null && selectedItem.getValue() == n)
+      fireEvent(n);
+    else
+      treeView.getSelectionModel().select(treeItem);
   }
 
   default TreeItem<Node> getTreeItem(Node n, TreeItem<Node> treeItem) {
@@ -78,7 +71,7 @@ public interface GameAppDecorator {
     var treeItem = getTreeItem(n, treeView.getRoot());
     var nextItem = treeItem.nextSibling() == null ? treeItem.previousSibling() == null ?
       treeItem.getParent() : treeItem.previousSibling() : treeItem.nextSibling();
-    fireEvent(nextItem.getValue(), treeView);
+    selectTreeItem(nextItem.getValue(), treeView);
     freezeEvent(n);
     treeItem.getParent().getChildren().remove(treeItem);
   }
@@ -127,6 +120,7 @@ public interface GameAppDecorator {
 
         x.setOnAction(_ -> animatedTexture.setTranslateX(x.getDouble()));
         y.setOnAction(_ -> animatedTexture.setTranslateY(y.getDouble()));
+
       }
       default -> {
         rightPane.add(new Label("Game Width:"), 0, 0);
