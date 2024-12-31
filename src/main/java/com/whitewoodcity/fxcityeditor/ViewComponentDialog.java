@@ -1,7 +1,5 @@
 package com.whitewoodcity.fxcityeditor;
 
-import com.whitewoodcity.control.IntField;
-import com.whitewoodcity.control.NumberField;
 import com.whitewoodcity.model.View;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -24,13 +22,6 @@ public class ViewComponentDialog extends Dialog<View> {
     GridPane grid = new GridPane(10,10);
     grid.setPadding(new Insets(20, 150, 10, 10));
 
-    var framesPerRowField = new IntField(1,100);
-    framesPerRowField.setPromptText("How many frames in the row?");
-
-    var durationField = new NumberField(0,100);
-    durationField.setPromptText("How long the animation endure?");
-    durationField.setText("1");
-
     ComboBox<File> fileComboBox = new ComboBox<>();
 
     fileComboBox.setConverter(new StringConverter<>() {
@@ -49,10 +40,14 @@ public class ViewComponentDialog extends Dialog<View> {
 
     grid.add(new Label("Image:"), 0, 0);
     grid.add(fileComboBox, 1, 0);
-    grid.add(new Label("Frames per Row:"), 0, 1);
-    grid.add(framesPerRowField, 1, 1);
-    grid.add(new Label("Duration(in seconds):"), 0, 2);
-    grid.add(durationField, 1, 2);
+
+    ComboBox<View.TextureType> textureTypeComboBox = new ComboBox<>();
+    textureTypeComboBox.getItems().add(View.TextureType.ANIMATED);
+    textureTypeComboBox.getItems().add(View.TextureType.TRANSIT);
+    textureTypeComboBox.getSelectionModel().select(View.TextureType.TRANSIT);
+
+    grid.add(new Label("Texture Type:"), 0, 1);
+    grid.add(textureTypeComboBox, 1, 1);
 
     Node okButton = getDialogPane().lookupButton(ButtonType.OK);
     okButton.setDisable(true);
@@ -60,11 +55,11 @@ public class ViewComponentDialog extends Dialog<View> {
 
     getDialogPane().setContent(grid);
 
-    Platform.runLater(fileComboBox::requestFocus);
+    Platform.runLater(textureTypeComboBox::requestFocus);
 
     setResultConverter(dialogButton -> {
       if (dialogButton == ButtonType.OK) {
-        return new View(fileComboBox.getValue(), framesPerRowField.getInt(), durationField.getDouble());
+        return new View(fileComboBox.getValue(), textureTypeComboBox.getValue());
       }
       return null;
     });

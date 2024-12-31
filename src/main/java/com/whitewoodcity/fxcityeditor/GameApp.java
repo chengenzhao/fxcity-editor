@@ -92,8 +92,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     addViewComponentButton.setOnAction(_ ->
       new ViewComponentDialog(fileBiMap.values()).showAndWait().ifPresent(view -> {
         var image = new Image(view.image().toURI().toString());//file -> image
-        var imageChannel = new AnimationChannel(image, view.framesPerRow(), Duration.seconds(view.duration()));
-        var animatedTexture = new AnimatedTexture(imageChannel);
+        var animatedTexture = new AnimatedTexture(new AnimationChannel(image,1,Duration.seconds(1)));
 
         entity.getViewComponent().addChild(animatedTexture);
 
