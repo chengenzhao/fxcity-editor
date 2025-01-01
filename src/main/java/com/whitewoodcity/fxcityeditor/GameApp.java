@@ -144,13 +144,13 @@ public class GameApp extends GameApplication implements GameAppDecorator {
             if(originalE.getButton()==MouseButton.SECONDARY){
               r.setAngle(r.getAngle()+5);
             }else{
-              var ox = originalE.getSceneX();
-              var oy = originalE.getSceneY();
+              var ox = originalE.getX();
+              var oy = originalE.getY();
               var tx = temp.getCenterX();
               var ty = temp.getCenterY();
               temp.setOnMouseDragged(e -> {
-                double changeInX = e.getSceneX() - ox;
-                double changeInY = e.getSceneY() - oy;
+                double changeInX = e.getX() - ox;
+                double changeInY = e.getY() - oy;
                 temp.setCenterX(tx + changeInX);
                 temp.setCenterY(ty + changeInY);
               });
