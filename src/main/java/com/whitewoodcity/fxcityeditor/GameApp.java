@@ -229,8 +229,15 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     rect.setStroke(Color.web("#039ED3"));
 
     var arrow = new Arrow(0,0,0,rect.getHeight());
+    arrow.x1Property().bindBidirectional(texture.getRotation().pivotXProperty());
+    arrow.y1Property().bindBidirectional(texture.getRotation().pivotYProperty());
     arrow.y2Property().bind(arrow.y1Property().add(rect.heightProperty()));
     arrow.x2Property().bind(arrow.x1Property());
+    var rotate = new Rotate();
+    rotate.pivotXProperty().bind(arrow.x1Property());
+    rotate.pivotYProperty().bind(arrow.y1Property());
+    rotate.angleProperty().bindBidirectional(texture.getRotation().angleProperty());
+    arrow.getTransforms().add(rotate);
 
     var textureItem = new TreeItem<Node>();
     var textureLabel = new Label(name);
@@ -271,17 +278,33 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         });
       });
 
-      arrow.setOnMousePressed(oe -> {
+      arrow.getOrigin().setOnMousePressed(oe -> {
         selectTreeItem(textureHBox, treeview);
         var ox = oe.getX();
         var oy = oe.getY();
         var tx = arrow.getX1();
         var ty = arrow.getY1();
-        arrow.setOnMouseDragged(e -> {
+        arrow.getOrigin().setOnMouseDragged(e -> {
           double changeInX = e.getX() - ox;
           double changeInY = e.getY() - oy;
           arrow.setX1(tx + changeInX);
           arrow.setY1(ty + changeInY);
+        });
+      });
+
+      arrow.getHeadB().setOnMousePressed(oe -> {
+        selectTreeItem(textureHBox, treeview);
+        var ox = oe.getX();
+        var oy = oe.getY();
+        var tx = arrow.getX1();
+        var ty = arrow.getY1();
+        arrow.getHeadB().setOnMouseDragged(e -> {
+          double changeInX = e.getX() - ox;
+//          double changeInY = e.getY() - oy;
+          if(changeInX > 0) texture.getRotation().setAngle(texture.getRotation().getAngle() - 1);
+          if(changeInX < 0) texture.getRotation().setAngle(texture.getRotation().getAngle() + 1);
+//          arrow.setX1(tx + changeInX);
+//          arrow.setY1(ty + changeInY);
         });
       });
     });

@@ -70,6 +70,7 @@ public class Arrow extends Group {
     headB.strokeLineCapProperty().bind(mainLine.strokeLineCapProperty());
     headB.strokeLineJoinProperty().bind(mainLine.strokeLineJoinProperty());
     origin.radiusProperty().bind(mainLine.strokeWidthProperty());
+    origin.fillProperty().bind(mainLine.strokeProperty());
     origin.centerXProperty().bindBidirectional(x1);
     origin.centerYProperty().bindBidirectional(y1);
   }
@@ -165,5 +166,13 @@ public class Arrow extends Group {
   }
   public void setHeadBVisible(boolean headBVisible) {
     this.headBVisible.set(headBVisible);
+  }
+
+  public Circle getOrigin() {
+    return origin;
+  }
+
+  public Polyline getHeadB() {
+    return headB;
   }
 }
