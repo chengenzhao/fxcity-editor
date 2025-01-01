@@ -175,4 +175,8 @@ public class Arrow extends Group {
   public Polyline getHeadB() {
     return headB;
   }
+
+  public Polyline getMainLine() {
+    return mainLine;
+  }
 }

@@ -229,6 +229,8 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     rect.setStroke(Color.web("#039ED3"));
 
     var arrow = new Arrow(0,0,0,rect.getHeight());
+    arrow.translateXProperty().bindBidirectional(texture.translateXProperty());
+    arrow.translateYProperty().bindBidirectional(texture.translateYProperty());
     arrow.x1Property().bindBidirectional(texture.getRotation().pivotXProperty());
     arrow.y1Property().bindBidirectional(texture.getRotation().pivotYProperty());
     arrow.y2Property().bind(arrow.y1Property().add(rect.heightProperty()));
@@ -296,6 +298,17 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         selectTreeItem(textureHBox, treeview);
         var ox = oe.getX();
         arrow.getHeadB().setOnMouseDragged(e -> {
+          double changeInX = e.getX() - ox;
+          var angle = rotate.getAngle();
+          if(changeInX > 0) rotate.setAngle(angle - 1);
+          if(changeInX < 0) rotate.setAngle(angle + 1);
+        });
+      });
+
+      arrow.getMainLine().setOnMousePressed(oe -> {
+        selectTreeItem(textureHBox, treeview);
+        var ox = oe.getX();
+        arrow.getMainLine().setOnMouseDragged(e -> {
           double changeInX = e.getX() - ox;
           var angle = rotate.getAngle();
           if(changeInX > 0) rotate.setAngle(angle - 1);
