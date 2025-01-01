@@ -1,7 +1,6 @@
 package com.whitewoodcity.control;
 
 import javafx.scene.Group;
-import javafx.scene.Parent;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.transform.Rotate;
@@ -18,8 +17,6 @@ public class TransitTexture extends Group {
     imageView.setFitWidth(image.getWidth());
     imageView.setFitHeight(image.getHeight());
     this.getChildren().add(imageView);
-
-    this.getTransforms().add(rotation);
   }
 
   public Rotate getRotation() {

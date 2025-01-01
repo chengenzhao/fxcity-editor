@@ -295,16 +295,11 @@ public class GameApp extends GameApplication implements GameAppDecorator {
       arrow.getHeadB().setOnMousePressed(oe -> {
         selectTreeItem(textureHBox, treeview);
         var ox = oe.getX();
-        var oy = oe.getY();
-        var tx = arrow.getX1();
-        var ty = arrow.getY1();
         arrow.getHeadB().setOnMouseDragged(e -> {
           double changeInX = e.getX() - ox;
-//          double changeInY = e.getY() - oy;
-          if(changeInX > 0) texture.getRotation().setAngle(texture.getRotation().getAngle() - 1);
-          if(changeInX < 0) texture.getRotation().setAngle(texture.getRotation().getAngle() + 1);
-//          arrow.setX1(tx + changeInX);
-//          arrow.setY1(ty + changeInY);
+          var angle = rotate.getAngle();
+          if(changeInX > 0) rotate.setAngle(angle - 1);
+          if(changeInX < 0) rotate.setAngle(angle + 1);
         });
       });
     });
