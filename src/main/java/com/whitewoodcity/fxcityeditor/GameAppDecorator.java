@@ -28,6 +28,7 @@ import javafx.util.Duration;
 import javafx.util.converter.NumberStringConverter;
 
 import java.text.DecimalFormat;
+import java.util.Objects;
 
 public interface GameAppDecorator {
 
@@ -122,7 +123,6 @@ public interface GameAppDecorator {
 
         x.setOnAction(_ -> animatedTexture.setX(x.getDouble()));
         y.setOnAction(_ -> animatedTexture.setY(y.getDouble()));
-
       }
       default -> {
         rightPane.add(new Label("Game Width:"), 0, 0);

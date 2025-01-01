@@ -6,6 +6,7 @@ import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.whitewoodcity.control.Arrow;
 import com.whitewoodcity.control.TransitTexture;
 import com.whitewoodcity.fxgl.texture.AnimatedTexture;
 import com.whitewoodcity.fxgl.texture.AnimationChannel;
@@ -182,10 +183,10 @@ public class GameApp extends GameApplication implements GameAppDecorator {
       entity.getViewComponent().removeDevChild(rect);
       entity.getViewComponent().addDevChild(rect);
 
-      rect.setOnMousePressed(originalE -> {
+      rect.setOnMousePressed(oe -> {
         selectTreeItem(textureHBox, treeview);
-        var ox = originalE.getX();
-        var oy = originalE.getY();
+        var ox = oe.getX();
+        var oy = oe.getY();
         var tx = rect.getX();
         var ty = rect.getY();
         rect.setOnMouseDragged(e -> {
@@ -216,7 +217,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     selectTreeItem(textureHBox, treeview);
   }
 
-  private void addTransitTexture(TreeItem<Node> treeItem, String name, TransitTexture texture,TreeView<Node> treeView, Pane bottomPane, GridPane rightPane){
+  private void addTransitTexture(TreeItem<Node> treeItem, String name, TransitTexture texture,TreeView<Node> treeview, Pane bottomPane, GridPane rightPane){
     entity.getViewComponent().addChild(texture);
 
     var rect = new Rectangle();
@@ -226,5 +227,64 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     rect.yProperty().bindBidirectional(texture.translateYProperty());
     rect.setFill(Color.TRANSPARENT);
     rect.setStroke(Color.web("#039ED3"));
+
+    var arrow = new Arrow(0,0,0,rect.getHeight());
+
+    var textureItem = new TreeItem<Node>();
+    var textureLabel = new Label(name);
+    var addTextureButton = new Button("+");
+    var delTextureButton = new Button("×");
+    var textureHBox = new HBox(10, textureLabel, addTextureButton, delTextureButton);
+    textureHBox.setAlignment(Pos.BASELINE_LEFT);
+    textureItem.setValue(textureHBox);
+
+    delTextureButton.setOnAction(_ -> {
+      removeTreeItem(textureHBox,treeview);
+      entity.getViewComponent().removeChild(texture);
+    });
+
+    textureHBox.setOnMousePressed(_ -> {
+      decorateBottomAndRightPane(texture, bottomPane, rightPane);
+      if(texture.getParent() instanceof TransitTexture parent){
+        parent.getChildren().remove(rect);
+        parent.getChildren().add(rect);
+      }else{
+        entity.getViewComponent().removeDevChild(rect);
+        entity.getViewComponent().addDevChild(rect);
+        entity.getViewComponent().removeDevChild(arrow);
+        entity.getViewComponent().addDevChild(arrow);
+      }
+
+      rect.setOnMousePressed(oe -> {
+        selectTreeItem(textureHBox, treeview);
+        var ox = oe.getX();
+        var oy = oe.getY();
+        var tx = rect.getX();
+        var ty = rect.getY();
+        rect.setOnMouseDragged(e -> {
+          double changeInX = e.getX() - ox;
+          double changeInY = e.getY() - oy;
+          rect.setX(tx + changeInX);
+          rect.setY(ty + changeInY);
+        });
+      });
+
+      arrow.setOnMousePressed(oe -> {
+        selectTreeItem(textureHBox, treeview);
+        var ox = oe.getX();
+        var oy = oe.getY();
+        var tx = arrow.getX1();
+        var ty = arrow.getY1();
+        arrow.setOnMouseDragged(e -> {
+          double changeInX = e.getX() - ox;
+          double changeInY = e.getY() - oy;
+          arrow.setX1(tx + changeInX);
+          arrow.setY1(ty + changeInY);
+        });
+      });
+    });
+
+    treeItem.getChildren().add(textureItem);
+    selectTreeItem(textureHBox, treeview);
   }
 }
