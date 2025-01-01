@@ -9,6 +9,7 @@ import com.google.common.collect.HashBiMap;
 import com.whitewoodcity.control.TransitTexture;
 import com.whitewoodcity.fxgl.texture.AnimatedTexture;
 import com.whitewoodcity.fxgl.texture.AnimationChannel;
+import com.whitewoodcity.javafx.binding.XBindings;
 import com.whitewoodcity.model.View;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -20,6 +21,8 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.transform.Rotate;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
@@ -100,13 +103,13 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 
         entity.getViewComponent().addChild(texture);
 
-        var region = new Region();
-        region.prefWidthProperty().bind(texture.fitWidthProperty());
-        region.prefHeightProperty().bind(texture.fitHeightProperty());
-        region.translateXProperty().bind(texture.translateXProperty());
-        region.translateYProperty().bind(texture.translateYProperty());
-        String cssBordering = "-fx-border-color:#039ED3;";
-        region.setStyle(cssBordering);
+        var rect = new Rectangle();
+        rect.widthProperty().bind(texture.fitWidthProperty());
+        rect.heightProperty().bind(texture.fitHeightProperty());
+        rect.xProperty().bindBidirectional(texture.xProperty());
+        rect.yProperty().bindBidirectional(texture.yProperty());
+        rect.setFill(Color.TRANSPARENT);
+        rect.setStroke(Color.web("#039ED3"));
 
         var textureItem = new TreeItem<Node>();
         var textureName = view.image().getName();
@@ -117,33 +120,98 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         textureHBox.setAlignment(Pos.BASELINE_LEFT);
         textureItem.setValue(textureHBox);
 
+        Circle temp = new Circle(6);
+        temp.setFill(Color.GREEN);
+        Rotate r = new Rotate();
+
+        Circle pivot = new Circle(7);
+        if(view.textureType() == View.TextureType.TRANSIT){
+          pivot.setFill(Color.web("#039ED3"));
+          var transitTexture = (TransitTexture)texture;
+          var rotation = transitTexture.getRotation();
+
+          rect.getTransforms().addAll(rotation,r);
+          transitTexture.getTransforms().add(r);
+          rotation.pivotXProperty().bind(pivot.centerXProperty());
+          rotation.pivotYProperty().bind(pivot.centerYProperty());
+
+          r.pivotXProperty().bind(XBindings.reduceDoubleValue(temp.centerXProperty(),temp.centerYProperty(), rotation.pivotXProperty(),rotation.pivotYProperty(), rotation.angleProperty(),
+            (x,y,x0,y0,a) -> Math.cos(a)*(x-x0) + Math.sin(a)*(y-y0)));//needs to apply new position of new coordinate
+          r.pivotYProperty().bind(XBindings.reduceDoubleValue(temp.centerXProperty(),temp.centerYProperty(), rotation.pivotXProperty(),rotation.pivotYProperty(), rotation.angleProperty(),
+            (x,y,x0,y0,a) -> -Math.sin(a)*(x-x0) + Math.cos(a)*(y-y0)));//needs to apply new position of new coordinate
+
+          temp.setOnMousePressed(originalE -> {
+            if(originalE.getButton()==MouseButton.SECONDARY){
+              r.setAngle(r.getAngle()+5);
+            }else{
+              var ox = originalE.getSceneX();
+              var oy = originalE.getSceneY();
+              var tx = temp.getCenterX();
+              var ty = temp.getCenterY();
+              temp.setOnMouseDragged(e -> {
+                double changeInX = e.getSceneX() - ox;
+                double changeInY = e.getSceneY() - oy;
+                temp.setCenterX(tx + changeInX);
+                temp.setCenterY(ty + changeInY);
+              });
+            }
+          });
+
+          pivot.setOnMousePressed(originalE -> {
+            if(originalE.getButton()==MouseButton.SECONDARY){
+              rotation.setAngle(rotation.getAngle()+5);
+              System.out.println(rotation.getPivotX());
+            }else{
+              selectTreeItem(textureHBox, treeview);
+              var ox = originalE.getX();
+              var oy = originalE.getY();
+              var tx = pivot.getCenterX();
+              var ty = pivot.getCenterY();
+              pivot.setOnMouseDragged(e -> {
+                double changeInX = e.getX() - ox;
+                double changeInY = e.getY() - oy;
+                pivot.setCenterX(tx + changeInX);
+                pivot.setCenterY(ty + changeInY);
+              });
+            }
+          });
+        }
+
         textureHBox.setOnMousePressed(_ -> {
           decorateBottomAndRightPane(texture, bottomPane, rightPane);
-          entity.getViewComponent().removeDevChild(region);
-          entity.getViewComponent().addDevChild(region);
+          entity.getViewComponent().removeDevChild(rect);
+          entity.getViewComponent().addDevChild(rect);
+          if(view.textureType() == View.TextureType.TRANSIT){
+            entity.getViewComponent().removeDevChild(pivot);
+            entity.getViewComponent().addDevChild(pivot);
 
-          region.setOnMousePressed(originalE -> {
+            entity.getViewComponent().removeDevChild(temp);
+            entity.getViewComponent().addDevChild(temp);
+          }
+
+          rect.setOnMousePressed(originalE -> {
             selectTreeItem(textureHBox, treeview);
-            var ox = originalE.getSceneX();
-            var oy = originalE.getSceneY();
-            var tx = texture.getTranslateX();
-            var ty = texture.getTranslateY();
-            region.setOnMouseDragged(e -> {
-              double changeInX = e.getSceneX() - ox;
-              double changeInY = e.getSceneY() - oy;
-              texture.setTranslateX(tx + changeInX);
-              texture.setTranslateY(ty + changeInY);
+            var ox = originalE.getX();
+            var oy = originalE.getY();
+            var tx = rect.getX();
+            var ty = rect.getY();
+            rect.setOnMouseDragged(e -> {
+              double changeInX = e.getX() - ox;
+              double changeInY = e.getY() - oy;
+              rect.setX(tx + changeInX);
+              rect.setY(ty + changeInY);
             });
           });
         });
         texture.setOnMouseClicked(_ -> selectTreeItem(textureHBox, treeview));
-        region.setOnMouseReleased(e -> {//deselect the view component
+        rect.setOnMouseReleased(e -> {//deselect the view component
           if (e.getButton() == MouseButton.SECONDARY)
             freezeEvent(textureHBox);
         });
         textureHBox.setOnMouseReleased(e -> {//freeze event
           if (e.getButton() == MouseButton.SECONDARY) {
-            entity.getViewComponent().removeDevChild(region);
+            entity.getViewComponent().removeDevChild(rect);
+            if(view.textureType() == View.TextureType.TRANSIT) entity.getViewComponent().removeDevChild(pivot);
           }
         });
 
@@ -193,9 +261,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         return;
       }
       var image = new Image(file.toURI().toString());
-      label.setOnMousePressed(_ -> {
-        decorateBottomAndRightPane(image, bottomPane, rightPane);
-      });
+      label.setOnMousePressed(_ -> decorateBottomAndRightPane(image, bottomPane, rightPane));
       var treeItem = new TreeItem<Node>(label);
       treeView.getTreeItem(0).getChildren().add(treeItem);//row 0 is resources tree item
       selectTreeItem(label, treeView);

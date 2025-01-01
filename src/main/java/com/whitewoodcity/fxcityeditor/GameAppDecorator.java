@@ -107,21 +107,21 @@ public interface GameAppDecorator {
         y.setOnAction(_ -> e.setY(y.getDouble()));
       }
       case AnimatedTexture animatedTexture -> {
-        rightPane.add(new Label("Translate X:"), 0, 0);
-        rightPane.add(new Label("Translate Y:"), 0, 1);
+        rightPane.add(new Label("X:"), 0, 0);
+        rightPane.add(new Label("Y:"), 0, 1);
         var x = new NumberField(-WIDTH / 2, WIDTH / 2);
         var y = new NumberField(-HEIGHT / 2, HEIGHT / 2);
         rightPane.add(x, 1, 0);
         rightPane.add(y, 1, 1);
 
-        Bindings.bindBidirectional(x.textProperty(), animatedTexture.translateXProperty(), new NumberStringConverter());
-        Bindings.bindBidirectional(y.textProperty(), animatedTexture.translateYProperty(), new NumberStringConverter());
+        Bindings.bindBidirectional(x.textProperty(), animatedTexture.xProperty(), new NumberStringConverter());
+        Bindings.bindBidirectional(y.textProperty(), animatedTexture.yProperty(), new NumberStringConverter());
 
-        x.setText(animatedTexture.getTranslateX() + "");
-        y.setText(animatedTexture.getTranslateY() + "");
+        x.setText(animatedTexture.getX() + "");
+        y.setText(animatedTexture.getY() + "");
 
-        x.setOnAction(_ -> animatedTexture.setTranslateX(x.getDouble()));
-        y.setOnAction(_ -> animatedTexture.setTranslateY(y.getDouble()));
+        x.setOnAction(_ -> animatedTexture.setX(x.getDouble()));
+        y.setOnAction(_ -> animatedTexture.setY(y.getDouble()));
 
       }
       default -> {
