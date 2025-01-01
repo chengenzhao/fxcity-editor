@@ -229,6 +229,8 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     rect.setStroke(Color.web("#039ED3"));
 
     var arrow = new Arrow(0,0,0,rect.getHeight());
+    arrow.y2Property().bind(arrow.y1Property().add(rect.heightProperty()));
+    arrow.x2Property().bind(arrow.x1Property());
 
     var textureItem = new TreeItem<Node>();
     var textureLabel = new Label(name);
