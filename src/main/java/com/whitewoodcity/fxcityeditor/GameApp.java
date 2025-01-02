@@ -289,8 +289,14 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         arrow.getOrigin().setOnMouseDragged(e -> {
           double changeInX = e.getX() - ox;
           double changeInY = e.getY() - oy;
-          arrow.setX1(tx + changeInX);
-          arrow.setY1(ty + changeInY);
+          var x1 = tx + changeInX;
+          var y1 = ty + changeInY;
+          if(x1 < rect.getX()) x1 = rect.getX();
+          if(x1 > rect.getX()+rect.getWidth()) x1 = rect.getX()+rect.getWidth();
+          if(y1 < rect.getY()) y1 = rect.getY();
+          if(y1 > rect.getY()+rect.getHeight()) y1 = rect.getY()+rect.getHeight();
+          arrow.setX1(x1);
+          arrow.setY1(y1);
         });
       });
 
