@@ -239,7 +239,8 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     rotate.pivotXProperty().bind(arrow.x1Property());
     rotate.pivotYProperty().bind(arrow.y1Property());
     rotate.angleProperty().bindBidirectional(texture.getRotation().angleProperty());
-    arrow.getTransforms().add(rotate);
+    arrow.getMainLine().getTransforms().add(rotate);
+    arrow.getHeadB().getTransforms().add(rotate);
 
     var textureItem = new TreeItem<Node>();
     var textureLabel = new Label(name);
