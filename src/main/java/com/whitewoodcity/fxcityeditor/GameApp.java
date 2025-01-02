@@ -291,10 +291,10 @@ public class GameApp extends GameApplication implements GameAppDecorator {
           double changeInY = e.getY() - oy;
           var x1 = tx + changeInX;
           var y1 = ty + changeInY;
-          if(x1 < rect.getX()) x1 = rect.getX();
-          if(x1 > rect.getX()+rect.getWidth()) x1 = rect.getX()+rect.getWidth();
-          if(y1 < rect.getY()) y1 = rect.getY();
-          if(y1 > rect.getY()+rect.getHeight()) y1 = rect.getY()+rect.getHeight();
+          if(x1 < 0) x1 = 0;
+          if(x1 > rect.getWidth()) x1 = rect.getWidth();
+          if(y1 < 0) y1 = 0;
+          if(y1 > rect.getHeight()) y1 = rect.getHeight();
           arrow.setX1(x1);
           arrow.setY1(y1);
         });
