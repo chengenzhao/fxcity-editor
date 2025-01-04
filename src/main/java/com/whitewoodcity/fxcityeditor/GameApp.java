@@ -297,7 +297,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         var ox = oe.getX();
         arrow.getHeadB().setOnMouseDragged(e -> {
           double changeInX = e.getX() - ox;
-          var angle = (int)(texture.getRotation().getAngle());
+          var angle = texture.getRotation().getAngle();
           if(changeInX > 0) texture.getRotation().setAngle(angle - 1 < 0 ? 361 - angle : angle -1);
           if(changeInX < 0) texture.getRotation().setAngle((angle + 1)%360);
           if(changeInX!=0){
