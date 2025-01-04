@@ -3,6 +3,7 @@ package com.whitewoodcity.control;
 import com.whitewoodcity.fxgl.texture.Texture;
 import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
+import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Rotate;
 
 import java.util.ArrayList;
@@ -64,6 +65,18 @@ public class RotateTransit2DTexture extends Texture {
   public Point2D transform(Point2D point){
     for(var t: this.getTransforms()){
       point = t.transform(point);
+    }
+    return point;
+  }
+
+  public Point2D inverseTransform(Point2D point){
+    for(int i=getTransforms().size()-1;i>=0;i--){
+      var t = getTransforms().get(i);
+      try {
+        point = t.inverseTransform(point);
+      } catch (NonInvertibleTransformException e) {
+        throw new RuntimeException(e);
+      }
     }
     return point;
   }
