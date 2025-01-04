@@ -6,12 +6,14 @@ import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.whitewoodcity.control.Arrow;
 import com.whitewoodcity.control.RotateTransit2DTexture;
+import com.whitewoodcity.control.arrows.Arrow;
+import com.whitewoodcity.control.arrows.CrossArrows;
 import com.whitewoodcity.fxgl.texture.AnimatedTexture;
 import com.whitewoodcity.fxgl.texture.AnimationChannel;
 import com.whitewoodcity.model.View;
 import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
@@ -22,7 +24,6 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.transform.Rotate;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
@@ -221,18 +222,71 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     var rect = new Rectangle();
     rect.widthProperty().bind(texture.fitWidthProperty());
     rect.heightProperty().bind(texture.fitHeightProperty());
-    rect.xProperty().bindBidirectional(texture.translateXProperty());
-    rect.yProperty().bindBidirectional(texture.translateYProperty());
+    rect.xProperty().bindBidirectional(texture.xProperty());
+    rect.yProperty().bindBidirectional(texture.yProperty());
     rect.setFill(Color.TRANSPARENT);
     rect.setStroke(Color.web("#039ED3"));
-//
-//    var arrow = new Arrow(0,0,0,rect.getHeight());
-//    arrow.translateXProperty().bindBidirectional(texture.translateXProperty());
-//    arrow.translateYProperty().bindBidirectional(texture.translateYProperty());
-//    arrow.x1Property().bindBidirectional(texture.pivotXProperty());
-//    arrow.y1Property().bindBidirectional(texture.getRotation().pivotYProperty());
-//    arrow.y2Property().bind(arrow.y1Property().add(rect.heightProperty()));
-//    arrow.x2Property().bind(arrow.x1Property());
+
+    var arrow = new Arrow(0,0,0,rect.getHeight());
+    arrow.translateXProperty().bindBidirectional(texture.translateXProperty());
+    arrow.translateYProperty().bindBidirectional(texture.translateYProperty());
+    arrow.x1Property().bindBidirectional(texture.xProperty());
+    arrow.y1Property().bindBidirectional(texture.yProperty());
+    arrow.y2Property().bind(arrow.y1Property().add(rect.heightProperty()));
+    arrow.x2Property().bind(arrow.x1Property());
+
+    var textureItem = new TreeItem<Node>();
+    var textureLabel = new Label(name);
+    var delTextureButton = new Button("×");
+    var textureHBox = new HBox(20, textureLabel, delTextureButton);
+    textureHBox.setAlignment(Pos.BASELINE_LEFT);
+    textureItem.setValue(textureHBox);
+
+    textureHBox.setOnMousePressed(_ -> {
+      decorateBottomAndRightPane(texture, bottomPane, rightPane);
+      entity.getViewComponent().removeDevChild(rect);
+      entity.getViewComponent().addDevChild(rect);
+      entity.getViewComponent().removeDevChild(arrow);
+      entity.getViewComponent().addDevChild(arrow);
+
+      rect.setOnMousePressed(oe -> {
+        selectTreeItem(textureHBox, treeview);
+        var op = new Point2D(oe.getX(), oe.getY());
+        op = texture.transform(op);
+        var ox = op.getX();
+        var oy = op.getY();
+        var tx = rect.getX();
+        var ty = rect.getY();
+        rect.setOnMouseDragged(e -> {
+          var p = new Point2D(e.getX(), e.getY());
+          p = texture.transform(p);
+          double changeInX = p.getX() - ox;
+          double changeInY = p.getY() - oy;
+          rect.setX(tx + changeInX);
+          rect.setY(ty + changeInY);
+        });
+      });
+    });
+    texture.setOnMouseClicked(_ -> selectTreeItem(textureHBox, treeview));
+    rect.setOnMouseReleased(e -> {//deselect the view component
+      if (e.getButton() == MouseButton.SECONDARY)
+        freezeEvent(textureHBox);
+    });
+    textureHBox.setOnMouseReleased(e -> {//freeze event
+      if (e.getButton() == MouseButton.SECONDARY) {
+        entity.getViewComponent().removeDevChild(rect);
+        entity.getViewComponent().removeDevChild(arrow);
+      }
+    });
+
+    delTextureButton.setOnAction(_ -> {
+      removeTreeItem(textureHBox,treeview);
+      entity.getViewComponent().removeChild(texture);
+    });
+
+    treeItem.getChildren().add(textureItem);
+    selectTreeItem(textureHBox, treeview);
+
 //    var rotate = new Rotate();
 //    rotate.pivotXProperty().bind(arrow.x1Property());
 //    rotate.pivotYProperty().bind(arrow.y1Property());

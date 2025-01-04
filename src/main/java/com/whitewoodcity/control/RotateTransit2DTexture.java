@@ -11,12 +11,17 @@ import java.util.List;
 public class RotateTransit2DTexture extends Texture {
 
   private final List<Rotate> rotates = new ArrayList<>();
+  private final Rotate rotate;
 
   public RotateTransit2DTexture(Image image) {
     super(image);
 
     setFitWidth(image.getWidth());
     setFitHeight(image.getHeight());
+
+    rotate = new Rotate(0, this.getX(), this.getY());
+
+    this.addRotate(rotate);
   }
 
   public List<Rotate> getRotates() {
@@ -50,5 +55,16 @@ public class RotateTransit2DTexture extends Texture {
 
   public void addRotates(Rotate... rs){
     for(var r : rs) addRotate(r);
+  }
+
+  public Rotate getRotation() {
+    return rotate;
+  }
+
+  public Point2D transform(Point2D point){
+    for(var t: this.getTransforms()){
+      point = t.transform(point);
+    }
+    return point;
   }
 }

@@ -1,8 +1,7 @@
-package com.whitewoodcity.control;
+package com.whitewoodcity.control.arrows;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.collections.ListChangeListener;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
