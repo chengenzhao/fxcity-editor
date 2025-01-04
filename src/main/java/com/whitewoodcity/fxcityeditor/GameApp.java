@@ -7,15 +7,13 @@ import com.almasb.fxgl.entity.Entity;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.whitewoodcity.control.Arrow;
-import com.whitewoodcity.control.TransitTexture;
+import com.whitewoodcity.control.RotateTransit2DTexture;
 import com.whitewoodcity.fxgl.texture.AnimatedTexture;
 import com.whitewoodcity.fxgl.texture.AnimationChannel;
-import com.whitewoodcity.javafx.binding.XBindings;
 import com.whitewoodcity.model.View;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
-import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -104,7 +102,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 
         switch (view.textureType()){
           case TRANSIT -> {
-            var texture = new TransitTexture(image);
+            var texture = new RotateTransit2DTexture(image);
             addTransitTexture(entityTree, name, texture, treeview, bottomPane, rightPane);
           }
           case ANIMATED -> {
@@ -217,115 +215,117 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     selectTreeItem(textureHBox, treeview);
   }
 
-  private void addTransitTexture(TreeItem<Node> treeItem, String name, TransitTexture texture,TreeView<Node> treeview, Pane bottomPane, GridPane rightPane){
+  private void addTransitTexture(TreeItem<Node> treeItem, String name, RotateTransit2DTexture texture, TreeView<Node> treeview, Pane bottomPane, GridPane rightPane){
     entity.getViewComponent().addChild(texture);
 
     var rect = new Rectangle();
-    rect.widthProperty().bind(texture.getImageView().fitWidthProperty());
-    rect.heightProperty().bind(texture.getImageView().fitHeightProperty());
+    rect.widthProperty().bind(texture.fitWidthProperty());
+    rect.heightProperty().bind(texture.fitHeightProperty());
     rect.xProperty().bindBidirectional(texture.translateXProperty());
     rect.yProperty().bindBidirectional(texture.translateYProperty());
     rect.setFill(Color.TRANSPARENT);
     rect.setStroke(Color.web("#039ED3"));
-
-    var arrow = new Arrow(0,0,0,rect.getHeight());
-    arrow.translateXProperty().bindBidirectional(texture.translateXProperty());
-    arrow.translateYProperty().bindBidirectional(texture.translateYProperty());
-    arrow.x1Property().bindBidirectional(texture.getRotation().pivotXProperty());
-    arrow.y1Property().bindBidirectional(texture.getRotation().pivotYProperty());
-    arrow.y2Property().bind(arrow.y1Property().add(rect.heightProperty()));
-    arrow.x2Property().bind(arrow.x1Property());
-    var rotate = new Rotate();
-    rotate.pivotXProperty().bind(arrow.x1Property());
-    rotate.pivotYProperty().bind(arrow.y1Property());
-    rotate.angleProperty().bindBidirectional(texture.getRotation().angleProperty());
-    arrow.getMainLine().getTransforms().add(rotate);
-    arrow.getHeadB().getTransforms().add(rotate);
-
-    var textureItem = new TreeItem<Node>();
-    var textureLabel = new Label(name);
-    var addTextureButton = new Button("+");
-    var delTextureButton = new Button("×");
-    var textureHBox = new HBox(10, textureLabel, addTextureButton, delTextureButton);
-    textureHBox.setAlignment(Pos.BASELINE_LEFT);
-    textureItem.setValue(textureHBox);
-
-    delTextureButton.setOnAction(_ -> {
-      removeTreeItem(textureHBox,treeview);
-      entity.getViewComponent().removeChild(texture);
-    });
-
-    textureHBox.setOnMousePressed(_ -> {
-      decorateBottomAndRightPane(texture, bottomPane, rightPane);
-      if(texture.getParent() instanceof TransitTexture parent){
-        parent.getChildren().remove(rect);
-        parent.getChildren().add(rect);
-      }else{
-        entity.getViewComponent().removeDevChild(rect);
-        entity.getViewComponent().addDevChild(rect);
-        entity.getViewComponent().removeDevChild(arrow);
-        entity.getViewComponent().addDevChild(arrow);
-      }
-
-      rect.setOnMousePressed(oe -> {
-        selectTreeItem(textureHBox, treeview);
-        var ox = oe.getX();
-        var oy = oe.getY();
-        var tx = rect.getX();
-        var ty = rect.getY();
-        rect.setOnMouseDragged(e -> {
-          double changeInX = e.getX() - ox;
-          double changeInY = e.getY() - oy;
-          rect.setX(tx + changeInX);
-          rect.setY(ty + changeInY);
-        });
-      });
-
-      arrow.getOrigin().setOnMousePressed(oe -> {
-        selectTreeItem(textureHBox, treeview);
-        var ox = oe.getX();
-        var oy = oe.getY();
-        var tx = arrow.getX1();
-        var ty = arrow.getY1();
-        arrow.getOrigin().setOnMouseDragged(e -> {
-          double changeInX = e.getX() - ox;
-          double changeInY = e.getY() - oy;
-          var x1 = tx + changeInX;
-          var y1 = ty + changeInY;
-          var image = texture.getImageView();
-          if(x1 < image.getX()) x1 = image.getX();
-          if(x1 > image.getX()+image.getFitWidth()) x1 = image.getX()+image.getFitWidth();
-          if(y1 < image.getY()) y1 = image.getY();
-          if(y1 > image.getY()+image.getFitHeight()) y1 = image.getY()+image.getFitHeight();
-          arrow.setX1(x1);
-          arrow.setY1(y1);
-        });
-      });
-
-      arrow.getHeadB().setOnMousePressed(oe -> {
-        selectTreeItem(textureHBox, treeview);
-        var ox = oe.getX();
-        arrow.getHeadB().setOnMouseDragged(e -> {
-          double changeInX = e.getX() - ox;
-          var angle = rotate.getAngle();
-          if(changeInX > 0) rotate.setAngle(angle - 1);
-          if(changeInX < 0) rotate.setAngle(angle + 1);
-        });
-      });
-
-      arrow.getMainLine().setOnMousePressed(oe -> {
-        selectTreeItem(textureHBox, treeview);
-        var ox = oe.getX();
-        arrow.getMainLine().setOnMouseDragged(e -> {
-          double changeInX = e.getX() - ox;
-          var angle = rotate.getAngle();
-          if(changeInX > 0) rotate.setAngle(angle - 1);
-          if(changeInX < 0) rotate.setAngle(angle + 1);
-        });
-      });
-    });
-
-    treeItem.getChildren().add(textureItem);
-    selectTreeItem(textureHBox, treeview);
+//
+//    var arrow = new Arrow(0,0,0,rect.getHeight());
+//    arrow.translateXProperty().bindBidirectional(texture.translateXProperty());
+//    arrow.translateYProperty().bindBidirectional(texture.translateYProperty());
+//    arrow.x1Property().bindBidirectional(texture.pivotXProperty());
+//    arrow.y1Property().bindBidirectional(texture.getRotation().pivotYProperty());
+//    arrow.y2Property().bind(arrow.y1Property().add(rect.heightProperty()));
+//    arrow.x2Property().bind(arrow.x1Property());
+//    var rotate = new Rotate();
+//    rotate.pivotXProperty().bind(arrow.x1Property());
+//    rotate.pivotYProperty().bind(arrow.y1Property());
+//    rotate.angleProperty().bindBidirectional(texture.getRotation().angleProperty());
+//    arrow.getTransforms().add(rotate);
+//
+//    var textureItem = new TreeItem<Node>();
+//    var textureLabel = new Label(name);
+//    var addTextureButton = new Button("+");
+//    var delTextureButton = new Button("×");
+//    var textureHBox = new HBox(10, textureLabel, addTextureButton, delTextureButton);
+//    textureHBox.setAlignment(Pos.BASELINE_LEFT);
+//    textureItem.setValue(textureHBox);
+//
+//    delTextureButton.setOnAction(_ -> {
+//      removeTreeItem(textureHBox,treeview);
+//      entity.getViewComponent().removeChild(texture);
+//    });
+//
+//    textureHBox.setOnMousePressed(_ -> {
+//      decorateBottomAndRightPane(texture, bottomPane, rightPane);
+//      if(texture.getParent() instanceof RotateTransit2DTexture parent){
+//        parent.getChildren().remove(rect);
+//        parent.getChildren().add(rect);
+//      }else{
+//        entity.getViewComponent().removeDevChild(rect);
+//        entity.getViewComponent().addDevChild(rect);
+//        entity.getViewComponent().removeDevChild(arrow);
+//        entity.getViewComponent().addDevChild(arrow);
+//      }
+//
+//      rect.setOnMousePressed(oe -> {
+//        selectTreeItem(textureHBox, treeview);
+//        var ox = oe.getX();
+//        var oy = oe.getY();
+//        var tx = rect.getX();
+//        var ty = rect.getY();
+//        rect.setOnMouseDragged(e -> {
+//          double changeInX = e.getX() - ox;
+//          double changeInY = e.getY() - oy;
+//          rect.setX(tx + changeInX);
+//          rect.setY(ty + changeInY);
+//        });
+//      });
+//
+//      arrow.getOrigin().setOnMousePressed(oe -> {
+//        selectTreeItem(textureHBox, treeview);
+//        Rotate r = (Rotate) arrow.getTransforms().getFirst();
+//        var op = r.transform(oe.getX(), oe.getY());
+//        var ox = op.getX();
+//        var oy = op.getY();
+//        var tx = arrow.getX1();
+//        var ty = arrow.getY1();
+//        arrow.getOrigin().setOnMouseDragged(e -> {
+//          var p = r.transform(e.getX(), e.getY());
+//          double changeInX = p.getX() - ox;
+//          double changeInY = p.getY() - oy;
+//          var x1 = tx + changeInX;
+//          var y1 = ty + changeInY;
+//          var image = texture.getImageView();
+//          if(x1 < image.getX()) x1 = image.getX();
+//          if(x1 > image.getX()+image.getFitWidth()) x1 = image.getX()+image.getFitWidth();
+//          if(y1 < image.getY()) y1 = image.getY();
+//          if(y1 > image.getY()+image.getFitHeight()) y1 = image.getY()+image.getFitHeight();
+//          arrow.setX1(x1);
+//          arrow.setY1(y1);
+//        });
+//      });
+//
+//      arrow.getHeadB().setOnMousePressed(oe -> {
+//        selectTreeItem(textureHBox, treeview);
+//        var ox = oe.getX();
+//        arrow.getHeadB().setOnMouseDragged(e -> {
+//          double changeInX = e.getX() - ox;
+//          var angle = rotate.getAngle();
+//          if(changeInX > 0) rotate.setAngle(angle - 1);
+//          if(changeInX < 0) rotate.setAngle(angle + 1);
+//        });
+//      });
+//
+//      arrow.getMainLine().setOnMousePressed(oe -> {
+//        selectTreeItem(textureHBox, treeview);
+//        var ox = oe.getX();
+//        arrow.getMainLine().setOnMouseDragged(e -> {
+//          double changeInX = e.getX() - ox;
+//          var angle = rotate.getAngle();
+//          if(changeInX > 0) rotate.setAngle(angle - 1);
+//          if(changeInX < 0) rotate.setAngle(angle + 1);
+//        });
+//      });
+//    });
+//
+//    treeItem.getChildren().add(textureItem);
+//    selectTreeItem(textureHBox, treeview);
   }
 }
