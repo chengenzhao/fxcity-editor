@@ -24,6 +24,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.transform.Rotate;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
@@ -228,10 +229,8 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     rect.setStroke(Color.web("#039ED3"));
 
     var arrow = new Arrow(0,0,0,rect.getHeight());
-    arrow.translateXProperty().bindBidirectional(texture.translateXProperty());
-    arrow.translateYProperty().bindBidirectional(texture.translateYProperty());
-    arrow.x1Property().bindBidirectional(texture.xProperty());
-    arrow.y1Property().bindBidirectional(texture.yProperty());
+    arrow.x1Property().bindBidirectional(texture.getRotation().pivotXProperty());
+    arrow.y1Property().bindBidirectional(texture.getRotation().pivotYProperty());
     arrow.y2Property().bind(arrow.y1Property().add(rect.heightProperty()));
     arrow.x2Property().bind(arrow.x1Property());
 
@@ -255,15 +254,42 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         op = texture.transform(op);
         var ox = op.getX();
         var oy = op.getY();
-        var tx = rect.getX();
-        var ty = rect.getY();
+        var rx = rect.getX();
+        var ry = rect.getY();
+        var ax = arrow.getX1();
+        var ay = arrow.getY1();
         rect.setOnMouseDragged(e -> {
           var p = new Point2D(e.getX(), e.getY());
           p = texture.transform(p);
           double changeInX = p.getX() - ox;
           double changeInY = p.getY() - oy;
-          rect.setX(tx + changeInX);
-          rect.setY(ty + changeInY);
+          rect.setX(rx + changeInX);
+          rect.setY(ry + changeInY);
+          arrow.setX1(ax + changeInX);
+          arrow.setY1(ay + changeInY);
+        });
+      });
+
+      arrow.getOrigin().setOnMousePressed(oe -> {
+        selectTreeItem(textureHBox, treeview);
+        Rotate r = texture.getRotation();
+        var op = texture.transform(new Point2D(oe.getX(), oe.getY()));
+        var ox = op.getX();
+        var oy = op.getY();
+        var tx = arrow.getX1();
+        var ty = arrow.getY1();
+        arrow.getOrigin().setOnMouseDragged(e -> {
+          var p = texture.transform(new Point2D(e.getX(), e.getY()));
+          double changeInX = p.getX() - ox;
+          double changeInY = p.getY() - oy;
+          var x1 = tx + changeInX;
+          var y1 = ty + changeInY;
+          if(x1 < texture.getX()) x1 = texture.getX();
+          if(x1 > texture.getX()+texture.getFitWidth()) x1 = texture.getX()+texture.getFitWidth();
+          if(y1 < texture.getY()) y1 = texture.getY();
+          if(y1 > texture.getY()+texture.getFitHeight()) y1 = texture.getY()+texture.getFitHeight();
+          arrow.setX1(x1);
+          arrow.setY1(y1);
         });
       });
     });
