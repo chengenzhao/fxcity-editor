@@ -301,7 +301,13 @@ public class GameApp extends GameApplication implements GameAppDecorator {
           var angle = texture.getRotation().getAngle();
           if(changeInX > 0) texture.getRotation().setAngle(angle - 1);
           if(changeInX < 0) texture.getRotation().setAngle(angle + 1);
-          if(changeInX!=0) texture.update();
+          if(changeInX!=0){
+            texture.update();//make transforms work
+            arrow.getTransforms().clear();
+            arrow.getTransforms().addAll(texture.getTransforms());
+            rect.getTransforms().clear();
+            rect.getTransforms().addAll(texture.getTransforms());
+          }
         });
       });
     });
