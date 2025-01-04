@@ -250,15 +250,17 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 
       rect.setOnMousePressed(oe -> {
         selectTreeItem(textureHBox, treeview);
-        var ox = oe.getX();
-        var oy = oe.getY();
+        var op = texture.transform(new Point2D(oe.getX(), oe.getY()));
+        var ox = op.getX();
+        var oy = op.getY();
         var rx = rect.getX();
         var ry = rect.getY();
         var ax = arrow.getX1();
         var ay = arrow.getY1();
         rect.setOnMouseDragged(e -> {
-          double changeInX = e.getX() - ox;
-          double changeInY = e.getY() - oy;
+          var p = texture.transform(new Point2D(e.getX(), e.getY()));
+          double changeInX = p.getX() - ox;
+          double changeInY = p.getY() - oy;
           texture.setX(rx + changeInX);
           texture.setY(ry + changeInY);
           texture.getRotation().setPivotX(ax + changeInX);
@@ -269,13 +271,15 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 
       arrow.getOrigin().setOnMousePressed(oe -> {
         selectTreeItem(textureHBox, treeview);
-        var ox = oe.getX();
-        var oy = oe.getY();
+        var op = texture.transform(new Point2D(oe.getX(), oe.getY()));
+        var ox = op.getX();
+        var oy = op.getY();
         var tx = arrow.getX1();
         var ty = arrow.getY1();
         arrow.getOrigin().setOnMouseDragged(e -> {
-          double changeInX = e.getX() - ox;
-          double changeInY = e.getY() - oy;
+          var p = texture.transform(new Point2D(e.getX(), e.getY()));
+          double changeInX = p.getX() - ox;
+          double changeInY = p.getY() - oy;
           var x1 = tx + changeInX;
           var y1 = ty + changeInY;
           if(x1 < texture.getX()) x1 = texture.getX();
@@ -294,9 +298,9 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         var ox = oe.getX();
         arrow.getHeadB().setOnMouseDragged(e -> {
           double changeInX = e.getX() - ox;
-          var angle = texture.getRotation().getAngle();
-          if(changeInX > 0) texture.getRotation().setAngle(angle - 1);
-          if(changeInX < 0) texture.getRotation().setAngle(angle + 1);
+          var angle = (int)(texture.getRotation().getAngle());
+          if(changeInX > 0) texture.getRotation().setAngle(angle - 1 < 0 ? 361 - angle : angle -1);
+          if(changeInX < 0) texture.getRotation().setAngle((angle + 1)%360);
           if(changeInX!=0){
             texture.update();//make transforms work
             arrow.getTransforms().clear();
