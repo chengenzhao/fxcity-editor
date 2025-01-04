@@ -223,14 +223,14 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     var rect = new Rectangle();
     rect.widthProperty().bind(texture.fitWidthProperty());
     rect.heightProperty().bind(texture.fitHeightProperty());
-    rect.xProperty().bindBidirectional(texture.xProperty());
-    rect.yProperty().bindBidirectional(texture.yProperty());
+    rect.xProperty().bind(texture.xProperty());
+    rect.yProperty().bind(texture.yProperty());
     rect.setFill(Color.TRANSPARENT);
     rect.setStroke(Color.web("#039ED3"));
 
     var arrow = new Arrow(0,0,0,rect.getHeight());
-    arrow.x1Property().bindBidirectional(texture.getRotation().pivotXProperty());
-    arrow.y1Property().bindBidirectional(texture.getRotation().pivotYProperty());
+    arrow.x1Property().bind(texture.getRotation().pivotXProperty());
+    arrow.y1Property().bind(texture.getRotation().pivotYProperty());
     arrow.y2Property().bind(arrow.y1Property().add(rect.heightProperty()));
     arrow.x2Property().bind(arrow.x1Property());
 
@@ -259,16 +259,16 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         rect.setOnMouseDragged(e -> {
           double changeInX = e.getX() - ox;
           double changeInY = e.getY() - oy;
-          rect.setX(rx + changeInX);
-          rect.setY(ry + changeInY);
-          arrow.setX1(ax + changeInX);
-          arrow.setY1(ay + changeInY);
+          texture.setX(rx + changeInX);
+          texture.setY(ry + changeInY);
+          texture.getRotation().setPivotX(ax + changeInX);
+          texture.getRotation().setPivotY(ay + changeInY);
+          texture.update();
         });
       });
 
       arrow.getOrigin().setOnMousePressed(oe -> {
         selectTreeItem(textureHBox, treeview);
-        Rotate r = texture.getRotation();
         var ox = oe.getX();
         var oy = oe.getY();
         var tx = arrow.getX1();
@@ -282,11 +282,13 @@ public class GameApp extends GameApplication implements GameAppDecorator {
           if(x1 > texture.getX()+texture.getFitWidth()) x1 = texture.getX()+texture.getFitWidth();
           if(y1 < texture.getY()) y1 = texture.getY();
           if(y1 > texture.getY()+texture.getFitHeight()) y1 = texture.getY()+texture.getFitHeight();
-          arrow.setX1(x1);
-          arrow.setY1(y1);
+          texture.getRotation().setPivotX(x1);
+          texture.getRotation().setPivotY(y1);
+          texture.update();
         });
       });
 
+      //todo 这里有点问题，点了之后会跳
       arrow.getHeadB().setOnMousePressed(oe -> {
         selectTreeItem(textureHBox, treeview);
         var ox = oe.getX();
