@@ -250,19 +250,15 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 
       rect.setOnMousePressed(oe -> {
         selectTreeItem(textureHBox, treeview);
-        var op = new Point2D(oe.getX(), oe.getY());
-        op = texture.transform(op);
-        var ox = op.getX();
-        var oy = op.getY();
+        var ox = oe.getX();
+        var oy = oe.getY();
         var rx = rect.getX();
         var ry = rect.getY();
         var ax = arrow.getX1();
         var ay = arrow.getY1();
         rect.setOnMouseDragged(e -> {
-          var p = new Point2D(e.getX(), e.getY());
-          p = texture.transform(p);
-          double changeInX = p.getX() - ox;
-          double changeInY = p.getY() - oy;
+          double changeInX = e.getX() - ox;
+          double changeInY = e.getY() - oy;
           rect.setX(rx + changeInX);
           rect.setY(ry + changeInY);
           arrow.setX1(ax + changeInX);
@@ -273,15 +269,13 @@ public class GameApp extends GameApplication implements GameAppDecorator {
       arrow.getOrigin().setOnMousePressed(oe -> {
         selectTreeItem(textureHBox, treeview);
         Rotate r = texture.getRotation();
-        var op = texture.transform(new Point2D(oe.getX(), oe.getY()));
-        var ox = op.getX();
-        var oy = op.getY();
+        var ox = oe.getX();
+        var oy = oe.getY();
         var tx = arrow.getX1();
         var ty = arrow.getY1();
         arrow.getOrigin().setOnMouseDragged(e -> {
-          var p = texture.transform(new Point2D(e.getX(), e.getY()));
-          double changeInX = p.getX() - ox;
-          double changeInY = p.getY() - oy;
+          double changeInX = e.getX() - ox;
+          double changeInY = e.getY() - oy;
           var x1 = tx + changeInX;
           var y1 = ty + changeInY;
           if(x1 < texture.getX()) x1 = texture.getX();
