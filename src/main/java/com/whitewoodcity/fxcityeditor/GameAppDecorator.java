@@ -3,6 +3,8 @@ package com.whitewoodcity.fxcityeditor;
 import com.almasb.fxgl.entity.Entity;
 import com.whitewoodcity.control.IntField;
 import com.whitewoodcity.control.NumberField;
+import com.whitewoodcity.control.RotateTransit2DTexture;
+import com.whitewoodcity.control.arrows.Arrow;
 import com.whitewoodcity.fxgl.texture.AnimatedTexture;
 import com.whitewoodcity.fxgl.texture.AnimationChannel;
 import com.whitewoodcity.javafx.binding.XBindings;
@@ -21,6 +23,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Screen;
@@ -77,6 +80,42 @@ public interface GameAppDecorator {
     selectTreeItem(nextItem.getValue(), treeView);
     freezeEvent(n);
     treeItem.getParent().getChildren().remove(treeItem);
+  }
+
+  default TreeItem<Node> createDeletableTreeItem(String name, TreeView<Node> treeView, Runnable runnable){
+    var textureItem = new TreeItem<Node>();
+    var textureLabel = new Label(name);
+    var delTextureButton = new Button("×");
+    var textureHBox = new HBox(20, textureLabel, delTextureButton);
+    textureHBox.setAlignment(Pos.BASELINE_LEFT);
+    textureItem.setValue(textureHBox);
+
+    delTextureButton.setOnAction(_->{
+      removeTreeItem(textureHBox, treeView);
+      runnable.run();
+    });
+
+    return textureItem;
+  }
+
+  default Arrow createRotateArrow(RotateTransit2DTexture imageView){
+    var arrow = new Arrow(0,0,0,imageView.getFitHeight());
+    arrow.x1Property().bind(imageView.getRotation().pivotXProperty());
+    arrow.y1Property().bind(imageView.getRotation().pivotYProperty());
+    arrow.y2Property().bind(arrow.y1Property().add(imageView.fitHeightProperty()));
+    arrow.x2Property().bind(arrow.x1Property());
+    return arrow;
+  }
+
+  default Rectangle createSelectionRectangle(ImageView imageView){
+    var rect = new Rectangle();
+    rect.widthProperty().bind(imageView.fitWidthProperty());
+    rect.heightProperty().bind(imageView.fitHeightProperty());
+    rect.xProperty().bind(imageView.xProperty());
+    rect.yProperty().bind(imageView.yProperty());
+    rect.setFill(Color.TRANSPARENT);
+    rect.setStroke(Color.web("#039ED3"));
+    return rect;
   }
 
   default void decorateRightPane(Object object, GridPane rightPane) {
@@ -268,4 +307,5 @@ public interface GameAppDecorator {
       }
     }
   }
+
 }

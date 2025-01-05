@@ -271,11 +271,6 @@ public class GameApp extends GameApplication implements GameAppDecorator {
           if(changeInX < 0) texture.getRotation().setAngle((angle + 1)%360);
           if(changeInX!=0){
             update(texture, rect, arrow);
-//            texture.update();//make transforms work
-//            arrow.getTransforms().clear();
-//            arrow.getTransforms().addAll(texture.getTransforms());
-//            rect.getTransforms().clear();
-//            rect.getTransforms().addAll(texture.getTransforms());
           }
         });
       });
@@ -294,42 +289,6 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 
     treeItem.getChildren().add(textureItem);
     selectTreeItem(textureHBox, treeview);
-  }
-
-  private TreeItem<Node> createDeletableTreeItem(String name, TreeView<Node> treeView, Runnable runnable){
-    var textureItem = new TreeItem<Node>();
-    var textureLabel = new Label(name);
-    var delTextureButton = new Button("×");
-    var textureHBox = new HBox(20, textureLabel, delTextureButton);
-    textureHBox.setAlignment(Pos.BASELINE_LEFT);
-    textureItem.setValue(textureHBox);
-
-    delTextureButton.setOnAction(_->{
-      removeTreeItem(textureHBox, treeView);
-      runnable.run();
-    });
-
-    return textureItem;
-  }
-
-  private Arrow createRotateArrow(RotateTransit2DTexture imageView){
-    var arrow = new Arrow(0,0,0,imageView.getFitHeight());
-    arrow.x1Property().bind(imageView.getRotation().pivotXProperty());
-    arrow.y1Property().bind(imageView.getRotation().pivotYProperty());
-    arrow.y2Property().bind(arrow.y1Property().add(imageView.fitHeightProperty()));
-    arrow.x2Property().bind(arrow.x1Property());
-    return arrow;
-  }
-
-  private Rectangle createSelectionRectangle(ImageView imageView){
-    var rect = new Rectangle();
-    rect.widthProperty().bind(imageView.fitWidthProperty());
-    rect.heightProperty().bind(imageView.fitHeightProperty());
-    rect.xProperty().bind(imageView.xProperty());
-    rect.yProperty().bind(imageView.yProperty());
-    rect.setFill(Color.TRANSPARENT);
-    rect.setStroke(Color.web("#039ED3"));
-    return rect;
   }
 
   private void update(RotateTransit2DTexture texture, Node... nodes){
