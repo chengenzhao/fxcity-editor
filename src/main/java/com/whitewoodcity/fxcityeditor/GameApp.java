@@ -8,10 +8,9 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.whitewoodcity.control.RotateTransit2DTexture;
 import com.whitewoodcity.control.arrows.Arrow;
-import com.whitewoodcity.control.arrows.CrossArrows;
 import com.whitewoodcity.fxgl.texture.AnimatedTexture;
 import com.whitewoodcity.fxgl.texture.AnimationChannel;
-import com.whitewoodcity.model.View;
+import com.whitewoodcity.fxgl.texture.Texture;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
@@ -19,12 +18,12 @@ import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.transform.Rotate;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
@@ -34,7 +33,8 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 
   Entity entity;
   final BiMap<Label, File> fileBiMap = HashBiMap.create();
-  final BiMap<Label, View> textureBiMap = HashBiMap.create();
+  final BiMap<Label, Texture> textureBiMap = HashBiMap.create();
+  final BiMap<Label, Node> devBiMap = HashBiMap.create();
 
   @Override
   protected void initSettings(GameSettings settings) {
@@ -163,20 +163,9 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 
     entity.getViewComponent().addChild(texture);
 
-    var rect = new Rectangle();
-    rect.widthProperty().bind(texture.fitWidthProperty());
-    rect.heightProperty().bind(texture.fitHeightProperty());
-    rect.xProperty().bindBidirectional(texture.xProperty());
-    rect.yProperty().bindBidirectional(texture.yProperty());
-    rect.setFill(Color.TRANSPARENT);
-    rect.setStroke(Color.web("#039ED3"));
-
-    var textureItem = new TreeItem<Node>();
-    var textureLabel = new Label(name);
-    var delTextureButton = new Button("×");
-    var textureHBox = new HBox(20, textureLabel, delTextureButton);
-    textureHBox.setAlignment(Pos.BASELINE_LEFT);
-    textureItem.setValue(textureHBox);
+    var rect = createSelectionRectangle(texture);
+    var textureItem = createDeletableTreeItem(name, treeview, ()->entity.getViewComponent().removeChild(texture));
+    var textureHBox = textureItem.getValue();
 
     textureHBox.setOnMousePressed(_ -> {
       decorateBottomAndRightPane(texture, bottomPane, rightPane);
@@ -187,13 +176,13 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         selectTreeItem(textureHBox, treeview);
         var ox = oe.getX();
         var oy = oe.getY();
-        var tx = rect.getX();
-        var ty = rect.getY();
+        var tx = texture.getX();
+        var ty = texture.getY();
         rect.setOnMouseDragged(e -> {
           double changeInX = e.getX() - ox;
           double changeInY = e.getY() - oy;
-          rect.setX(tx + changeInX);
-          rect.setY(ty + changeInY);
+          texture.setX(tx + changeInX);
+          texture.setY(ty + changeInY);
         });
       });
     });
@@ -208,11 +197,6 @@ public class GameApp extends GameApplication implements GameAppDecorator {
       }
     });
 
-    delTextureButton.setOnAction(_ -> {
-      removeTreeItem(textureHBox,treeview);
-      entity.getViewComponent().removeChild(texture);
-    });
-
     entityTree.getChildren().add(textureItem);
     selectTreeItem(textureHBox, treeview);
   }
@@ -220,26 +204,11 @@ public class GameApp extends GameApplication implements GameAppDecorator {
   private void addTransitTexture(TreeItem<Node> treeItem, String name, RotateTransit2DTexture texture, TreeView<Node> treeview, Pane bottomPane, GridPane rightPane){
     entity.getViewComponent().addChild(texture);
 
-    var rect = new Rectangle();
-    rect.widthProperty().bind(texture.fitWidthProperty());
-    rect.heightProperty().bind(texture.fitHeightProperty());
-    rect.xProperty().bind(texture.xProperty());
-    rect.yProperty().bind(texture.yProperty());
-    rect.setFill(Color.TRANSPARENT);
-    rect.setStroke(Color.web("#039ED3"));
+    var rect = createSelectionRectangle(texture);
+    var arrow = createRotateArrow(texture);
+    var textureItem = createDeletableTreeItem(name, treeview, ()-> entity.getViewComponent().removeChild(texture));
 
-    var arrow = new Arrow(0,0,0,rect.getHeight());
-    arrow.x1Property().bind(texture.getRotation().pivotXProperty());
-    arrow.y1Property().bind(texture.getRotation().pivotYProperty());
-    arrow.y2Property().bind(arrow.y1Property().add(rect.heightProperty()));
-    arrow.x2Property().bind(arrow.x1Property());
-
-    var textureItem = new TreeItem<Node>();
-    var textureLabel = new Label(name);
-    var delTextureButton = new Button("×");
-    var textureHBox = new HBox(20, textureLabel, delTextureButton);
-    textureHBox.setAlignment(Pos.BASELINE_LEFT);
-    textureItem.setValue(textureHBox);
+    var textureHBox = textureItem.getValue();
 
     textureHBox.setOnMousePressed(_ -> {
       decorateBottomAndRightPane(texture, bottomPane, rightPane);
@@ -265,7 +234,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
           texture.setY(ry + changeInY);
           texture.getRotation().setPivotX(ax + changeInX);
           texture.getRotation().setPivotY(ay + changeInY);
-          texture.update();
+          update(texture, rect, arrow);
         });
       });
 
@@ -288,7 +257,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
           if(y1 > texture.getY()+texture.getFitHeight()) y1 = texture.getY()+texture.getFitHeight();
           texture.getRotation().setPivotX(x1);
           texture.getRotation().setPivotY(y1);
-          texture.update();
+          update(texture, rect, arrow);
         });
       });
 
@@ -301,11 +270,12 @@ public class GameApp extends GameApplication implements GameAppDecorator {
           if(changeInX > 0) texture.getRotation().setAngle(angle - 1 < 0 ? 361 - angle : angle -1);
           if(changeInX < 0) texture.getRotation().setAngle((angle + 1)%360);
           if(changeInX!=0){
-            texture.update();//make transforms work
-            arrow.getTransforms().clear();
-            arrow.getTransforms().addAll(texture.getTransforms());
-            rect.getTransforms().clear();
-            rect.getTransforms().addAll(texture.getTransforms());
+            update(texture, rect, arrow);
+//            texture.update();//make transforms work
+//            arrow.getTransforms().clear();
+//            arrow.getTransforms().addAll(texture.getTransforms());
+//            rect.getTransforms().clear();
+//            rect.getTransforms().addAll(texture.getTransforms());
           }
         });
       });
@@ -322,13 +292,51 @@ public class GameApp extends GameApplication implements GameAppDecorator {
       }
     });
 
-    delTextureButton.setOnAction(_ -> {
-      removeTreeItem(textureHBox,treeview);
-      entity.getViewComponent().removeChild(texture);
-    });
-
     treeItem.getChildren().add(textureItem);
     selectTreeItem(textureHBox, treeview);
+  }
 
+  private TreeItem<Node> createDeletableTreeItem(String name, TreeView<Node> treeView, Runnable runnable){
+    var textureItem = new TreeItem<Node>();
+    var textureLabel = new Label(name);
+    var delTextureButton = new Button("×");
+    var textureHBox = new HBox(20, textureLabel, delTextureButton);
+    textureHBox.setAlignment(Pos.BASELINE_LEFT);
+    textureItem.setValue(textureHBox);
+
+    delTextureButton.setOnAction(_->{
+      removeTreeItem(textureHBox, treeView);
+      runnable.run();
+    });
+
+    return textureItem;
+  }
+
+  private Arrow createRotateArrow(RotateTransit2DTexture imageView){
+    var arrow = new Arrow(0,0,0,imageView.getFitHeight());
+    arrow.x1Property().bind(imageView.getRotation().pivotXProperty());
+    arrow.y1Property().bind(imageView.getRotation().pivotYProperty());
+    arrow.y2Property().bind(arrow.y1Property().add(imageView.fitHeightProperty()));
+    arrow.x2Property().bind(arrow.x1Property());
+    return arrow;
+  }
+
+  private Rectangle createSelectionRectangle(ImageView imageView){
+    var rect = new Rectangle();
+    rect.widthProperty().bind(imageView.fitWidthProperty());
+    rect.heightProperty().bind(imageView.fitHeightProperty());
+    rect.xProperty().bind(imageView.xProperty());
+    rect.yProperty().bind(imageView.yProperty());
+    rect.setFill(Color.TRANSPARENT);
+    rect.setStroke(Color.web("#039ED3"));
+    return rect;
+  }
+
+  private void update(RotateTransit2DTexture texture, Node... nodes){
+    texture.update();
+    for(var node: nodes){
+      node.getTransforms().clear();
+      node.getTransforms().addAll(texture.getTransforms());
+    }
   }
 }
