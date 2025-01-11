@@ -1,12 +1,14 @@
 package com.whitewoodcity.fxcityeditor;
 
 import com.almasb.fxgl.entity.Entity;
+import com.google.common.collect.BiMap;
 import com.whitewoodcity.control.IntField;
 import com.whitewoodcity.control.NumberField;
 import com.whitewoodcity.control.RotateTransit2DTexture;
 import com.whitewoodcity.control.arrows.Arrow;
 import com.whitewoodcity.fxgl.texture.AnimatedTexture;
 import com.whitewoodcity.fxgl.texture.AnimationChannel;
+import com.whitewoodcity.fxgl.texture.Texture;
 import com.whitewoodcity.javafx.binding.XBindings;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
@@ -31,6 +33,7 @@ import javafx.util.Duration;
 import javafx.util.converter.NumberStringConverter;
 
 import java.text.DecimalFormat;
+import java.util.HashMap;
 import java.util.Objects;
 
 public interface GameAppDecorator {
@@ -107,12 +110,12 @@ public interface GameAppDecorator {
     return arrow;
   }
 
-  default Rectangle createSelectionRectangle(ImageView imageView){
+  default Rectangle createSelectionRectangle(Texture texture){
     var rect = new Rectangle();
-    rect.widthProperty().bind(imageView.fitWidthProperty());
-    rect.heightProperty().bind(imageView.fitHeightProperty());
-    rect.xProperty().bind(imageView.xProperty());
-    rect.yProperty().bind(imageView.yProperty());
+    rect.widthProperty().bind(texture.fitWidthProperty());
+    rect.heightProperty().bind(texture.fitHeightProperty());
+    rect.xProperty().bind(texture.xProperty());
+    rect.yProperty().bind(texture.yProperty());
     rect.setFill(Color.TRANSPARENT);
     rect.setStroke(Color.web("#039ED3"));
     return rect;
@@ -174,7 +177,7 @@ public interface GameAppDecorator {
     }
   }
 
-  default void decorateBottomAndRightPane(Object object, Pane pane, GridPane rightPane) {
+  default void decorateBottomAndRightPane(Object object, Pane pane, GridPane rightPane, Object... p){
     pane.getChildren().clear();
     switch (object) {
       case Image image -> {
@@ -221,7 +224,6 @@ public interface GameAppDecorator {
 
         decorateRightPane(entity, rightPane);
       }
-
       case AnimatedTexture animatedTexture -> {
         var hbox = new HBox(20);
         hbox.setAlignment(Pos.TOP_RIGHT);
@@ -279,6 +281,10 @@ public interface GameAppDecorator {
         stopButton.setOnAction(_ -> stopAnimations(animatedTexture));
 
         decorateRightPane(animatedTexture, rightPane);
+      }
+      case RotateTransit2DTexture texture when p.length > 0 && p[0] instanceof BiMap biMap ->{
+        var map = (BiMap<Node, RotateTransit2DTexture>)biMap;
+        System.out.println(map);
       }
       default -> {
       }
