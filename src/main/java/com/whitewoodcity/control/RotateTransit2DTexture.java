@@ -14,6 +14,9 @@ public class RotateTransit2DTexture extends Texture {
   private final List<Rotate> rotates = new ArrayList<>();
   private final Rotate rotate;
 
+  private RotateTransit2DTexture parent;
+  private List<RotateTransit2DTexture> children = new ArrayList<>();
+
   public RotateTransit2DTexture(Image image) {
     super(image);
 
@@ -51,7 +54,7 @@ public class RotateTransit2DTexture extends Texture {
 
   public void addRotate(Rotate rotate){
     this.rotates.add(rotate);
-    this.getTransforms().add(rotate.clone());
+    this.getTransforms().addFirst(rotate.clone());
   }
 
   public void addRotates(Rotate... rs){
@@ -79,5 +82,27 @@ public class RotateTransit2DTexture extends Texture {
       }
     }
     return point;
+  }
+
+  public void setParent(RotateTransit2DTexture parent) {
+    if(this.parent != null) {
+      this.parent.getChildren().remove(this);
+      rotates.remove(this.parent.getRotation());
+    }
+    this.parent = parent;
+    if(parent!=null) {
+      parent.getChildren().add(this);
+      var r = parent.getRotation();
+      addRotate(r);
+      update();
+      for(var child:children){
+        child.addRotate(r);
+        child.update();
+      }
+    }
+  }
+
+  public List<RotateTransit2DTexture> getChildren() {
+    return children;
   }
 }
