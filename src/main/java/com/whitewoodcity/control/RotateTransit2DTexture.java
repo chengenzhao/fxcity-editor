@@ -35,7 +35,10 @@ public class RotateTransit2DTexture extends Texture {
   public void update(){
     List<Rotate> rotations = this.getTransforms().stream().filter(e -> e instanceof Rotate).map(Rotate.class::cast).toList();
     if(rotations.size() != rotates.size()){
-      throw new RuntimeException("rotate number is incorrect"){};
+      this.getTransforms().clear();
+      this.rotates.forEach(e -> this.getTransforms().add(e.clone()));
+      update();
+      return;
     }
 
     for(int i=0;i<rotates.size();i++){
@@ -53,8 +56,17 @@ public class RotateTransit2DTexture extends Texture {
   }
 
   public void addRotate(Rotate rotate){
+    for(var child:children)
+      child.addRotate(rotate);
     this.rotates.add(rotate);
-    this.getTransforms().addFirst(rotate.clone());
+    update();
+  }
+
+  public void removeRotate(Rotate rotate){
+    for(var child:children)
+      child.removeRotate(rotate);
+    this.rotates.remove(rotate);
+    update();
   }
 
   public void addRotates(Rotate... rs){
@@ -86,19 +98,11 @@ public class RotateTransit2DTexture extends Texture {
 
   public void setParent(RotateTransit2DTexture parent) {
     if(this.parent != null) {
-      this.parent.getChildren().remove(this);
-      rotates.remove(this.parent.getRotation());
+      removeRotate(this.parent.getRotation());
     }
     this.parent = parent;
     if(parent!=null) {
-      parent.getChildren().add(this);
-      var r = parent.getRotation();
-      addRotate(r);
-      update();
-      for(var child:children){
-        child.addRotate(r);
-        child.update();
-      }
+      addRotate(parent.getRotation());
     }
   }
 
