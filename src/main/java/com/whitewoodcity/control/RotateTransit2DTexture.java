@@ -106,7 +106,11 @@ public class RotateTransit2DTexture extends Texture {
     }
   }
 
-  public List<RotateTransit2DTexture> getChildren() {
+  public RotateTransit2DTexture parent(){
+    return this.parent;
+  }
+
+  public List<RotateTransit2DTexture> children() {
     return children;
   }
 }

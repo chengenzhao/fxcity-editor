@@ -32,7 +32,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 
   Entity entity;
   final BiMap<Label, File> fileBiMap = HashBiMap.create();
-  final BiMap<Node, RotateTransit2DTexture> rotateTransit2DTextureBiMap = HashBiMap.create();
+  final BiMap<HBox, RotateTransit2DTexture> rotateTransit2DTextureBiMap = HashBiMap.create();
 
   @Override
   protected void initSettings(GameSettings settings) {
@@ -212,7 +212,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 
     var textureHBox = textureItem.getValue();
 
-    rotateTransit2DTextureBiMap.put(textureHBox, texture);
+    rotateTransit2DTextureBiMap.put((HBox) textureHBox, texture);
 
     textureHBox.setOnMousePressed(_ -> {
       decorateBottomAndRightPane(texture, bottomPane, rightPane, rotateTransit2DTextureBiMap);

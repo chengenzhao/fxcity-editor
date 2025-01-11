@@ -27,14 +27,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineCap;
-import javafx.scene.transform.Rotate;
 import javafx.stage.Screen;
 import javafx.util.Duration;
+import javafx.util.StringConverter;
 import javafx.util.converter.NumberStringConverter;
 
 import java.text.DecimalFormat;
-import java.util.HashMap;
-import java.util.Objects;
 
 public interface GameAppDecorator {
 
@@ -85,7 +83,7 @@ public interface GameAppDecorator {
     treeItem.getParent().getChildren().remove(treeItem);
   }
 
-  default TreeItem<Node> createDeletableTreeItem(String name, TreeView<Node> treeView, Runnable runnable){
+  default TreeItem<Node> createDeletableTreeItem(String name, TreeView<Node> treeView, Runnable runnable) {
     var textureItem = new TreeItem<Node>();
     var textureLabel = new Label(name);
     var delTextureButton = new Button("×");
@@ -93,7 +91,7 @@ public interface GameAppDecorator {
     textureHBox.setAlignment(Pos.BASELINE_LEFT);
     textureItem.setValue(textureHBox);
 
-    delTextureButton.setOnAction(_->{
+    delTextureButton.setOnAction(_ -> {
       removeTreeItem(textureHBox, treeView);
       runnable.run();
     });
@@ -101,8 +99,8 @@ public interface GameAppDecorator {
     return textureItem;
   }
 
-  default Arrow createRotateArrow(RotateTransit2DTexture imageView){
-    var arrow = new Arrow(0,0,0,imageView.getFitHeight());
+  default Arrow createRotateArrow(RotateTransit2DTexture imageView) {
+    var arrow = new Arrow(0, 0, 0, imageView.getFitHeight());
     arrow.x1Property().bind(imageView.getRotation().pivotXProperty());
     arrow.y1Property().bind(imageView.getRotation().pivotYProperty());
     arrow.y2Property().bind(arrow.y1Property().add(imageView.fitHeightProperty()));
@@ -110,7 +108,7 @@ public interface GameAppDecorator {
     return arrow;
   }
 
-  default Rectangle createSelectionRectangle(Texture texture){
+  default Rectangle createSelectionRectangle(Texture texture) {
     var rect = new Rectangle();
     rect.widthProperty().bind(texture.fitWidthProperty());
     rect.heightProperty().bind(texture.fitHeightProperty());
@@ -177,7 +175,7 @@ public interface GameAppDecorator {
     }
   }
 
-  default void decorateBottomAndRightPane(Object object, Pane pane, GridPane rightPane, Object... p){
+  default void decorateBottomAndRightPane(Object object, Pane pane, GridPane rightPane, Object... p) {
     pane.getChildren().clear();
     switch (object) {
       case Image image -> {
@@ -234,7 +232,7 @@ public interface GameAppDecorator {
         currentTime.setEditable(false);
         var framesPerRow = new IntField(1, 50);
         framesPerRow.setPromptText("How many frames per row?");
-        framesPerRow.setText(animatedTexture.getAnimationChannel().getSequence().size()+"");
+        framesPerRow.setText(animatedTexture.getAnimationChannel().getSequence().size() + "");
         var playButton = new Button("⏯");
         var stopButton = new Button("⏹");
         hbox.layoutXProperty().bind(pane.widthProperty().subtract(hbox.widthProperty()));
@@ -271,8 +269,8 @@ public interface GameAppDecorator {
         anchor.startYProperty().bind(line.startYProperty().subtract(25));
         anchor.endYProperty().bind(anchor.startYProperty().add(60));
 
-        currentFrame.textProperty().bind(animatedTexture.currentFrameProperty().map(f -> "Current Frame: "+f));
-        currentTime.textProperty().bind(animatedTexture.timeProperty().map(Number::doubleValue).map(t -> " Duration: "+new DecimalFormat("0.000").format(t)));
+        currentFrame.textProperty().bind(animatedTexture.currentFrameProperty().map(f -> "Current Frame: " + f));
+        currentTime.textProperty().bind(animatedTexture.timeProperty().map(Number::doubleValue).map(t -> " Duration: " + new DecimalFormat("0.000").format(t)));
 
         pane.getChildren().addAll(hbox, line, anchor);
 
@@ -282,9 +280,27 @@ public interface GameAppDecorator {
 
         decorateRightPane(animatedTexture, rightPane);
       }
-      case RotateTransit2DTexture texture when p.length > 0 && p[0] instanceof BiMap biMap ->{
-        var map = (BiMap<Node, RotateTransit2DTexture>)biMap;
-        System.out.println(map);
+      case RotateTransit2DTexture texture when p.length > 0 && p[0] instanceof BiMap biMap -> {
+        var map = (BiMap<HBox, RotateTransit2DTexture>) biMap;
+        var choiceBox = new ChoiceBox<HBox>();
+        choiceBox.getItems().add(map.inverse().get(texture.parent()));
+        choiceBox.getItems().addAll(map.keySet());
+
+        choiceBox.setConverter(new StringConverter<>() {
+          @Override
+          public String toString(HBox hBox) {
+            return hBox == null ? "" : ((Label) hBox.getChildren().getFirst()).getText();
+          }
+
+          @Override
+          public HBox fromString(String string) {
+            return choiceBox.getItems().stream()
+              .filter(hbox -> ((Label) hbox.getChildren().getFirst()).getText().equals(string))
+              .findFirst().orElse(null);
+          }
+        });
+
+        pane.getChildren().add(choiceBox);
       }
       default -> {
       }
