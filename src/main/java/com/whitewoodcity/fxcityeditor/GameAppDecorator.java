@@ -11,6 +11,7 @@ import com.whitewoodcity.fxgl.texture.AnimationChannel;
 import com.whitewoodcity.fxgl.texture.Texture;
 import com.whitewoodcity.javafx.binding.XBindings;
 import javafx.beans.binding.Bindings;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -285,6 +286,7 @@ public interface GameAppDecorator {
         var choiceBox = new ChoiceBox<HBox>();
         choiceBox.getItems().add(map.inverse().get(texture.parent()));
         choiceBox.getItems().addAll(map.keySet());
+        removeTextureFromItems(choiceBox.getItems(), texture, map);
 
         choiceBox.setConverter(new StringConverter<>() {
           @Override
@@ -305,6 +307,14 @@ public interface GameAppDecorator {
       default -> {
       }
     }
+  }
+
+  private void removeTextureFromItems(ObservableList<HBox> items, RotateTransit2DTexture texture, BiMap<HBox, RotateTransit2DTexture> map){
+    for(var child:texture.children()){
+      removeTextureFromItems(items, child, map);
+    }
+    var item = map.inverse().get(texture);
+    items.remove(item);
   }
 
   private void startAnimations(Node component) {
