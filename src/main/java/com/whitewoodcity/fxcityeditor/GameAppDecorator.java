@@ -104,7 +104,7 @@ public interface GameAppDecorator {
     var arrow = new Arrow(0, 0, 0, imageView.getFitHeight());
     arrow.x1Property().bind(imageView.getRotation().pivotXProperty());
     arrow.y1Property().bind(imageView.getRotation().pivotYProperty());
-    arrow.y2Property().bind(arrow.y1Property().add(imageView.fitHeightProperty()));
+    arrow.y2Property().bind(XBindings.reduceDoubleValue(arrow.y1Property(), imageView.fitHeightProperty(),(y,h)-> y + Math.max(70,h)));
     arrow.x2Property().bind(arrow.x1Property());
     return arrow;
   }

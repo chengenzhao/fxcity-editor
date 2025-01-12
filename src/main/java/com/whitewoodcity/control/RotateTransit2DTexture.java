@@ -52,7 +52,7 @@ public class RotateTransit2DTexture extends Texture {
       var rotate = rotates.get(i);
       var point = new Point2D(rotate.getPivotX(),rotate.getPivotY());
       //find the current position of transformed coordinates
-      for(int j=0;j<i;j++){
+      for(int j=i-1;j>=0;j--){
 //        System.out.print(point+" -> ");
         try {
           point = rotates.get(j).inverseTransform(point);//critical action, current position of transformed coordinates is inverse transformed position
