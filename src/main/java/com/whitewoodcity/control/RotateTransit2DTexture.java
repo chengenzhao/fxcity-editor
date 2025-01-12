@@ -33,12 +33,19 @@ public class RotateTransit2DTexture extends Texture {
   }
 
   public void update(){
-    List<Rotate> rotations = this.getTransforms().stream().filter(e -> e instanceof Rotate).map(Rotate.class::cast).toList();
-    if(rotations.size() != rotates.size()){
-      this.getTransforms().clear();
-      this.rotates.forEach(e -> this.getTransforms().add(e.clone()));
-      update();
-      return;
+    List<Rotate> rotations = this.getTransforms().stream().map(Rotate.class::cast).toList();
+    assert rotations.size() == rotates.size();
+//    if(rotations.size() != rotates.size()){
+////      this.getTransforms().clear();
+////      this.rotates.forEach(e -> this.getTransforms().add(e.clone()));
+////      update();
+////      return;
+//      throw new RuntimeException("error");
+//    }
+
+//    System.out.println(this.getTransforms().size());
+    for(var child:children) {
+      child.update();
     }
 
     for(int i=0;i<rotates.size();i++){
@@ -46,27 +53,41 @@ public class RotateTransit2DTexture extends Texture {
       var point = new Point2D(rotate.getPivotX(),rotate.getPivotY());
       //find the current position of transformed coordinates
       for(int j=0;j<i;j++){
-        point = rotates.get(j).transform(point);
+//        System.out.print(point+" -> ");
+        try {
+          point = rotates.get(j).inverseTransform(point);//critical action, current position of transformed coordinates is inverse transformed position
+        } catch (NonInvertibleTransformException e) {
+          throw new RuntimeException(e);
+        }
+//        System.out.println(point);
       }
-      var r = rotations.get(i);
+      var r = (Rotate)this.getTransforms().get(i);
       r.setPivotX(point.getX());
       r.setPivotY(point.getY());
       r.setAngle(rotate.getAngle());
+      this.getTransforms().set(i, r);
     }
+
   }
 
   public void addRotate(Rotate rotate){
     for(var child:children)
       child.addRotate(rotate);
     this.rotates.add(rotate);
-    update();
+    updateTransforms();
   }
 
   public void removeRotate(Rotate rotate){
     for(var child:children)
       child.removeRotate(rotate);
     this.rotates.remove(rotate);
-    update();
+    updateTransforms();
+  }
+
+  private void updateTransforms(){
+    this.getTransforms().clear();
+    for(var r:rotates)
+      this.getTransforms().add(r.clone());
   }
 
   public void addRotates(Rotate... rs){
