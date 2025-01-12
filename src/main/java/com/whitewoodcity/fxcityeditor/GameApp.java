@@ -221,6 +221,11 @@ public class GameApp extends GameApplication implements GameAppDecorator {
       entity.getViewComponent().removeDevChild(arrow);
       entity.getViewComponent().addDevChild(arrow);
 
+      rect.getTransforms().clear();
+      rect.getTransforms().addAll(texture.getTransforms());
+      arrow.getTransforms().clear();
+      arrow.getTransforms().addAll(texture.getTransforms());
+
       rect.setOnMousePressed(oe -> {
         selectTreeItem(textureHBox, treeview);
         var op = texture.transform(new Point2D(oe.getX(), oe.getY()));
