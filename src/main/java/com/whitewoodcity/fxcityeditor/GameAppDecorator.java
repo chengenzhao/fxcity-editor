@@ -284,9 +284,11 @@ public interface GameAppDecorator {
       case RotateTransit2DTexture texture when p.length > 0 && p[0] instanceof BiMap biMap -> {
         var map = (BiMap<HBox, RotateTransit2DTexture>) biMap;
         var choiceBox = new ChoiceBox<HBox>();
-        choiceBox.getItems().add(map.inverse().get(texture.parent()));
+        choiceBox.getItems().add(null);
         choiceBox.getItems().addAll(map.keySet());
         removeTextureFromItems(choiceBox.getItems(), texture, map);
+
+        choiceBox.setValue(map.inverse().get(texture.parent()));
 
         choiceBox.setConverter(new StringConverter<>() {
           @Override
@@ -301,6 +303,8 @@ public interface GameAppDecorator {
               .findFirst().orElse(null);
           }
         });
+
+        choiceBox.setOnAction(_ -> texture.setParent(map.get(choiceBox.getValue())));
 
         pane.getChildren().add(choiceBox);
       }

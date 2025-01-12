@@ -98,10 +98,12 @@ public class RotateTransit2DTexture extends Texture {
 
   public void setParent(RotateTransit2DTexture parent) {
     if(this.parent != null) {
+      this.parent.children().remove(this);
       removeRotate(this.parent.getRotation());
     }
     this.parent = parent;
     if(parent!=null) {
+      this.parent.children().add(this);
       addRotate(parent.getRotation());
     }
   }
