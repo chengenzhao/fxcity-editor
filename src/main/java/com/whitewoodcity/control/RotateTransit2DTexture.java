@@ -35,13 +35,6 @@ public class RotateTransit2DTexture extends Texture {
   public void update(){
     List<Rotate> rotations = this.getTransforms().stream().map(Rotate.class::cast).toList();
     assert rotations.size() == rotates.size();
-//    if(rotations.size() != rotates.size()){
-////      this.getTransforms().clear();
-////      this.rotates.forEach(e -> this.getTransforms().add(e.clone()));
-////      update();
-////      return;
-//      throw new RuntimeException("error");
-//    }
 
 //    System.out.println(this.getTransforms().size());
     for(var child:children) {

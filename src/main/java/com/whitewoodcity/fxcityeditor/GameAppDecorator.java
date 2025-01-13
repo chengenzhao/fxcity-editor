@@ -11,6 +11,7 @@ import com.whitewoodcity.fxgl.texture.AnimationChannel;
 import com.whitewoodcity.fxgl.texture.Texture;
 import com.whitewoodcity.javafx.binding.XBindings;
 import javafx.beans.binding.Bindings;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -28,6 +29,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineCap;
+import javafx.scene.transform.Transform;
 import javafx.stage.Screen;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
@@ -106,6 +108,10 @@ public interface GameAppDecorator {
     arrow.y1Property().bind(imageView.getRotation().pivotYProperty());
     arrow.y2Property().bind(XBindings.reduceDoubleValue(arrow.y1Property(), imageView.fitHeightProperty(),(y,h)-> y + Math.max(70,h)));
     arrow.x2Property().bind(arrow.x1Property());
+    imageView.getTransforms().addListener((ListChangeListener<Transform>)_ ->{
+      arrow.getTransforms().clear();
+      arrow.getTransforms().addAll(imageView.getTransforms());
+    });
     return arrow;
   }
 
@@ -117,6 +123,11 @@ public interface GameAppDecorator {
     rect.yProperty().bind(texture.yProperty());
     rect.setFill(Color.TRANSPARENT);
     rect.setStroke(Color.web("#039ED3"));
+    texture.getTransforms().addListener((ListChangeListener<Transform>) (_)->{
+      rect.getTransforms().clear();
+      rect.getTransforms().addAll(texture.getTransforms());
+    });
+//    rect.getStrokeDashArray().addAll(4d);
     return rect;
   }
 
