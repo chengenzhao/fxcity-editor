@@ -115,6 +115,13 @@ public interface GameAppDecorator {
     return arrow;
   }
 
+  default Rectangle createJointSelectionRectangle(Texture texture) {
+    var rect = createSelectionRectangle(texture);
+    rect.getStrokeDashArray().addAll(5d);
+    rect.setMouseTransparent(true);
+    return rect;
+  }
+
   default Rectangle createSelectionRectangle(Texture texture) {
     var rect = new Rectangle();
     rect.widthProperty().bind(texture.fitWidthProperty());
@@ -123,11 +130,11 @@ public interface GameAppDecorator {
     rect.yProperty().bind(texture.yProperty());
     rect.setFill(Color.TRANSPARENT);
     rect.setStroke(Color.web("#039ED3"));
+    rect.getTransforms().addAll(texture.getTransforms());
     texture.getTransforms().addListener((ListChangeListener<Transform>) (_)->{
       rect.getTransforms().clear();
       rect.getTransforms().addAll(texture.getTransforms());
     });
-//    rect.getStrokeDashArray().addAll(4d);
     return rect;
   }
 

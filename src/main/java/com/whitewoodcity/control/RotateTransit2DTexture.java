@@ -1,6 +1,8 @@
 package com.whitewoodcity.control;
 
 import com.whitewoodcity.fxgl.texture.Texture;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 import javafx.scene.transform.NonInvertibleTransformException;
@@ -15,7 +17,7 @@ public class RotateTransit2DTexture extends Texture {
   private final Rotate rotate;
 
   private RotateTransit2DTexture parent;
-  private List<RotateTransit2DTexture> children = new ArrayList<>();
+  private final ObservableList<RotateTransit2DTexture> children = FXCollections.observableArrayList();
 
   public RotateTransit2DTexture(Image image) {
     super(image);
@@ -126,7 +128,7 @@ public class RotateTransit2DTexture extends Texture {
     return this.parent;
   }
 
-  public List<RotateTransit2DTexture> children() {
+  public ObservableList<RotateTransit2DTexture> children() {
     return children;
   }
 }
