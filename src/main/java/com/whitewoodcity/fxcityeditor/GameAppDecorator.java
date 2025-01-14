@@ -324,7 +324,12 @@ public interface GameAppDecorator {
 
         choiceBox.setOnAction(_ -> texture.setParent(map.get(choiceBox.getValue())));
 
-        pane.getChildren().add(choiceBox);
+        var hbox = new HBox();
+        hbox.getChildren().addAll(new Label("Parent: "), choiceBox);
+        hbox.setPadding(new Insets(20));
+        hbox.setSpacing(20);
+        hbox.setAlignment(Pos.BASELINE_LEFT);
+        pane.getChildren().add(hbox);
       }
       default -> {
       }
