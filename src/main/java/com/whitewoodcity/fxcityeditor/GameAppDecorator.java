@@ -359,16 +359,15 @@ public interface GameAppDecorator {
           rightPane.add(py, 1, 3+4*i+1);
           rightPane.add(r, 1, 3+4*i+2);
 
-          if(rotate == rotateTransit2DTexture.getRotation()) {
-            Bindings.bindBidirectional(px.textProperty(), rotate.pivotXProperty(), new NumberStringConverter());
-            Bindings.bindBidirectional(py.textProperty(), rotate.pivotYProperty(), new NumberStringConverter());
-            Bindings.bindBidirectional(r.textProperty(), rotate.angleProperty(), new NumberStringConverter());
+          Bindings.bindBidirectional(px.textProperty(), rotate.pivotXProperty(), new NumberStringConverter());
+          Bindings.bindBidirectional(py.textProperty(), rotate.pivotYProperty(), new NumberStringConverter());
+          Bindings.bindBidirectional(r.textProperty(), rotate.angleProperty(), new NumberStringConverter());
 
+          if(rotate == rotateTransit2DTexture.getRotation()) {
             r.textProperty().addListener((_,_,value)->{
               rotate.setAngle(Double.parseDouble(value));
               rotateTransit2DTexture.update();
             });
-
           }else{
             r.setEditable(false);
           }

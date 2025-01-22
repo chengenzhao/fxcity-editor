@@ -293,6 +293,20 @@ public class GameApp extends GameApplication implements GameAppDecorator {
           }
         });
       });
+
+      arrow.getMainLine().setOnMousePressed(oe -> {
+        selectTreeItem(textureHBox, treeview);
+        var ox = oe.getX();
+        arrow.getMainLine().setOnMouseDragged(e -> {
+          double changeInX = e.getX() - ox;
+          var angle = texture.getRotation().getAngle();
+          if (changeInX > 0) texture.getRotation().setAngle(angle - 1 < 0 ? 361 - angle : angle - 1);
+          if (changeInX < 0) texture.getRotation().setAngle((angle + 1) % 360);
+          if (changeInX != 0) {
+            update(texture, rect, arrow);
+          }
+        });
+      });
     });
     texture.setOnMouseClicked(_ -> selectTreeItem(textureHBox, treeview));
     texture.children().addListener((ListChangeListener<RotateTransit2DTexture>) _ -> selectTreeItem(textureHBox, treeview));
