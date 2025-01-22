@@ -183,6 +183,9 @@ public interface GameAppDecorator {
         x.setOnAction(_ -> animatedTexture.setX(x.getDouble()));
         y.setOnAction(_ -> animatedTexture.setY(y.getDouble()));
       }
+      case RotateTransit2DTexture rotateTransit2DTexture -> {
+
+      }
       default -> {
         rightPane.add(new Label("Game Width:"), 0, 0);
         rightPane.add(new Label("Game Height:"), 0, 1);
@@ -330,6 +333,8 @@ public interface GameAppDecorator {
         hbox.setSpacing(20);
         hbox.setAlignment(Pos.BASELINE_LEFT);
         pane.getChildren().add(hbox);
+
+        decorateRightPane(texture, rightPane);
       }
       default -> {
       }

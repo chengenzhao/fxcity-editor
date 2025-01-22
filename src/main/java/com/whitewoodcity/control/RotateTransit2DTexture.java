@@ -13,7 +13,7 @@ import java.util.List;
 
 public class RotateTransit2DTexture extends Texture {
 
-  private final List<Rotate> rotates = new ArrayList<>();
+  private final ObservableList<Rotate> rotates = FXCollections.observableArrayList();
   private final Rotate rotate;
 
   private RotateTransit2DTexture parent;
