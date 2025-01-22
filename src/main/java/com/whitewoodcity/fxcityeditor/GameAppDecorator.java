@@ -36,6 +36,7 @@ import javafx.util.StringConverter;
 import javafx.util.converter.NumberStringConverter;
 
 import java.text.DecimalFormat;
+import java.time.chrono.HijrahChronology;
 
 public interface GameAppDecorator {
 
@@ -136,65 +137,6 @@ public interface GameAppDecorator {
       rect.getTransforms().addAll(texture.getTransforms());
     });
     return rect;
-  }
-
-  default void decorateRightPane(Object object, GridPane rightPane) {
-    rightPane.getChildren().clear();
-    switch (object) {
-      case Image image -> {
-        rightPane.add(new Label("Image Width:"), 0, 0);
-        rightPane.add(new Label("Image Height:"), 0, 1);
-        var width = new Label(image.getWidth() + "");
-        var height = new Label(image.getHeight() + "");
-        rightPane.add(width, 1, 0);
-        rightPane.add(height, 1, 1);
-      }
-      case Entity e -> {
-        rightPane.add(new Label("X:"), 0, 0);
-        rightPane.add(new Label("Y:"), 0, 1);
-        var x = new NumberField(WIDTH);
-        var y = new NumberField(HEIGHT);
-        rightPane.add(x, 1, 0);
-        rightPane.add(y, 1, 1);
-
-        Bindings.bindBidirectional(x.textProperty(), e.xProperty(), new NumberStringConverter());
-        Bindings.bindBidirectional(y.textProperty(), e.yProperty(), new NumberStringConverter());
-
-        x.setText((int) e.getX() + "");
-        y.setText((int) e.getY() + "");
-
-        x.setOnAction(_ -> e.setX(x.getDouble()));
-        y.setOnAction(_ -> e.setY(y.getDouble()));
-      }
-      case AnimatedTexture animatedTexture -> {
-        rightPane.add(new Label("X:"), 0, 0);
-        rightPane.add(new Label("Y:"), 0, 1);
-        var x = new NumberField(-WIDTH / 2, WIDTH / 2);
-        var y = new NumberField(-HEIGHT / 2, HEIGHT / 2);
-        rightPane.add(x, 1, 0);
-        rightPane.add(y, 1, 1);
-
-        Bindings.bindBidirectional(x.textProperty(), animatedTexture.xProperty(), new NumberStringConverter());
-        Bindings.bindBidirectional(y.textProperty(), animatedTexture.yProperty(), new NumberStringConverter());
-
-        x.setText(animatedTexture.getX() + "");
-        y.setText(animatedTexture.getY() + "");
-
-        x.setOnAction(_ -> animatedTexture.setX(x.getDouble()));
-        y.setOnAction(_ -> animatedTexture.setY(y.getDouble()));
-      }
-      case RotateTransit2DTexture rotateTransit2DTexture -> {
-
-      }
-      default -> {
-        rightPane.add(new Label("Game Width:"), 0, 0);
-        rightPane.add(new Label("Game Height:"), 0, 1);
-        var width = new Label(WIDTH + "");
-        var height = new Label(HEIGHT + "");
-        rightPane.add(width, 1, 0);
-        rightPane.add(height, 1, 1);
-      }
-    }
   }
 
   default void decorateBottomAndRightPane(Object object, Pane pane, GridPane rightPane, Object... p) {
@@ -337,6 +279,79 @@ public interface GameAppDecorator {
         decorateRightPane(texture, rightPane);
       }
       default -> {
+      }
+    }
+  }
+  default void decorateRightPane(Object object, GridPane rightPane) {
+    rightPane.getChildren().clear();
+    switch (object) {
+      case Image image -> {
+        rightPane.add(new Label("Image Width:"), 0, 0);
+        rightPane.add(new Label("Image Height:"), 0, 1);
+        var width = new Label(image.getWidth() + "");
+        var height = new Label(image.getHeight() + "");
+        rightPane.add(width, 1, 0);
+        rightPane.add(height, 1, 1);
+      }
+      case Entity e -> {
+        rightPane.add(new Label("X:"), 0, 0);
+        rightPane.add(new Label("Y:"), 0, 1);
+        var x = new NumberField(WIDTH);
+        var y = new NumberField(HEIGHT);
+        rightPane.add(x, 1, 0);
+        rightPane.add(y, 1, 1);
+
+        Bindings.bindBidirectional(x.textProperty(), e.xProperty(), new NumberStringConverter());
+        Bindings.bindBidirectional(y.textProperty(), e.yProperty(), new NumberStringConverter());
+
+        x.setText((int) e.getX() + "");
+        y.setText((int) e.getY() + "");
+
+        x.setOnAction(_ -> e.setX(x.getDouble()));
+        y.setOnAction(_ -> e.setY(y.getDouble()));
+      }
+      case AnimatedTexture animatedTexture -> {
+        rightPane.add(new Label("X:"), 0, 0);
+        rightPane.add(new Label("Y:"), 0, 1);
+        var x = new NumberField(-WIDTH / 2, WIDTH / 2);
+        var y = new NumberField(-HEIGHT / 2, HEIGHT / 2);
+        rightPane.add(x, 1, 0);
+        rightPane.add(y, 1, 1);
+
+        Bindings.bindBidirectional(x.textProperty(), animatedTexture.xProperty(), new NumberStringConverter());
+        Bindings.bindBidirectional(y.textProperty(), animatedTexture.yProperty(), new NumberStringConverter());
+
+        x.setText(animatedTexture.getX() + "");
+        y.setText(animatedTexture.getY() + "");
+
+        x.setOnAction(_ -> animatedTexture.setX(x.getDouble()));
+        y.setOnAction(_ -> animatedTexture.setY(y.getDouble()));
+      }
+      case RotateTransit2DTexture rotateTransit2DTexture -> {
+        rightPane.add(new Label("X:"), 0, 0);
+        rightPane.add(new Label("Y:"), 0, 1);
+        var x = new NumberField(-WIDTH / 2, WIDTH / 2);
+        var y = new NumberField(-HEIGHT / 2, HEIGHT / 2);
+        rightPane.add(x, 1, 0);
+        rightPane.add(y, 1, 1);
+
+        Bindings.bindBidirectional(x.textProperty(), rotateTransit2DTexture.xProperty(), new NumberStringConverter());
+        Bindings.bindBidirectional(y.textProperty(), rotateTransit2DTexture.yProperty(), new NumberStringConverter());
+
+        x.setText(rotateTransit2DTexture.getX() + "");
+        y.setText(rotateTransit2DTexture.getY() + "");
+
+        x.setOnAction(_ -> rotateTransit2DTexture.setX(x.getDouble()));
+        y.setOnAction(_ -> rotateTransit2DTexture.setY(y.getDouble()));
+
+      }
+      default -> {
+        rightPane.add(new Label("Game Width:"), 0, 0);
+        rightPane.add(new Label("Game Height:"), 0, 1);
+        var width = new Label(WIDTH + "");
+        var height = new Label(HEIGHT + "");
+        rightPane.add(width, 1, 0);
+        rightPane.add(height, 1, 1);
       }
     }
   }
