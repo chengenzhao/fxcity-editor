@@ -370,10 +370,11 @@ public interface GameAppDecorator {
             });
 
           }else{
-            px.setEditable(false);
-            py.setEditable(false);
             r.setEditable(false);
           }
+
+          px.setEditable(false);
+          py.setEditable(false);
 
           final Separator sh = new Separator();
           sh.setValignment(VPos.CENTER);
