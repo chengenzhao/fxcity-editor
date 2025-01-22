@@ -352,8 +352,8 @@ public interface GameAppDecorator {
           rightPane.add(new Label("Pivot X:"), 0, 3+i*4);
           rightPane.add(new Label("Pivot Y:"), 0, 3+i*4+1);
           rightPane.add(new Label("Rotate:"), 0, 3+i*4+2);
-          var px = new NumberField(0, (int)rotateTransit2DTexture.getWidth());
-          var py = new NumberField(0, (int)rotateTransit2DTexture.getHeight());
+          var px = new NumberField(-WIDTH, WIDTH);
+          var py = new NumberField(-HEIGHT, HEIGHT);
           var r = new NumberField(360);
           rightPane.add(px, 1, 3+4*i);
           rightPane.add(py, 1, 3+4*i+1);
