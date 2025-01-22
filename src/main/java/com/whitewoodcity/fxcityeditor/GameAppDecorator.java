@@ -11,10 +11,13 @@ import com.whitewoodcity.fxgl.texture.AnimationChannel;
 import com.whitewoodcity.fxgl.texture.Texture;
 import com.whitewoodcity.javafx.binding.XBindings;
 import javafx.beans.binding.Bindings;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -338,11 +341,46 @@ public interface GameAppDecorator {
         Bindings.bindBidirectional(x.textProperty(), rotateTransit2DTexture.xProperty(), new NumberStringConverter());
         Bindings.bindBidirectional(y.textProperty(), rotateTransit2DTexture.yProperty(), new NumberStringConverter());
 
-        x.setText(rotateTransit2DTexture.getX() + "");
-        y.setText(rotateTransit2DTexture.getY() + "");
+        final Separator sepHor = new Separator();
+        sepHor.setValignment(VPos.CENTER);
+        GridPane.setConstraints(sepHor, 0, 2);
+        GridPane.setColumnSpan(sepHor, 2);
+        rightPane.getChildren().add(sepHor);
 
-        x.setOnAction(_ -> rotateTransit2DTexture.setX(x.getDouble()));
-        y.setOnAction(_ -> rotateTransit2DTexture.setY(y.getDouble()));
+        for(int i =0;i<rotateTransit2DTexture.getRotates().size();i++){
+          var rotate = rotateTransit2DTexture.getRotates().get(i);
+          rightPane.add(new Label("Pivot X:"), 0, 3+i*4);
+          rightPane.add(new Label("Pivot Y:"), 0, 3+i*4+1);
+          rightPane.add(new Label("Rotate:"), 0, 3+i*4+2);
+          var px = new NumberField(0, (int)rotateTransit2DTexture.getWidth());
+          var py = new NumberField(0, (int)rotateTransit2DTexture.getHeight());
+          var r = new NumberField(360);
+          rightPane.add(px, 1, 3+4*i);
+          rightPane.add(py, 1, 3+4*i+1);
+          rightPane.add(r, 1, 3+4*i+2);
+
+          if(rotate == rotateTransit2DTexture.getRotation()) {
+            Bindings.bindBidirectional(px.textProperty(), rotate.pivotXProperty(), new NumberStringConverter());
+            Bindings.bindBidirectional(py.textProperty(), rotate.pivotYProperty(), new NumberStringConverter());
+            Bindings.bindBidirectional(r.textProperty(), rotate.angleProperty(), new NumberStringConverter());
+
+            r.textProperty().addListener((_,_,value)->{
+              rotate.setAngle(Double.parseDouble(value));
+              rotateTransit2DTexture.update();
+            });
+
+          }else{
+            px.setEditable(false);
+            py.setEditable(false);
+            r.setEditable(false);
+          }
+
+          final Separator sh = new Separator();
+          sh.setValignment(VPos.CENTER);
+          GridPane.setConstraints(sh, 0, 3+4*i+3);
+          GridPane.setColumnSpan(sh, 2);
+          rightPane.getChildren().add(sh);
+        }
 
       }
       default -> {
