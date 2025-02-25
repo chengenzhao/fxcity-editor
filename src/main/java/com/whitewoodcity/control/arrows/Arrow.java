@@ -87,7 +87,7 @@ public class Arrow extends Group {
 
     double theta = Math.atan2(y2-y1, x2-x1);
 
-//    //arrowhead 1
+    //arrowhead 1
     double x = x1 + Math.cos(theta + ARROWHEAD_ANGLE) * ARROWHEAD_LENGTH;
     double y = y1 + Math.sin(theta + ARROWHEAD_ANGLE) * ARROWHEAD_LENGTH;
     headA.getPoints().setAll(x,y,x1,y1);
