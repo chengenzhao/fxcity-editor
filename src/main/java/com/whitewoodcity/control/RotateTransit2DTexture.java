@@ -8,7 +8,6 @@ import javafx.scene.image.Image;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Rotate;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class RotateTransit2DTexture extends Texture {
@@ -115,13 +114,27 @@ public class RotateTransit2DTexture extends Texture {
   public void setParent(RotateTransit2DTexture parent) {
     if(this.parent != null) {
       this.parent.children().remove(this);
-      removeRotate(this.parent.getRotation());
+//      removeRotate(this.parent.getRotation());
+      removeAncestorsRotations(this.parent);
     }
     this.parent = parent;
     if(parent!=null) {
       this.parent.children().add(this);
-      addRotate(parent.getRotation());
+//      addRotate(parent.getRotation());
+      addAncestorsRotations(parent);
     }
+  }
+
+  private void removeAncestorsRotations(RotateTransit2DTexture texture){
+    removeRotate(texture.getRotation());
+    if(texture.parent!=null)
+      removeAncestorsRotations(texture.parent);
+  }
+
+  private void addAncestorsRotations(RotateTransit2DTexture texture){
+    addRotate(texture.getRotation());
+    if(texture.parent!=null)
+      addAncestorsRotations(texture.parent);
   }
 
   public RotateTransit2DTexture parent(){
