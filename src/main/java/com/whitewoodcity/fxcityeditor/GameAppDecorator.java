@@ -37,6 +37,7 @@ import javafx.util.StringConverter;
 import javafx.util.converter.NumberStringConverter;
 
 import java.text.DecimalFormat;
+import java.util.List;
 
 public interface GameAppDecorator {
 
@@ -151,7 +152,9 @@ public interface GameAppDecorator {
         decorateRightPane(image, rightPane);
       }
 
-      case Entity entity -> {
+      case Entity entity when p.length==1 && p[0] instanceof List keyFrameList -> {
+        List<KeyFrame> keyFrames = (List<KeyFrame>)keyFrameList;
+
         var hbox = new HBox(20);
         hbox.setAlignment(Pos.TOP_RIGHT);
         hbox.setPadding(new Insets(20));
@@ -172,13 +175,21 @@ public interface GameAppDecorator {
         var anchor = new Line();
         anchor.setStrokeLineCap(StrokeLineCap.ROUND);
         anchor.setStrokeWidth(20);
-        anchor.setStroke(Color.RED);
+        anchor.setStroke(Color.LIGHTBLUE);
         anchor.endXProperty().bind(anchor.startXProperty());
         anchor.startXProperty().bind(line.startXProperty());
         anchor.startYProperty().bind(line.startYProperty().subtract(25));
         anchor.endYProperty().bind(anchor.startYProperty().add(50));
 
-        pane.getChildren().addAll(hbox, line, anchor);
+        var kf0 = keyFrames.get(0);
+        var kf1 = keyFrames.get(1);
+
+        kf0.setCenterX(line.getStartX());
+        kf0.bindCenterY(line.startYProperty());
+        kf1.setCenterX(line.getEndX());
+        kf1.bindCenterY(line.endYProperty());
+
+        pane.getChildren().addAll(hbox, anchor, line, kf0,kf1);
 
         playButton.setOnAction(_ -> entity.getViewComponent().getChildren().forEach(this::startAnimations));
 

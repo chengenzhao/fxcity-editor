@@ -34,6 +34,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
   Entity entity;
   final BiMap<Label, File> fileBiMap = HashBiMap.create();
   final BiMap<HBox, RotateTransit2DTexture> rotateTransit2DTextureBiMap = HashBiMap.create();
+  final List<KeyFrame> keyFrames = new ArrayList<>();
 
   @Override
   protected void initSettings(GameSettings settings) {
@@ -117,7 +118,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     );
     entityHBox.setAlignment(Pos.BASELINE_LEFT);
     entityHBox.getChildren().addAll(new Label("Entity0"), addViewComponentButton);
-    entityHBox.setOnMousePressed(_ -> decorateBottomAndRightPane(entity, bottomPane, rightPane));
+    entityHBox.setOnMousePressed(_ -> decorateBottomAndRightPane(entity, bottomPane, rightPane, keyFrames));
 
     addImageButton.setOnAction(_ -> addImage(treeview, bottomPane, rightPane));
 
@@ -135,6 +136,13 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     exit.setOnAction(_ -> System.exit(0));
 
     FXGL.getGameScene().addUINodes(menubar, treeview, rightPane, bottomPane);
+
+    keyFrames.add(generateKeyFrame(Duration.seconds(0)));
+    keyFrames.add(generateKeyFrame(Duration.seconds(1)));
+  }
+
+  private KeyFrame generateKeyFrame(Duration duration){
+    return new KeyFrame(20,50).setTime(duration).setColor(Color.ORANGE);//LIGHTSEAGREEN
   }
 
   private void addImage(TreeView<Node> treeView, Pane bottomPane, GridPane rightPane) {
