@@ -55,7 +55,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
   protected void initUI() {
     FXGL.getGameScene().setCursor(Cursor.DEFAULT);
 
-    entity.getViewComponent().addDevChild(new Circle(10, Color.RED));
+    entity.getViewComponent().addDevChild(new Circle(3, Color.RED));
     entity.setX((double) WIDTH / 2);
     entity.setY(300);
 
@@ -177,8 +177,8 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 
     textureHBox.setOnMousePressed(_ -> {
       decorateBottomAndRightPane(texture, bottomPane, rightPane);
-      entity.getViewComponent().removeDevChild(rect);
-      entity.getViewComponent().addDevChild(rect);
+      entity.getViewComponent().removeChild(rect);
+      entity.getViewComponent().addChild(rect);
 
       rect.setOnMousePressed(oe -> {
         selectTreeItem(textureHBox, treeview);
@@ -201,7 +201,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     });
     textureHBox.setOnMouseReleased(e -> {//freeze event
       if (e.getButton() == MouseButton.SECONDARY) {
-        entity.getViewComponent().removeDevChild(rect);
+        entity.getViewComponent().removeChild(rect);
       }
     });
 
@@ -227,10 +227,10 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 
     textureHBox.setOnMousePressed(_ -> {
       decorateBottomAndRightPane(texture, bottomPane, rightPane, rotateTransit2DTextureBiMap);
-      entity.getViewComponent().removeDevChild(rect);
-      entity.getViewComponent().addDevChild(rect);
-      entity.getViewComponent().removeDevChild(arrow);
-      entity.getViewComponent().addDevChild(arrow);
+      entity.getViewComponent().removeChild(rect);
+      entity.getViewComponent().addChild(rect);
+      entity.getViewComponent().removeChild(arrow);
+      entity.getViewComponent().addChild(arrow);
 
       rect.getTransforms().clear();
       rect.getTransforms().addAll(texture.getTransforms());
@@ -238,11 +238,11 @@ public class GameApp extends GameApplication implements GameAppDecorator {
       arrow.getTransforms().addAll(texture.getTransforms());
 
       for(var r:rectangles)
-        entity.getViewComponent().removeDevChild(r);
+        entity.getViewComponent().removeChild(r);
       rectangles.clear();
       populateJointSelectionRectanglesExceptThis(texture, rectangles);
       for(var r:rectangles)
-        entity.getViewComponent().addDevChild(r);
+        entity.getViewComponent().addChild(r);
 
       rect.setOnMousePressed(oe -> {
         selectTreeItem(textureHBox, treeview);
@@ -324,10 +324,10 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     });
     textureHBox.setOnMouseReleased(e -> {//freeze event
       if (e.getButton() == MouseButton.SECONDARY) {
-        entity.getViewComponent().removeDevChild(rect);
-        entity.getViewComponent().removeDevChild(arrow);
+        entity.getViewComponent().removeChild(rect);
+        entity.getViewComponent().removeChild(arrow);
         for(var r:rectangles)
-          entity.getViewComponent().removeDevChild(r);
+          entity.getViewComponent().removeChild(r);
       }
     });
 

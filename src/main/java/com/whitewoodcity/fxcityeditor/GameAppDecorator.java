@@ -401,6 +401,9 @@ public interface GameAppDecorator {
       }
     }
   }
+  default void decorateMiddlePane(Entity entity){
+
+  }
 
   private void removeTextureFromItems(ObservableList<HBox> items, RotateTransit2DTexture texture, BiMap<HBox, RotateTransit2DTexture> map){
     for(var child:texture.children()){
