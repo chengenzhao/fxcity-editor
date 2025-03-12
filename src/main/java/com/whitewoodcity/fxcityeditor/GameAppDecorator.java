@@ -1,5 +1,6 @@
 package com.whitewoodcity.fxcityeditor;
 
+import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
 import com.google.common.collect.BiMap;
 import com.whitewoodcity.control.IntField;
@@ -140,7 +141,8 @@ public interface GameAppDecorator {
     return rect;
   }
 
-  default void decorateBottomAndRightPane(Object object, Pane pane, GridPane rightPane, Object... p) {
+  default void decorateBottomAndRightPane(Object object, Object... p) {
+    var pane = FXGL.<GameApp>getAppCast().bottomPane;
     pane.getChildren().clear();
     switch (object) {
       case Image image -> {
@@ -149,7 +151,7 @@ public interface GameAppDecorator {
         vbox.setPadding(new Insets(20));
         pane.getChildren().add(vbox);
 
-        decorateRightPane(image, rightPane);
+        decorateRightPane(image);
       }
 
       case Entity entity when p.length==1 && p[0] instanceof List keyFrameList -> {
@@ -195,7 +197,7 @@ public interface GameAppDecorator {
 
         stopButton.setOnAction(_ -> entity.getViewComponent().getChildren().forEach(this::stopAnimations));
 
-        decorateRightPane(entity, rightPane);
+        decorateRightPane(entity);
       }
       case AnimatedTexture animatedTexture -> {
         var hbox = new HBox(20);
@@ -253,7 +255,7 @@ public interface GameAppDecorator {
 
         stopButton.setOnAction(_ -> stopAnimations(animatedTexture));
 
-        decorateRightPane(animatedTexture, rightPane);
+        decorateRightPane(animatedTexture);
       }
       case RotateTransit2DTexture texture when p.length > 0 && p[0] instanceof BiMap biMap -> {
         var map = (BiMap<HBox, RotateTransit2DTexture>) biMap;
@@ -287,13 +289,14 @@ public interface GameAppDecorator {
         hbox.setAlignment(Pos.BASELINE_LEFT);
         pane.getChildren().add(hbox);
 
-        decorateRightPane(texture, rightPane);
+        decorateRightPane(texture);
       }
       default -> {
       }
     }
   }
-  default void decorateRightPane(Object object, GridPane rightPane) {
+  default void decorateRightPane(Object object) {
+    var rightPane = FXGL.<GameApp>getAppCast().rightPane;
     rightPane.getChildren().clear();
     switch (object) {
       case Image image -> {

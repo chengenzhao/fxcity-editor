@@ -31,6 +31,11 @@ import java.util.List;
 
 public class GameApp extends GameApplication implements GameAppDecorator {
 
+  MenuBar menubar=new MenuBar();
+  GridPane rightPane = new GridPane();
+  Pane bottomPane = new Pane();
+  TreeView<Node> treeview = new TreeView<>();
+
   Entity entity;
   final BiMap<Label, File> fileBiMap = HashBiMap.create();
   final BiMap<HBox, RotateTransit2DTexture> rotateTransit2DTextureBiMap = HashBiMap.create();
@@ -55,7 +60,9 @@ public class GameApp extends GameApplication implements GameAppDecorator {
   protected void initUI() {
     FXGL.getGameScene().setCursor(Cursor.DEFAULT);
 
-    entity.getViewComponent().addDevChild(new Circle(3, Color.RED));
+    var originalPoint = new Circle(3, Color.RED);
+    originalPoint.setMouseTransparent(true);
+    entity.getViewComponent().addDevChild(originalPoint);
     entity.setX((double) WIDTH / 2);
     entity.setY(300);
 
@@ -63,20 +70,20 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 
     var exit = new MenuItem("Exit");
 
-    var menubar = new MenuBar(menu);
+    menubar.getMenus().add(menu);
     menubar.setPrefWidth(WIDTH);
 
-    var treeview = new TreeView<Node>();
+    treeview = new TreeView<Node>();
     treeview.translateYProperty().bind(menubar.heightProperty());
     treeview.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
 
-    var rightPane = new GridPane(20, 20);
+    rightPane = new GridPane(20, 20);
     rightPane.setPadding(new Insets(20));
     rightPane.setPrefWidth(300);
     rightPane.layoutYProperty().bind(menubar.heightProperty());
     rightPane.setLayoutX(WIDTH - rightPane.getPrefWidth());
 
-    var bottomPane = new Pane();
+    bottomPane = new Pane();
     bottomPane.setPrefWidth(WIDTH);
     bottomPane.setLayoutY(600);
 
@@ -89,7 +96,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 
     var resourceLabel = new Label("Resources");
     resourceHBox.getChildren().addAll(resourceLabel, addImageButton);
-    resourceHBox.setOnMousePressed(_ -> decorateRightPane(resourceHBox, rightPane));
+    resourceHBox.setOnMousePressed(_ -> decorateRightPane(resourceHBox));
     fireEvent(resourceHBox);
 
     var entityHBox = new HBox(10);
@@ -118,7 +125,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     );
     entityHBox.setAlignment(Pos.BASELINE_LEFT);
     entityHBox.getChildren().addAll(new Label("Entity0"), addViewComponentButton);
-    entityHBox.setOnMousePressed(_ -> decorateBottomAndRightPane(entity, bottomPane, rightPane, keyFrames));
+    entityHBox.setOnMousePressed(_ -> decorateBottomAndRightPane(entity, keyFrames));
 
     addImageButton.setOnAction(_ -> addImage(treeview, bottomPane, rightPane));
 
@@ -160,7 +167,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         return;
       }
       var image = new Image(file.toURI().toString());
-      label.setOnMousePressed(_ -> decorateBottomAndRightPane(image, bottomPane, rightPane));
+      label.setOnMousePressed(_ -> decorateBottomAndRightPane(image));
       var treeItem = new TreeItem<Node>(label);
       treeView.getTreeItem(0).getChildren().add(treeItem);//row 0 is resources tree item
       selectTreeItem(label, treeView);
@@ -176,7 +183,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     var textureHBox = textureItem.getValue();
 
     textureHBox.setOnMousePressed(_ -> {
-      decorateBottomAndRightPane(texture, bottomPane, rightPane);
+      decorateBottomAndRightPane(texture);
       entity.getViewComponent().removeChild(rect);
       entity.getViewComponent().addChild(rect);
 
@@ -226,7 +233,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     rotateTransit2DTextureBiMap.put((HBox) textureHBox, texture);
 
     textureHBox.setOnMousePressed(_ -> {
-      decorateBottomAndRightPane(texture, bottomPane, rightPane, rotateTransit2DTextureBiMap);
+      decorateBottomAndRightPane(texture, rotateTransit2DTextureBiMap);
       entity.getViewComponent().removeChild(rect);
       entity.getViewComponent().addChild(rect);
       entity.getViewComponent().removeChild(arrow);
