@@ -4,11 +4,9 @@ package com.whitewoodcity.fxcityeditor;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.whitewoodcity.control.RotateTransit2DTexture;
-import javafx.beans.Observable;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
@@ -57,5 +55,12 @@ public class KeyFrame extends Rectangle {
   public KeyFrame bindCenterY(ObservableValue<Number> y){
     super.yProperty().bind(y.map(Number::doubleValue).map(v -> v - height/2));
     return this;
+  }
+
+  public void select(){
+    this.setStroke(Color.web("#039ED3"));
+  }
+  public void deSelect(){
+    this.setStroke(null);
   }
 }

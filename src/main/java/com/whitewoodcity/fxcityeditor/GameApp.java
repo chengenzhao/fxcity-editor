@@ -40,6 +40,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
   final BiMap<Label, File> fileBiMap = HashBiMap.create();
   final BiMap<HBox, RotateTransit2DTexture> rotateTransit2DTextureBiMap = HashBiMap.create();
   final List<KeyFrame> keyFrames = new ArrayList<>();
+  private int currentKeyFrame = 0; //index of current key frame in the above keyFrames
 
   @Override
   protected void initSettings(GameSettings settings) {
@@ -146,6 +147,17 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 
     keyFrames.add(generateKeyFrame(Duration.seconds(0)));
     keyFrames.add(generateKeyFrame(Duration.seconds(1)));
+
+    for(int i=0;i<keyFrames.size();i++){
+      var frame = keyFrames.get(i);
+      final int j = i;
+      frame.setOnMouseClicked(_ ->{
+        keyFrames.get(currentKeyFrame).deSelect();
+        frame.select();
+        currentKeyFrame = j;
+        //todo decorate entity
+      });
+    }
   }
 
   private KeyFrame generateKeyFrame(Duration duration){
@@ -361,5 +373,13 @@ public class GameApp extends GameApplication implements GameAppDecorator {
       node.getTransforms().clear();
       node.getTransforms().addAll(texture.getTransforms());
     }
+  }
+
+  public int getCurrentKeyFrame() {
+    return currentKeyFrame;
+  }
+
+  public void setCurrentKeyFrame(int currentKeyFrame) {
+    this.currentKeyFrame = currentKeyFrame;
   }
 }
