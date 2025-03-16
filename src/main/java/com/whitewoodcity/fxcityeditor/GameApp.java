@@ -31,7 +31,7 @@ import java.util.List;
 
 public class GameApp extends GameApplication implements GameAppDecorator {
 
-  MenuBar menubar=new MenuBar();
+  MenuBar menubar = new MenuBar();
   GridPane rightPane = new GridPane();
   Pane bottomPane = new Pane();
   TreeView<Node> treeview = new TreeView<>();
@@ -113,11 +113,11 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         switch (view.textureType()) {
           case TRANSIT -> {
             var texture = new RotateTransit2DTexture(image);
-            addTransitTexture(entityTree, name, texture, treeview, bottomPane, rightPane);
+            addTransitTexture(entityTree, name, texture, treeview);
           }
           case ANIMATED -> {
             var texture = new AnimatedTexture(new AnimationChannel(image, 1, Duration.seconds(1)));
-            addAnimatedTexture(entityTree, name, texture, treeview, bottomPane, rightPane);
+            addAnimatedTexture(entityTree, name, texture, treeview);
           }
           default -> {
           }
@@ -128,7 +128,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     entityHBox.getChildren().addAll(new Label("Entity0"), addViewComponentButton);
     entityHBox.setOnMousePressed(_ -> decorateBottomAndRightPane(entity, keyFrames));
 
-    addImageButton.setOnAction(_ -> addImage(treeview, bottomPane, rightPane));
+    addImageButton.setOnAction(_ -> addImage(treeview));
 
     treeviewRoot.getChildren().addAll(resourceTree, entityTree);
 
@@ -148,10 +148,10 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     keyFrames.add(generateKeyFrame(Duration.seconds(0)));
     keyFrames.add(generateKeyFrame(Duration.seconds(1)));
 
-    for(int i=0;i<keyFrames.size();i++){
+    for (int i = 0; i < keyFrames.size(); i++) {
       var frame = keyFrames.get(i);
       final int j = i;
-      frame.setOnMouseClicked(_ ->{
+      frame.setOnMouseClicked(_ -> {
         keyFrames.get(currentKeyFrame).deSelect();
         frame.select();
         currentKeyFrame = j;
@@ -160,11 +160,11 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     }
   }
 
-  private KeyFrame generateKeyFrame(Duration duration){
-    return new KeyFrame(20,50).setTime(duration).setColor(Color.ORANGE);//LIGHTSEAGREEN
+  private KeyFrame generateKeyFrame(Duration duration) {
+    return new KeyFrame(20, 50).setTime(duration).setColor(Color.ORANGE);//LIGHTSEAGREEN
   }
 
-  private void addImage(TreeView<Node> treeView, Pane bottomPane, GridPane rightPane) {
+  private void addImage(TreeView<Node> treeView) {
     FileChooser fileChooser = new FileChooser();
     fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image files", "*.PNG", "*.JPG"));
     File file = fileChooser.showOpenDialog(null);
@@ -186,7 +186,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     }
   }
 
-  private void addAnimatedTexture(TreeItem<Node> entityTree, String name, AnimatedTexture texture, TreeView<Node> treeview, Pane bottomPane, GridPane rightPane) {
+  private void addAnimatedTexture(TreeItem<Node> entityTree, String name, AnimatedTexture texture, TreeView<Node> treeview) {
 
     entity.getViewComponent().addChild(texture);
 
@@ -228,7 +228,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     selectTreeItem(textureHBox, treeview);
   }
 
-  private void addTransitTexture(TreeItem<Node> treeItem, String name, RotateTransit2DTexture texture, TreeView<Node> treeview, Pane bottomPane, GridPane rightPane) {
+  private void addTransitTexture(TreeItem<Node> treeItem, String name, RotateTransit2DTexture texture, TreeView<Node> treeview) {
     entity.getViewComponent().addChild(texture);
 
     var rect = createSelectionRectangle(texture);
@@ -256,11 +256,11 @@ public class GameApp extends GameApplication implements GameAppDecorator {
       arrow.getTransforms().clear();
       arrow.getTransforms().addAll(texture.getTransforms());
 
-      for(var r:rectangles)
+      for (var r : rectangles)
         entity.getViewComponent().removeChild(r);
       rectangles.clear();
       populateJointSelectionRectanglesExceptThis(texture, rectangles);
-      for(var r:rectangles)
+      for (var r : rectangles)
         entity.getViewComponent().addChild(r);
 
       rect.setOnMousePressed(oe -> {
@@ -345,7 +345,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
       if (e.getButton() == MouseButton.SECONDARY) {
         entity.getViewComponent().removeChild(rect);
         entity.getViewComponent().removeChild(arrow);
-        for(var r:rectangles)
+        for (var r : rectangles)
           entity.getViewComponent().removeChild(r);
       }
     });
@@ -354,14 +354,14 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     selectTreeItem(textureHBox, treeview);
   }
 
-  private void populateJointSelectionRectanglesExceptThis(RotateTransit2DTexture texture, List<Rectangle> rectangles){
-    for(var child:texture.children()){
+  private void populateJointSelectionRectanglesExceptThis(RotateTransit2DTexture texture, List<Rectangle> rectangles) {
+    for (var child : texture.children()) {
       populateJointSelectionRectangles(child, rectangles);
     }
   }
 
-  private void populateJointSelectionRectangles(RotateTransit2DTexture texture, List<Rectangle> rectangles){
-    for(var child:texture.children()){
+  private void populateJointSelectionRectangles(RotateTransit2DTexture texture, List<Rectangle> rectangles) {
+    for (var child : texture.children()) {
       populateJointSelectionRectangles(child, rectangles);
     }
     rectangles.add(createJointSelectionRectangle(texture));
