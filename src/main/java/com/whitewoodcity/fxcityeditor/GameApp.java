@@ -112,12 +112,10 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 
         switch (view.textureType()) {
           case TRANSIT -> {
-            var texture = new RotateTransit2DTexture(image);
-            addTransitTexture(entityTree, name, texture);
+            addTransitTexture(entityTree, name, image);
           }
           case ANIMATED -> {
-            var texture = new AnimatedTexture(new AnimationChannel(image, 1, Duration.seconds(1)));
-            addAnimatedTexture(entityTree, name, texture);
+            addAnimatedTexture(entityTree, name, image);
           }
           default -> {
           }
@@ -159,6 +157,8 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         //todo decorate entity
       });
     }
+
+    keyFrames.getFirst().select();
   }
 
   private KeyFrame generateKeyFrame(Duration duration) {
@@ -187,7 +187,8 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     }
   }
 
-  private void addAnimatedTexture(TreeItem<Node> entityTree, String name, AnimatedTexture texture) {
+  private void addAnimatedTexture(TreeItem<Node> entityTree, String name, Image image) {
+    var texture = new AnimatedTexture(new AnimationChannel(image, 1, Duration.seconds(1)));
     entity.getViewComponent().addChild(texture);
 
     var rect = createSelectionRectangle(texture);
@@ -228,7 +229,8 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     selectTreeItem(textureHBox, treeView);
   }
 
-  private void addTransitTexture(TreeItem<Node> treeItem, String name, RotateTransit2DTexture texture) {
+  private void addTransitTexture(TreeItem<Node> treeItem, String name, Image image) {
+    var texture = new RotateTransit2DTexture(image);
     entity.getViewComponent().addChild(texture);
 
     var rect = createSelectionRectangle(texture);
