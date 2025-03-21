@@ -37,6 +37,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
   TreeView<Node> treeView = new TreeView<>();
 
   Entity entity;
+  TreeItem<Node> entityTree;
   final BiMap<Label, File> fileBiMap = HashBiMap.create();
   final BiMap<HBox, RotateTransit2DTexture> rotateTransit2DTextureBiMap = HashBiMap.create();
   final List<KeyFrame> keyFrames = new ArrayList<>();
@@ -74,7 +75,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     menubar.getMenus().add(menu);
     menubar.setPrefWidth(WIDTH);
 
-    treeView = new TreeView<Node>();
+    treeView = new TreeView<>();
     treeView.translateYProperty().bind(menubar.heightProperty());
     treeView.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
 
@@ -100,8 +101,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     resourceHBox.setOnMousePressed(_ -> decorateRightPane(resourceHBox));
     fireEvent(resourceHBox);
 
-    var entityHBox = new HBox(10);
-    var entityTree = new TreeItem<Node>(entityHBox);
+    entityTree = new TreeItem<>(new HBox(10));
     var addViewComponentButton = new Button("+");
     addViewComponentButton.setOnAction(_ ->
       new ViewComponentDialog(fileBiMap.values()).showAndWait().ifPresent(view -> {
@@ -124,6 +124,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         }
       })
     );
+    var entityHBox = (HBox)entityTree.getValue();
     entityHBox.setAlignment(Pos.BASELINE_LEFT);
     entityHBox.getChildren().addAll(new Label("Entity"), addViewComponentButton);
     entityHBox.setOnMousePressed(_ -> decorateBottomAndRightPane(entity, keyFrames));
