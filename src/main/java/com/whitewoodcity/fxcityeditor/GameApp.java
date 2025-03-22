@@ -234,6 +234,8 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 //      for(var keyFrame:keyFrames){
 //        var texture = keyFrame.getRotateTransit2DTextureBiMap().remove(hBox);
 //        texture.setParent(null);
+//        var l = new ArrayList<>(texture.children());
+//        l.forEach(e -> e.setParent(null));
 //      }
 //    });
 //    treeItem.getChildren().add(textureItem);
@@ -247,9 +249,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     var rectangles = new ArrayList<Rectangle>();
     var textureItem = createDeletableTreeItem(name, () -> {
       texture.setParent(null);
-      for(int i=0;i<texture.children().size();i++){
-        texture.children().get(i).setParent(null);
-      }
+      new ArrayList<>(texture.children()).forEach(e -> e.setParent(null));
       entity.getViewComponent().removeChild(texture);
       rotateTransit2DTextureBiMap.inverse().remove(texture);
     });
