@@ -79,7 +79,8 @@ public interface GameAppDecorator {
     }
   }
 
-  default void removeTreeItem(Node n, TreeView<Node> treeView) {
+  default void removeTreeItem(Node n) {
+    var treeView = FXGL.<GameApp>getAppCast().treeView;
     var treeItem = getTreeItem(n, treeView.getRoot());
     var nextItem = treeItem.nextSibling() == null ? treeItem.previousSibling() == null ?
       treeItem.getParent() : treeItem.previousSibling() : treeItem.nextSibling();
@@ -96,20 +97,20 @@ public interface GameAppDecorator {
     return textureHBox;
   }
 
-  default TreeItem<Node> createDeletableTreeItem(HBox textureHBox, TreeView<Node> treeView, Runnable runnable) {
+  default TreeItem<Node> createDeletableTreeItem(HBox textureHBox, Runnable runnable) {
     var textureItem = new TreeItem<Node>(textureHBox);
 
     ((Button)textureHBox.getChildren().get(1)).setOnAction(_ -> {
-      removeTreeItem(textureHBox, treeView);
+      removeTreeItem(textureHBox);
       runnable.run();
     });
 
     return textureItem;
   }
 
-  default TreeItem<Node> createDeletableTreeItem(String name, TreeView<Node> treeView, Runnable runnable) {
+  default TreeItem<Node> createDeletableTreeItem(String name, Runnable runnable) {
     var box = createDeletableLableBox(name);
-    return createDeletableTreeItem(box, treeView, runnable);
+    return createDeletableTreeItem(box, runnable);
   }
 
   default Arrow createRotateArrow(RotateTransit2DTexture imageView) {

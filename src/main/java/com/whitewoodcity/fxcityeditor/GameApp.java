@@ -186,7 +186,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     entity.getViewComponent().addChild(texture);
 
     var rect = createSelectionRectangle(texture);
-    var textureItem = createDeletableTreeItem(name, treeView, () -> entity.getViewComponent().removeChild(texture));
+    var textureItem = createDeletableTreeItem(name, () -> entity.getViewComponent().removeChild(texture));
     var textureHBox = textureItem.getValue();
 
     textureHBox.setOnMousePressed(_ -> {
@@ -230,7 +230,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     var rect = createSelectionRectangle(texture);
     var arrow = createRotateArrow(texture);
     var rectangles = new ArrayList<Rectangle>();
-    var textureItem = createDeletableTreeItem(name, this.treeView, () -> {
+    var textureItem = createDeletableTreeItem(name, () -> {
       texture.setParent(null);
       entity.getViewComponent().removeChild(texture);
       rotateTransit2DTextureBiMap.inverse().remove(texture);
