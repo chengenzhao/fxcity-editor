@@ -111,14 +111,8 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         name = name.substring(0, name.indexOf("."));
 
         switch (view.textureType()) {
-          case TRANSIT -> {
-            addTransitTexture(entityTree, name, image);
-          }
-          case ANIMATED -> {
-            addAnimatedTexture(entityTree, name, image);
-          }
-          default -> {
-          }
+          case TRANSIT -> addTransitTexture(entityTree, name, image);
+          case ANIMATED -> addAnimatedTexture(entityTree, name, image);
         }
       })
     );
