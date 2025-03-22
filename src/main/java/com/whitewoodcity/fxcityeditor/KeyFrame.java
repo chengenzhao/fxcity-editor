@@ -63,4 +63,8 @@ public class KeyFrame extends Rectangle {
   public void deSelect(){
     this.setStroke(null);
   }
+
+  public BiMap<HBox, RotateTransit2DTexture> getRotateTransit2DTextureBiMap() {
+    return rotateTransit2DTextureBiMap;
+  }
 }

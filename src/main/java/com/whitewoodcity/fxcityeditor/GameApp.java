@@ -239,6 +239,9 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     var textureHBox = textureItem.getValue();
 
     rotateTransit2DTextureBiMap.put((HBox) textureHBox, texture);
+//    for(var keyFrame:keyFrames){
+//      keyFrame.getRotateTransit2DTextureBiMap().put((HBox) textureHBox, texture);
+//    }
 
     textureHBox.setOnMousePressed(_ -> {
       decorateBottomAndRightPane(texture, rotateTransit2DTextureBiMap);

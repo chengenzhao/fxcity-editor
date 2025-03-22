@@ -25,7 +25,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
@@ -89,20 +88,28 @@ public interface GameAppDecorator {
     treeItem.getParent().getChildren().remove(treeItem);
   }
 
-  default TreeItem<Node> createDeletableTreeItem(String name, TreeView<Node> treeView, Runnable runnable) {
-    var textureItem = new TreeItem<Node>();
+  default HBox createDeletableLableBox(String name){
     var textureLabel = new Label(name);
     var delTextureButton = new Button("×");
     var textureHBox = new HBox(20, textureLabel, delTextureButton);
     textureHBox.setAlignment(Pos.BASELINE_LEFT);
-    textureItem.setValue(textureHBox);
+    return textureHBox;
+  }
 
-    delTextureButton.setOnAction(_ -> {
+  default TreeItem<Node> createDeletableTreeItem(HBox textureHBox, TreeView<Node> treeView, Runnable runnable) {
+    var textureItem = new TreeItem<Node>(textureHBox);
+
+    ((Button)textureHBox.getChildren().get(1)).setOnAction(_ -> {
       removeTreeItem(textureHBox, treeView);
       runnable.run();
     });
 
     return textureItem;
+  }
+
+  default TreeItem<Node> createDeletableTreeItem(String name, TreeView<Node> treeView, Runnable runnable) {
+    var box = createDeletableLableBox(name);
+    return createDeletableTreeItem(box, treeView, runnable);
   }
 
   default Arrow createRotateArrow(RotateTransit2DTexture imageView) {
