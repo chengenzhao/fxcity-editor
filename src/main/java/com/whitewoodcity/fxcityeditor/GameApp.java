@@ -224,6 +224,21 @@ public class GameApp extends GameApplication implements GameAppDecorator {
   }
 
   private void addTransitTexture(TreeItem<Node> treeItem, String name, Image image) {
+//    var hBox = createDeletableLableBox(name);
+//    for(var keyFrame:keyFrames){
+//      var texture = new RotateTransit2DTexture(image);
+//      keyFrame.getRotateTransit2DTextureBiMap().put(hBox, texture);
+//    }
+//
+//    var textureItem = createDeletableTreeItem(hBox, ()->{
+//      for(var keyFrame:keyFrames){
+//        var texture = keyFrame.getRotateTransit2DTextureBiMap().remove(hBox);
+//        texture.setParent(null);
+//      }
+//    });
+//    treeItem.getChildren().add(textureItem);
+
+
     var texture = new RotateTransit2DTexture(image);
     entity.getViewComponent().addChild(texture);
 
@@ -232,6 +247,9 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     var rectangles = new ArrayList<Rectangle>();
     var textureItem = createDeletableTreeItem(name, () -> {
       texture.setParent(null);
+      for(int i=0;i<texture.children().size();i++){
+        texture.children().get(i).setParent(null);
+      }
       entity.getViewComponent().removeChild(texture);
       rotateTransit2DTextureBiMap.inverse().remove(texture);
     });
@@ -239,9 +257,6 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     var textureHBox = textureItem.getValue();
 
     rotateTransit2DTextureBiMap.put((HBox) textureHBox, texture);
-//    for(var keyFrame:keyFrames){
-//      keyFrame.getRotateTransit2DTextureBiMap().put((HBox) textureHBox, texture);
-//    }
 
     textureHBox.setOnMousePressed(_ -> {
       decorateBottomAndRightPane(texture, rotateTransit2DTextureBiMap);

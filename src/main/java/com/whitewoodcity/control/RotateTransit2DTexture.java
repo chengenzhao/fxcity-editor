@@ -33,29 +33,26 @@ public class RotateTransit2DTexture extends Texture {
     return rotates;
   }
 
-  public void update(){
+  public void update() {
     List<Rotate> rotations = this.getTransforms().stream().map(Rotate.class::cast).toList();
     assert rotations.size() == rotates.size();
 
-//    System.out.println(this.getTransforms().size());
-    for(var child:children) {
+    for (var child : children) {
       child.update();
     }
 
-    for(int i=0;i<rotates.size();i++){
+    for (int i = 0; i < rotates.size(); i++) {
       var rotate = rotates.get(i);
-      var point = new Point2D(rotate.getPivotX(),rotate.getPivotY());
+      var point = new Point2D(rotate.getPivotX(), rotate.getPivotY());
       //find the current position of transformed coordinates
-      for(int j=i-1;j>=0;j--){
-//        System.out.print(point+" -> ");
+      for (int j = i - 1; j >= 0; j--) {
         try {
           point = rotates.get(j).inverseTransform(point);//critical action, current position of transformed coordinates is inverse transformed position
         } catch (NonInvertibleTransformException e) {
           throw new RuntimeException(e);
         }
-//        System.out.println(point);
       }
-      var r = (Rotate)this.getTransforms().get(i);
+      var r = (Rotate) this.getTransforms().get(i);
       r.setPivotX(point.getX());
       r.setPivotY(point.getY());
       r.setAngle(rotate.getAngle());
@@ -64,43 +61,43 @@ public class RotateTransit2DTexture extends Texture {
 
   }
 
-  public void addRotate(Rotate rotate){
-    for(var child:children)
+  public void addRotate(Rotate rotate) {
+    for (var child : children)
       child.addRotate(rotate);
     this.rotates.add(rotate);
     updateTransforms();
   }
 
-  public void removeRotate(Rotate rotate){
-    for(var child:children)
+  public void removeRotate(Rotate rotate) {
+    for (var child : children)
       child.removeRotate(rotate);
     this.rotates.remove(rotate);
     updateTransforms();
   }
 
-  private void updateTransforms(){
+  private void updateTransforms() {
     this.getTransforms().clear();
-    for(var r:rotates)
+    for (var r : rotates)
       this.getTransforms().add(r.clone());
   }
 
-  public void addRotates(Rotate... rs){
-    for(var r : rs) addRotate(r);
+  public void addRotates(Rotate... rs) {
+    for (var r : rs) addRotate(r);
   }
 
   public Rotate getRotation() {
     return rotate;
   }
 
-  public Point2D transform(Point2D point){
-    for(var t: this.getTransforms()){
+  public Point2D transform(Point2D point) {
+    for (var t : this.getTransforms()) {
       point = t.transform(point);
     }
     return point;
   }
 
-  public Point2D inverseTransform(Point2D point){
-    for(int i=getTransforms().size()-1;i>=0;i--){
+  public Point2D inverseTransform(Point2D point) {
+    for (int i = getTransforms().size() - 1; i >= 0; i--) {
       var t = getTransforms().get(i);
       try {
         point = t.inverseTransform(point);
@@ -112,30 +109,51 @@ public class RotateTransit2DTexture extends Texture {
   }
 
   public void setParent(RotateTransit2DTexture parent) {
-    if(this.parent != null) {
+    //remove parent
+    if (this.parent != null) {
       this.parent.children().remove(this);
-      removeAncestorsRotations(this.parent);
+      removeAncestorsRotations(this, this.parent.getRotation());
     }
+
+//    if(this.parent != null) {
+//      this.parent.children().remove(this);
+//      removeAncestorsRotations(this.parent);
+//    }
     this.parent = parent;
-    if(parent!=null) {
+    if (parent != null) {
       this.parent.children().add(this);
-      addAncestorsRotations(parent);
+      var rs = this.parent.getRotates().toArray(new Rotate[0]);
+      addAncestorsRotations(this, rs);
     }
+    updateTransforms();
   }
 
-  private void removeAncestorsRotations(RotateTransit2DTexture texture){
+  private void removeAncestorsRotations(RotateTransit2DTexture texture, Rotate rotate) {
+    for (var child : texture.children)
+      removeAncestorsRotations(child, rotate);
+    var i = texture.rotates.indexOf(rotate);
+    texture.rotates.subList(i, texture.rotates.size()).clear();
+  }
+
+  private void removeAncestorsRotations(RotateTransit2DTexture texture) {
     removeRotate(texture.getRotation());
-    if(texture.parent!=null)
+    if (texture.parent != null)
       removeAncestorsRotations(texture.parent);
   }
 
-  private void addAncestorsRotations(RotateTransit2DTexture texture){
+  private void addAncestorsRotations(RotateTransit2DTexture texture, Rotate... rotates) {
+    for (var child : texture.children)
+      addAncestorsRotations(child, rotates);
+    texture.rotates.addAll(rotates);
+  }
+
+  private void addAncestorsRotations(RotateTransit2DTexture texture) {
     addRotate(texture.getRotation());
-    if(texture.parent!=null)
+    if (texture.parent != null)
       addAncestorsRotations(texture.parent);
   }
 
-  public RotateTransit2DTexture parent(){
+  public RotateTransit2DTexture parent() {
     return this.parent;
   }
 

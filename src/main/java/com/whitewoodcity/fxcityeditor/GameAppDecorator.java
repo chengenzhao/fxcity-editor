@@ -288,7 +288,10 @@ public interface GameAppDecorator {
           }
         });
 
-        choiceBox.setOnAction(_ -> texture.setParent(map.get(choiceBox.getValue())));
+        choiceBox.setOnAction(_ -> {
+          texture.setParent(map.get(choiceBox.getValue()));
+//          decorateRightPane(texture);
+        });
 
         var hbox = new HBox();
         hbox.getChildren().addAll(new Label("Parent: "), choiceBox);
