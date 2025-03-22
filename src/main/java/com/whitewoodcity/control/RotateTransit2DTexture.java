@@ -133,6 +133,7 @@ public class RotateTransit2DTexture extends Texture {
       removeAncestorsRotations(child, rotate);
     var i = texture.rotates.indexOf(rotate);
     texture.rotates.subList(i, texture.rotates.size()).clear();
+    texture.updateTransforms();
   }
 
   private void removeAncestorsRotations(RotateTransit2DTexture texture) {
@@ -145,6 +146,7 @@ public class RotateTransit2DTexture extends Texture {
     for (var child : texture.children)
       addAncestorsRotations(child, rotates);
     texture.rotates.addAll(rotates);
+    texture.updateTransforms();
   }
 
   private void addAncestorsRotations(RotateTransit2DTexture texture) {

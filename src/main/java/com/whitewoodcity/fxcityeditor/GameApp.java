@@ -234,8 +234,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 //      for(var keyFrame:keyFrames){
 //        var texture = keyFrame.getRotateTransit2DTextureBiMap().remove(hBox);
 //        texture.setParent(null);
-//        var l = new ArrayList<>(texture.children());
-//        l.forEach(e -> e.setParent(null));
+//        new ArrayList<>(texture.children()).forEach(e -> e.setParent(null));
 //      }
 //    });
 //    treeItem.getChildren().add(textureItem);
