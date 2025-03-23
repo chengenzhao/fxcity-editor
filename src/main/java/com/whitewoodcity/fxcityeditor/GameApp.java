@@ -28,6 +28,7 @@ import javafx.util.Duration;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class GameApp extends GameApplication implements GameAppDecorator {
@@ -226,12 +227,17 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 
   private void addTransitTexture(TreeItem<Node> treeItem, String name, Image image) {
     var hBox = createDeletableLableBox(name);
+    var rectMap = new HashMap<KeyFrame, Rectangle>();
+    var arrowMap = new HashMap<KeyFrame, Arrow>();
     for (var keyFrame : keyFrames) {
       var texture = new RotateTransit2DTexture(image);
       keyFrame.getRotateTransit2DTextureBiMap().put(hBox, texture);
 
       texture.setOnMouseClicked(_ -> selectTreeItem(hBox));
       texture.children().addListener((ListChangeListener<RotateTransit2DTexture>) _ -> selectTreeItem(hBox));
+
+      rectMap.put(keyFrame, createSelectionRectangle(texture));
+      arrowMap.put(keyFrame, createRotateArrow(texture));
     }
 
     var textureItem = createDeletableTreeItem(hBox, () -> {
@@ -239,8 +245,8 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         var texture = keyFrame.getRotateTransit2DTextureBiMap().remove(hBox);
         texture.setParent(null);
         new ArrayList<>(texture.children()).forEach(e -> e.setParent(null));
-        fireEvent(keyFrames.get(currentKeyFrame));
       }
+      fireEvent(keyFrames.get(currentKeyFrame));
     });
     treeItem.getChildren().add(textureItem);
     selectTreeItem(hBox);
@@ -263,24 +269,19 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 //
 //    rotateTransit2DTextureBiMap.put((HBox) textureHBox, texture);
 //
-    var editor = new Editor();
+
     var rectangles = new ArrayList<Rectangle>();
 
     hBox.setOnMousePressed(_ -> {
-      var texture = keyFrames.get(currentKeyFrame).getRotateTransit2DTextureBiMap().get(hBox);
+      var keyFrame = keyFrames.get(currentKeyFrame);
+      var texture = keyFrame.getRotateTransit2DTextureBiMap().get(hBox);
       decorateBottomAndRightPane(texture, rotateTransit2DTextureBiMap);
 
-//      if(editor.getRect()!=null)
-//        entity.getViewComponent().removeChild(editor.getRect());
-//      if(editor.getArrow()!=null)
-//        entity.getViewComponent().removeChild(editor.getArrow());
+      var rect = rectMap.get(keyFrame);
+      var arrow = arrowMap.get(keyFrame);
 
-      editor.setRect(createSelectionRectangle(texture));
-      editor.setArrow(createRotateArrow(texture));
-
-      var rect = editor.getRect();
-      var arrow = editor.getArrow();
-
+      entity.getViewComponent().removeChild(rect);
+      entity.getViewComponent().removeChild(arrow);
       entity.getViewComponent().addChild(rect);
       entity.getViewComponent().addChild(arrow);
 
