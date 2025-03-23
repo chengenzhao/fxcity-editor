@@ -58,7 +58,8 @@ public interface GameAppDecorator {
       true, true, true, null));
   }
 
-  default void selectTreeItem(Node n, TreeView<Node> treeView) {
+  default void selectTreeItem(Node n) {
+    var treeView = FXGL.<GameApp>getAppCast().treeView;
     var treeItem = getTreeItem(n, treeView.getRoot());
     var selectedItem = treeView.getSelectionModel().getSelectedItem();
     if (selectedItem != null && selectedItem.getValue() == n)
@@ -84,7 +85,7 @@ public interface GameAppDecorator {
     var treeItem = getTreeItem(n, treeView.getRoot());
     var nextItem = treeItem.nextSibling() == null ? treeItem.previousSibling() == null ?
       treeItem.getParent() : treeItem.previousSibling() : treeItem.nextSibling();
-    selectTreeItem(nextItem.getValue(), treeView);
+    selectTreeItem(nextItem.getValue());
     freezeEvent(n);
     treeItem.getParent().getChildren().remove(treeItem);
   }
