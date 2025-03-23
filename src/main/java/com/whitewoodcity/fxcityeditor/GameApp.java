@@ -7,6 +7,7 @@ import com.almasb.fxgl.entity.Entity;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.whitewoodcity.control.RotateTransit2DTexture;
+import com.whitewoodcity.control.arrows.Arrow;
 import com.whitewoodcity.fxgl.texture.AnimatedTexture;
 import com.whitewoodcity.fxgl.texture.AnimationChannel;
 import javafx.collections.ListChangeListener;
@@ -228,6 +229,9 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     for (var keyFrame : keyFrames) {
       var texture = new RotateTransit2DTexture(image);
       keyFrame.getRotateTransit2DTextureBiMap().put(hBox, texture);
+
+      texture.setOnMouseClicked(_ -> selectTreeItem(hBox));
+      texture.children().addListener((ListChangeListener<RotateTransit2DTexture>) _ -> selectTreeItem(hBox));
     }
 
     var textureItem = createDeletableTreeItem(hBox, () -> {
@@ -235,6 +239,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         var texture = keyFrame.getRotateTransit2DTextureBiMap().remove(hBox);
         texture.setParent(null);
         new ArrayList<>(texture.children()).forEach(e -> e.setParent(null));
+        fireEvent(keyFrames.get(currentKeyFrame));
       }
     });
     treeItem.getChildren().add(textureItem);
@@ -258,111 +263,126 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 //
 //    rotateTransit2DTextureBiMap.put((HBox) textureHBox, texture);
 //
-//    textureHBox.setOnMousePressed(_ -> {
-//      decorateBottomAndRightPane(texture, rotateTransit2DTextureBiMap);
-//      entity.getViewComponent().removeChild(rect);
-//      entity.getViewComponent().addChild(rect);
-//      entity.getViewComponent().removeChild(arrow);
-//      entity.getViewComponent().addChild(arrow);
-//
-//      rect.getTransforms().clear();
-//      rect.getTransforms().addAll(texture.getTransforms());
-//      arrow.getTransforms().clear();
-//      arrow.getTransforms().addAll(texture.getTransforms());
-//
-//      for (var r : rectangles)
-//        entity.getViewComponent().removeChild(r);
-//      rectangles.clear();
-//      populateJointSelectionRectanglesExceptThis(texture, rectangles);
-//      for (var r : rectangles)
-//        entity.getViewComponent().addChild(r);
-//
-//      rect.setOnMousePressed(oe -> {
-//        selectTreeItem(textureHBox, this.treeView);
-//        var op = texture.getRotation().transform(new Point2D(oe.getX(), oe.getY()));
-//        var ox = op.getX();
-//        var oy = op.getY();
-//        var rx = rect.getX();
-//        var ry = rect.getY();
-//        var ax = arrow.getX1();
-//        var ay = arrow.getY1();
-//        rect.setOnMouseDragged(e -> {
-//          var p = texture.getRotation().transform(new Point2D(e.getX(), e.getY()));
-//          double changeInX = p.getX() - ox;
-//          double changeInY = p.getY() - oy;
-//          texture.setX(rx + changeInX);
-//          texture.setY(ry + changeInY);
-//          texture.getRotation().setPivotX(ax + changeInX);
-//          texture.getRotation().setPivotY(ay + changeInY);
-//          update(texture, rect, arrow);
-//        });
-//      });
-//
-//      arrow.getOrigin().setOnMousePressed(oe -> {
-//        selectTreeItem(textureHBox, this.treeView);
-//        var op = texture.getRotation().transform(new Point2D(oe.getX(), oe.getY()));
-//        var ox = op.getX();
-//        var oy = op.getY();
-//        var tx = arrow.getX1();
-//        var ty = arrow.getY1();
-//        arrow.getOrigin().setOnMouseDragged(e -> {
-//          var p = texture.getRotation().transform(new Point2D(e.getX(), e.getY()));
-//          double changeInX = p.getX() - ox;
-//          double changeInY = p.getY() - oy;
-//          var x1 = tx + changeInX;
-//          var y1 = ty + changeInY;
-//          if (x1 < texture.getX()) x1 = texture.getX();
-//          if (x1 > texture.getX() + texture.getFitWidth()) x1 = texture.getX() + texture.getFitWidth();
-//          if (y1 < texture.getY()) y1 = texture.getY();
-//          if (y1 > texture.getY() + texture.getFitHeight()) y1 = texture.getY() + texture.getFitHeight();
-//          texture.getRotation().setPivotX(x1);
-//          texture.getRotation().setPivotY(y1);
-//          update(texture, rect, arrow);
-//        });
-//      });
-//
-//      arrow.getHeadB().setOnMousePressed(oe -> {
-//        selectTreeItem(textureHBox, this.treeView);
-//        var ox = oe.getX();
-//        arrow.getHeadB().setOnMouseDragged(e -> {
-//          double changeInX = e.getX() - ox;
-//          var angle = texture.getRotation().getAngle();
-//          if (changeInX > 0) texture.getRotation().setAngle(angle - 1 < 0 ? 361 - angle : angle - 1);
-//          if (changeInX < 0) texture.getRotation().setAngle((angle + 1) % 360);
-//          if (changeInX != 0) {
-//            update(texture, rect, arrow);
-//          }
-//        });
-//      });
-//
-//      arrow.getMainLine().setOnMousePressed(oe -> {
-//        selectTreeItem(textureHBox, this.treeView);
-//        var ox = oe.getX();
-//        arrow.getMainLine().setOnMouseDragged(e -> {
-//          double changeInX = e.getX() - ox;
-//          var angle = texture.getRotation().getAngle();
-//          if (changeInX > 0) texture.getRotation().setAngle(angle - 1 < 0 ? 361 - angle : angle - 1);
-//          if (changeInX < 0) texture.getRotation().setAngle((angle + 1) % 360);
-//          if (changeInX != 0) {
-//            update(texture, rect, arrow);
-//          }
-//        });
-//      });
-//    });
+    var editor = new Editor();
+    var rectangles = new ArrayList<Rectangle>();
+
+    hBox.setOnMousePressed(_ -> {
+      var texture = keyFrames.get(currentKeyFrame).getRotateTransit2DTextureBiMap().get(hBox);
+      decorateBottomAndRightPane(texture, rotateTransit2DTextureBiMap);
+
+//      if(editor.getRect()!=null)
+//        entity.getViewComponent().removeChild(editor.getRect());
+//      if(editor.getArrow()!=null)
+//        entity.getViewComponent().removeChild(editor.getArrow());
+
+      editor.setRect(createSelectionRectangle(texture));
+      editor.setArrow(createRotateArrow(texture));
+
+      var rect = editor.getRect();
+      var arrow = editor.getArrow();
+
+      entity.getViewComponent().addChild(rect);
+      entity.getViewComponent().addChild(arrow);
+
+      rect.getTransforms().clear();
+      rect.getTransforms().addAll(texture.getTransforms());
+      arrow.getTransforms().clear();
+      arrow.getTransforms().addAll(texture.getTransforms());
+
+      for (var r : rectangles)
+        entity.getViewComponent().removeChild(r);
+      rectangles.clear();
+      populateJointSelectionRectanglesExceptThis(texture, rectangles);
+      for (var r : rectangles)
+        entity.getViewComponent().addChild(r);
+
+      rect.setOnMousePressed(oe -> {
+        selectTreeItem(hBox);
+        var op = texture.getRotation().transform(new Point2D(oe.getX(), oe.getY()));
+        var ox = op.getX();
+        var oy = op.getY();
+        var rx = rect.getX();
+        var ry = rect.getY();
+        var ax = arrow.getX1();
+        var ay = arrow.getY1();
+        rect.setOnMouseDragged(e -> {
+          var p = texture.getRotation().transform(new Point2D(e.getX(), e.getY()));
+          double changeInX = p.getX() - ox;
+          double changeInY = p.getY() - oy;
+          texture.setX(rx + changeInX);
+          texture.setY(ry + changeInY);
+          texture.getRotation().setPivotX(ax + changeInX);
+          texture.getRotation().setPivotY(ay + changeInY);
+          update(texture, rect, arrow);
+        });
+      });
+
+      rect.setOnMouseReleased(e -> {//deselect the view component
+        if (e.getButton() == MouseButton.SECONDARY)
+          freezeEvent(hBox);
+      });
+
+      arrow.getOrigin().setOnMousePressed(oe -> {
+        selectTreeItem(hBox);
+        var op = texture.getRotation().transform(new Point2D(oe.getX(), oe.getY()));
+        var ox = op.getX();
+        var oy = op.getY();
+        var tx = arrow.getX1();
+        var ty = arrow.getY1();
+        arrow.getOrigin().setOnMouseDragged(e -> {
+          var p = texture.getRotation().transform(new Point2D(e.getX(), e.getY()));
+          double changeInX = p.getX() - ox;
+          double changeInY = p.getY() - oy;
+          var x1 = tx + changeInX;
+          var y1 = ty + changeInY;
+          if (x1 < texture.getX()) x1 = texture.getX();
+          if (x1 > texture.getX() + texture.getFitWidth()) x1 = texture.getX() + texture.getFitWidth();
+          if (y1 < texture.getY()) y1 = texture.getY();
+          if (y1 > texture.getY() + texture.getFitHeight()) y1 = texture.getY() + texture.getFitHeight();
+          texture.getRotation().setPivotX(x1);
+          texture.getRotation().setPivotY(y1);
+          update(texture, rect, arrow);
+        });
+      });
+
+      arrow.getHeadB().setOnMousePressed(oe -> {
+        selectTreeItem(hBox);
+        var ox = oe.getX();
+        arrow.getHeadB().setOnMouseDragged(e -> {
+          double changeInX = e.getX() - ox;
+          var angle = texture.getRotation().getAngle();
+          if (changeInX > 0) texture.getRotation().setAngle(angle - 1 < 0 ? 361 - angle : angle - 1);
+          if (changeInX < 0) texture.getRotation().setAngle((angle + 1) % 360);
+          if (changeInX != 0) {
+            update(texture, rect, arrow);
+          }
+        });
+      });
+
+      arrow.getMainLine().setOnMousePressed(oe -> {
+        selectTreeItem(hBox);
+        var ox = oe.getX();
+        arrow.getMainLine().setOnMouseDragged(e -> {
+          double changeInX = e.getX() - ox;
+          var angle = texture.getRotation().getAngle();
+          if (changeInX > 0) texture.getRotation().setAngle(angle - 1 < 0 ? 361 - angle : angle - 1);
+          if (changeInX < 0) texture.getRotation().setAngle((angle + 1) % 360);
+          if (changeInX != 0) {
+            update(texture, rect, arrow);
+          }
+        });
+      });
+    });
 //    texture.setOnMouseClicked(_ -> selectTreeItem(textureHBox, this.treeView));
 //    texture.children().addListener((ListChangeListener<RotateTransit2DTexture>) _ -> selectTreeItem(textureHBox, this.treeView));
 //    rect.setOnMouseReleased(e -> {//deselect the view component
 //      if (e.getButton() == MouseButton.SECONDARY)
 //        freezeEvent(textureHBox);
 //    });
-//    textureHBox.setOnMouseReleased(e -> {//freeze event
-//      if (e.getButton() == MouseButton.SECONDARY) {
-//        entity.getViewComponent().removeChild(rect);
-//        entity.getViewComponent().removeChild(arrow);
-//        for (var r : rectangles)
-//          entity.getViewComponent().removeChild(r);
-//      }
-//    });
+    hBox.setOnMouseReleased(e -> {//freeze event
+      if(e.getButton() == MouseButton.SECONDARY)
+        fireEvent(keyFrames.get(currentKeyFrame));
+    });
 //
 //    treeItem.getChildren().add(textureItem);
 //    selectTreeItem(textureHBox, this.treeView);
@@ -395,5 +415,26 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 
   public void setCurrentKeyFrame(int currentKeyFrame) {
     this.currentKeyFrame = currentKeyFrame;
+  }
+}
+
+class Editor{
+  private Rectangle rect;
+  private Arrow arrow;
+
+  public Rectangle getRect() {
+    return rect;
+  }
+
+  public void setRect(Rectangle rect) {
+    this.rect = rect;
+  }
+
+  public Arrow getArrow() {
+    return arrow;
+  }
+
+  public void setArrow(Arrow arrow) {
+    this.arrow = arrow;
   }
 }

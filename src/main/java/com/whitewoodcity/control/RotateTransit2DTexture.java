@@ -149,12 +149,6 @@ public class RotateTransit2DTexture extends Texture {
     texture.updateTransforms();
   }
 
-  private void addAncestorsRotations(RotateTransit2DTexture texture) {
-    addRotate(texture.getRotation());
-    if (texture.parent != null)
-      addAncestorsRotations(texture.parent);
-  }
-
   public RotateTransit2DTexture parent() {
     return this.parent;
   }
