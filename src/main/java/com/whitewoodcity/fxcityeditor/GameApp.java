@@ -148,8 +148,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         keyFrames.get(currentKeyFrame).deSelect();
         frame.select();
         currentKeyFrame = j;
-        //todo decorate entity
-        System.out.println(111);
+        decorateMiddlePane(frame);
       });
     }
 
@@ -240,9 +239,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     });
     treeItem.getChildren().add(textureItem);
     selectTreeItem(hBox);
-
     fireEvent(keyFrames.get(currentKeyFrame));
-    selectTreeItem(hBox);
 
 //    var texture = new RotateTransit2DTexture(image);
 //    entity.getViewComponent().addChild(texture);

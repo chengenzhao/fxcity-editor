@@ -37,6 +37,7 @@ import javafx.util.StringConverter;
 import javafx.util.converter.NumberStringConverter;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 public interface GameAppDecorator {
@@ -416,8 +417,17 @@ public interface GameAppDecorator {
       }
     }
   }
-  default void decorateMiddlePane(Entity entity){
-
+  default void decorateMiddlePane(KeyFrame keyFrame){
+    var entity = FXGL.<GameApp>getAppCast().entity;
+    //don't use entity.getViewComponent().clearChildren();, this method will dispose node.disposing imageview will cause image -> null
+    List.copyOf(entity.getViewComponent().getChildren())
+      .forEach(e -> entity.getViewComponent().removeChild(e));
+    var entityTree = FXGL.<GameApp>getAppCast().entityTree;
+    for(var childItem:entityTree.getChildren()){
+      var hbox = (HBox) childItem.getValue();
+      var texture = keyFrame.getRotateTransit2DTextureBiMap().get(hbox);
+      entity.getViewComponent().addChild(texture);
+    }
   }
 
   private void removeTextureFromItems(ObservableList<HBox> items, RotateTransit2DTexture texture, BiMap<HBox, RotateTransit2DTexture> map){
