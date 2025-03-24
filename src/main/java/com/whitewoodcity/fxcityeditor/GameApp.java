@@ -41,7 +41,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
   Entity entity;
   TreeItem<Node> entityTree;
   final BiMap<Label, File> fileBiMap = HashBiMap.create();
-  final BiMap<HBox, RotateTransit2DTexture> rotateTransit2DTextureBiMap = HashBiMap.create();
+//  final BiMap<HBox, RotateTransit2DTexture> rotateTransit2DTextureBiMap = HashBiMap.create();
   final List<KeyFrame> keyFrames = new ArrayList<>();
   private int currentKeyFrame = 0; //index of current key frame in the above keyFrames
 
@@ -275,7 +275,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     hBox.setOnMousePressed(_ -> {
       var keyFrame = keyFrames.get(currentKeyFrame);
       var texture = keyFrame.getRotateTransit2DTextureBiMap().get(hBox);
-      decorateBottomAndRightPane(texture, rotateTransit2DTextureBiMap);
+      decorateBottomAndRightPane(texture, keyFrame.getRotateTransit2DTextureBiMap());
 
       var rect = rectMap.get(keyFrame);
       var arrow = arrowMap.get(keyFrame);
@@ -416,26 +416,5 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 
   public void setCurrentKeyFrame(int currentKeyFrame) {
     this.currentKeyFrame = currentKeyFrame;
-  }
-}
-
-class Editor{
-  private Rectangle rect;
-  private Arrow arrow;
-
-  public Rectangle getRect() {
-    return rect;
-  }
-
-  public void setRect(Rectangle rect) {
-    this.rect = rect;
-  }
-
-  public Arrow getArrow() {
-    return arrow;
-  }
-
-  public void setArrow(Arrow arrow) {
-    this.arrow = arrow;
   }
 }

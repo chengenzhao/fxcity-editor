@@ -291,8 +291,13 @@ public interface GameAppDecorator {
         });
 
         choiceBox.setOnAction(_ -> {
-          texture.setParent(map.get(choiceBox.getValue()));
-//          decorateRightPane(texture);
+          var childBox = map.inverse().get(texture);
+          var parentBox = map.inverse().get(map.get(choiceBox.getValue()));
+          for(var keyFrame:FXGL.<GameApp>getAppCast().keyFrames){
+            var m = keyFrame.getRotateTransit2DTextureBiMap();
+            m.get(childBox).setParent(m.get(parentBox));
+          }
+//          texture.setParent(map.get(choiceBox.getValue()));
         });
 
         var hbox = new HBox();
