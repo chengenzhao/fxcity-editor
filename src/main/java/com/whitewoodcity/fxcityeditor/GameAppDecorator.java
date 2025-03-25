@@ -91,7 +91,7 @@ public interface GameAppDecorator {
     treeItem.getParent().getChildren().remove(treeItem);
   }
 
-  default HBox createDeletableLableBox(String name){
+  default HBox createDeletableLableBox(String name) {
     var textureLabel = new Label(name);
     var delTextureButton = new Button("×");
     var textureHBox = new HBox(20, textureLabel, delTextureButton);
@@ -102,7 +102,7 @@ public interface GameAppDecorator {
   default TreeItem<Node> createDeletableTreeItem(HBox textureHBox, Runnable runnable) {
     var textureItem = new TreeItem<Node>(textureHBox);
 
-    ((Button)textureHBox.getChildren().get(1)).setOnAction(_ -> {
+    ((Button) textureHBox.getChildren().get(1)).setOnAction(_ -> {
       removeTreeItem(textureHBox);
       runnable.run();
     });
@@ -119,9 +119,9 @@ public interface GameAppDecorator {
     var arrow = new Arrow(0, 0, 0, imageView.getFitHeight());
     arrow.x1Property().bind(imageView.getRotation().pivotXProperty());
     arrow.y1Property().bind(imageView.getRotation().pivotYProperty());
-    arrow.y2Property().bind(XBindings.reduceDoubleValue(arrow.y1Property(), imageView.fitHeightProperty(),(y,h)-> y + Math.max(70,h)));
+    arrow.y2Property().bind(XBindings.reduceDoubleValue(arrow.y1Property(), imageView.fitHeightProperty(), (y, h) -> y + Math.max(70, h)));
     arrow.x2Property().bind(arrow.x1Property());
-    imageView.getTransforms().addListener((ListChangeListener<Transform>)_ ->{
+    imageView.getTransforms().addListener((ListChangeListener<Transform>) _ -> {
       arrow.getTransforms().clear();
       arrow.getTransforms().addAll(imageView.getTransforms());
     });
@@ -144,7 +144,7 @@ public interface GameAppDecorator {
     rect.setFill(Color.TRANSPARENT);
     rect.setStroke(Color.web("#039ED3"));
     rect.getTransforms().addAll(texture.getTransforms());
-    texture.getTransforms().addListener((ListChangeListener<Transform>) (_)->{
+    texture.getTransforms().addListener((ListChangeListener<Transform>) (_) -> {
       rect.getTransforms().clear();
       rect.getTransforms().addAll(texture.getTransforms());
     });
@@ -164,8 +164,8 @@ public interface GameAppDecorator {
         decorateRightPane(image);
       }
 
-      case Entity entity when p.length==1 && p[0] instanceof List keyFrameList -> {
-        List<KeyFrame> keyFrames = (List<KeyFrame>)keyFrameList;
+      case Entity entity when p.length == 1 && p[0] instanceof List keyFrameList -> {
+        List<KeyFrame> keyFrames = (List<KeyFrame>) keyFrameList;
 
         var hbox = new HBox(20);
         hbox.setAlignment(Pos.TOP_RIGHT);
@@ -173,7 +173,7 @@ public interface GameAppDecorator {
         var playButton = new Button("⏯");
         var stopButton = new Button("⏹");
         hbox.layoutXProperty().bind(pane.widthProperty().subtract(hbox.widthProperty()));
-        hbox.getChildren().addAll(playButton, stopButton);
+        hbox.getChildren().addAll(playButton, stopButton, new Label("Total Time: "), FXGL.<GameApp>getAppCast().maxTime);
 
         var line = new Line();
         line.setStroke(Color.DARKCYAN);
@@ -193,8 +193,10 @@ public interface GameAppDecorator {
         anchor.startYProperty().bind(line.startYProperty().subtract(25));
         anchor.endYProperty().bind(anchor.startYProperty().add(50));
 
-        for(var kf:keyFrames){
-          kf.setCenterX(line.getStartX() + (line.getEndX() - line.getStartX())*kf.getTime().toSeconds()/1.0);
+        for (var kf : keyFrames) {
+          var maxTime = FXGL.<GameApp>getAppCast().maxTime;
+          kf.bindCenterX(XBindings.reduce(kf.timeProperty(), maxTime.textProperty().map(Double::parseDouble),
+            (keyFrameTime, totalTime) -> line.getStartX() + (line.getEndX() - line.getStartX()) * keyFrameTime.toSeconds() / totalTime));
           kf.bindCenterY(line.startYProperty());
         }
 
@@ -291,7 +293,7 @@ public interface GameAppDecorator {
         choiceBox.setOnAction(_ -> {
           var childBox = map.inverse().get(texture);
           var parentBox = map.inverse().get(map.get(choiceBox.getValue()));
-          for(var keyFrame:FXGL.<GameApp>getAppCast().keyFrames){
+          for (var keyFrame : FXGL.<GameApp>getAppCast().keyFrames) {
             var m = keyFrame.getRotateTransit2DTextureBiMap();
             m.get(childBox).setParent(m.get(parentBox));
           }
@@ -310,6 +312,7 @@ public interface GameAppDecorator {
       }
     }
   }
+
   default void decorateRightPane(Object object) {
     var rightPane = FXGL.<GameApp>getAppCast().rightPane;
     rightPane.getChildren().clear();
@@ -373,28 +376,28 @@ public interface GameAppDecorator {
         GridPane.setColumnSpan(sepHor, 2);
         rightPane.getChildren().add(sepHor);
 
-        for(int i =0;i<rotateTransit2DTexture.getRotates().size();i++){
+        for (int i = 0; i < rotateTransit2DTexture.getRotates().size(); i++) {
           var rotate = rotateTransit2DTexture.getRotates().get(i);
-          rightPane.add(new Label("Pivot X:"), 0, 3+i*4);
-          rightPane.add(new Label("Pivot Y:"), 0, 3+i*4+1);
-          rightPane.add(new Label("Rotate:"), 0, 3+i*4+2);
+          rightPane.add(new Label("Pivot X:"), 0, 3 + i * 4);
+          rightPane.add(new Label("Pivot Y:"), 0, 3 + i * 4 + 1);
+          rightPane.add(new Label("Rotate:"), 0, 3 + i * 4 + 2);
           var px = new NumberField(-WIDTH, WIDTH);
           var py = new NumberField(-HEIGHT, HEIGHT);
           var r = new NumberField(360);
-          rightPane.add(px, 1, 3+4*i);
-          rightPane.add(py, 1, 3+4*i+1);
-          rightPane.add(r, 1, 3+4*i+2);
+          rightPane.add(px, 1, 3 + 4 * i);
+          rightPane.add(py, 1, 3 + 4 * i + 1);
+          rightPane.add(r, 1, 3 + 4 * i + 2);
 
           Bindings.bindBidirectional(px.textProperty(), rotate.pivotXProperty(), new NumberStringConverter());
           Bindings.bindBidirectional(py.textProperty(), rotate.pivotYProperty(), new NumberStringConverter());
           Bindings.bindBidirectional(r.textProperty(), rotate.angleProperty(), new NumberStringConverter());
 
-          if(rotate == rotateTransit2DTexture.getRotation()) {
-            r.textProperty().addListener((_,_,value)->{
+          if (rotate == rotateTransit2DTexture.getRotation()) {
+            r.textProperty().addListener((_, _, value) -> {
               rotate.setAngle(Double.parseDouble(value));
               rotateTransit2DTexture.update();
             });
-          }else{
+          } else {
             r.setEditable(false);
           }
 
@@ -403,7 +406,7 @@ public interface GameAppDecorator {
 
           final Separator sh = new Separator();
           sh.setValignment(VPos.CENTER);
-          GridPane.setConstraints(sh, 0, 3+4*i+3);
+          GridPane.setConstraints(sh, 0, 3 + 4 * i + 3);
           GridPane.setColumnSpan(sh, 2);
           rightPane.getChildren().add(sh);
         }
@@ -419,21 +422,22 @@ public interface GameAppDecorator {
       }
     }
   }
-  default void decorateMiddlePane(KeyFrame keyFrame){
+
+  default void decorateMiddlePane(KeyFrame keyFrame) {
     var entity = FXGL.<GameApp>getAppCast().entity;
     //don't use entity.getViewComponent().clearChildren();, this method will dispose node.disposing imageview will cause image -> null
     List.copyOf(entity.getViewComponent().getChildren())
       .forEach(e -> entity.getViewComponent().removeChild(e));
     var entityTree = FXGL.<GameApp>getAppCast().entityTree;
-    for(var childItem:entityTree.getChildren()){
+    for (var childItem : entityTree.getChildren()) {
       var hbox = (HBox) childItem.getValue();
       var texture = keyFrame.getRotateTransit2DTextureBiMap().get(hbox);
       entity.getViewComponent().addChild(texture);
     }
   }
 
-  private void removeTextureFromItems(ObservableList<HBox> items, RotateTransit2DTexture texture, BiMap<HBox, RotateTransit2DTexture> map){
-    for(var child:texture.children()){
+  private void removeTextureFromItems(ObservableList<HBox> items, RotateTransit2DTexture texture, BiMap<HBox, RotateTransit2DTexture> map) {
+    for (var child : texture.children()) {
       removeTextureFromItems(items, child, map);
     }
     var item = map.inverse().get(texture);

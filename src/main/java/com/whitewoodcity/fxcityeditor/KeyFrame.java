@@ -4,16 +4,16 @@ package com.whitewoodcity.fxcityeditor;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.whitewoodcity.control.RotateTransit2DTexture;
-import com.whitewoodcity.control.arrows.Arrow;
-import com.whitewoodcity.fxgl.texture.Texture;
-import com.whitewoodcity.javafx.binding.XBindings;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ListChangeListener;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
+
+import java.security.Key;
 
 public class KeyFrame extends Rectangle{
   private final double width, height;
@@ -25,14 +25,28 @@ public class KeyFrame extends Rectangle{
   }
 
   private final BiMap<HBox, RotateTransit2DTexture> rotateTransit2DTextureBiMap = HashBiMap.create();
-  private Duration time;
+//  private Duration time;
+  private final ObjectProperty<Duration> time = new SimpleObjectProperty<>();
+
+//  public Duration getTime() {
+//    return time;
+//  }
+//
+//  public KeyFrame setTime(Duration time) {
+//    this.time = time;
+//    return this;
+//  }
 
   public Duration getTime() {
+    return time.get();
+  }
+
+  public ObjectProperty<Duration> timeProperty() {
     return time;
   }
 
   public KeyFrame setTime(Duration time) {
-    this.time = time;
+    this.time.set(time);
     return this;
   }
 

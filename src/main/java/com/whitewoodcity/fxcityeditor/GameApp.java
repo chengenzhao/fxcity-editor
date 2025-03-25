@@ -6,6 +6,7 @@ import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.whitewoodcity.control.NumberField;
 import com.whitewoodcity.control.RotateTransit2DTexture;
 import com.whitewoodcity.control.arrows.Arrow;
 import com.whitewoodcity.fxgl.texture.AnimatedTexture;
@@ -41,9 +42,9 @@ public class GameApp extends GameApplication implements GameAppDecorator {
   Entity entity;
   TreeItem<Node> entityTree;
   final BiMap<Label, File> fileBiMap = HashBiMap.create();
-//  final BiMap<HBox, RotateTransit2DTexture> rotateTransit2DTextureBiMap = HashBiMap.create();
   final List<KeyFrame> keyFrames = new ArrayList<>();
-  private int currentKeyFrame = 0; //index of current key frame in the above keyFrames
+  int currentKeyFrame = 0; //index of current key frame in the above keyFrames
+  NumberField maxTime = new NumberField(100);//in seconds
 
   @Override
   protected void initSettings(GameSettings settings) {
@@ -57,6 +58,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
   protected void initGame() {
     entity = new Entity();
     FXGL.getGameWorld().addEntities(entity);
+    maxTime.setText("1");
   }
 
   @Override
