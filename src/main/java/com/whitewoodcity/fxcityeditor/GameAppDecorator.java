@@ -21,11 +21,10 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
@@ -193,16 +192,42 @@ public interface GameAppDecorator {
         anchor.startYProperty().bind(line.startYProperty().subtract(25));
         anchor.endYProperty().bind(anchor.startYProperty().add(50));
 
+        pane.getChildren().addAll(hbox, anchor, line);
+
         for (int i = 0; i < keyFrames.size(); i++) {
           var kf = keyFrames.get(i);
           var maxTime = FXGL.<GameApp>getAppCast().maxTime;
           kf.bindCenterX(XBindings.reduce(kf.timeProperty(), maxTime.textProperty().map(Double::parseDouble).map(t -> Math.max(t, 0.0001)),
             (keyFrameTime, totalTime) -> Math.min(line.getStartX() + (line.getEndX() - line.getStartX()) * keyFrameTime.toSeconds() / totalTime, line.getEndX())));
           kf.bindCenterY(line.startYProperty());
+          var timeField = new NumberField(0,(int)maxTime.getDouble()+1);
+          timeField.translateXProperty().bind(kf.xProperty());
+          timeField.translateYProperty().bind(kf.yProperty().add(kf.heightProperty()));
+          timeField.setPrefWidth(kf.getWidth()*2);
+          timeField.textProperty().bind(kf.timeProperty().map(t -> t.toSeconds()+""));
+          if(i > 0) {
+            timeField.setOnMousePressed(_ -> {
+              timeField.textProperty().unbind();
+              timeField.setEditable(true);
+              timeField.setMaxValue(maxTime.getDouble());
+            });
+            Runnable lostFocusAction = () -> {
+              timeField.textProperty().unbind();
+              kf.setTime(Duration.seconds(timeField.getDouble()));
+              timeField.textProperty().bind(kf.timeProperty().map(t -> t.toSeconds() + ""));
+              timeField.setEditable(false);
+            };
+            timeField.setOnKeyPressed(e -> {
+              if (e.getCode() == KeyCode.ENTER) {
+                lostFocusAction.run();
+              }
+            });
+            timeField.focusedProperty().addListener((_, _, _) -> lostFocusAction.run());
+          }else{
+            timeField.setDisable(true);
+          }
+          pane.getChildren().addAll(kf, timeField);
         }
-
-        pane.getChildren().addAll(hbox, anchor, line);
-        pane.getChildren().addAll(keyFrames.toArray(new KeyFrame[0]));
 
         playButton.setOnAction(_ -> entity.getViewComponent().getChildren().forEach(this::startAnimations));
 

@@ -70,6 +70,10 @@ public class KeyFrame extends Rectangle{
     return this;
   }
 
+  public double getCenterX(){
+    return getX() + width/2;
+  }
+
   public KeyFrame bindCenterY(ObservableValue<Number> y){
     super.yProperty().bind(y.map(Number::doubleValue).map(v -> v - height/2));
     return this;

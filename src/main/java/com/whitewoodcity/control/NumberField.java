@@ -5,12 +5,16 @@ import javafx.scene.control.TextFormatter;
 
 public class NumberField extends TextField {
 
+  private double minValue, maxValue;
+
   public NumberField(int maxValue) {
     this(0, maxValue);
   }
 
   public NumberField(int minValue, int maxValue) {
     assert(minValue <= maxValue);
+    this.minValue = minValue;
+    this.maxValue = maxValue;
 
     this.setTextFormatter(new TextFormatter<>(c -> {
       var newText = c.getControlNewText();
@@ -24,11 +28,11 @@ public class NumberField extends TextField {
       }  else if (!validate(newText)) {
         setText(c.getControlText());
         return null;
-      } else if (Double.parseDouble(newText) > maxValue) {
-        setText(maxValue + "");
+      } else if (Double.parseDouble(newText) > this.maxValue) {
+        setText(this.maxValue + "");
         return null;
-      } else if (Double.parseDouble(newText) < minValue) {
-        setText(minValue + "");
+      } else if (Double.parseDouble(newText) < this.minValue) {
+        setText(this.minValue + "");
         return null;
       } else {
         return c;
@@ -48,5 +52,21 @@ public class NumberField extends TextField {
 
   public double getDouble(){
     return Double.parseDouble(getText());
+  }
+
+  public double getMinValue() {
+    return minValue;
+  }
+
+  public void setMinValue(double minValue) {
+    this.minValue = minValue;
+  }
+
+  public double getMaxValue() {
+    return maxValue;
+  }
+
+  public void setMaxValue(double maxValue) {
+    this.maxValue = maxValue;
   }
 }
