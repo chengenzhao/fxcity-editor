@@ -200,30 +200,36 @@ public interface GameAppDecorator {
           kf.bindCenterX(XBindings.reduce(kf.timeProperty(), maxTime.textProperty().map(Double::parseDouble).map(t -> Math.max(t, 0.0001)),
             (keyFrameTime, totalTime) -> Math.min(line.getStartX() + (line.getEndX() - line.getStartX()) * keyFrameTime.toSeconds() / totalTime, line.getEndX())));
           kf.bindCenterY(line.startYProperty());
-          var timeField = new NumberField(0,(int)maxTime.getDouble()+1);
+          var timeField = new NumberField(0, (int) maxTime.getDouble() + 1);
           timeField.translateXProperty().bind(kf.xProperty());
           timeField.translateYProperty().bind(kf.yProperty().add(kf.heightProperty()));
-          timeField.setPrefWidth(kf.getWidth()*2);
-          timeField.textProperty().bind(kf.timeProperty().map(t -> t.toSeconds()+""));
-          if(i > 0) {
-            timeField.setOnMousePressed(_ -> {
+          timeField.setPrefWidth(kf.getWidth() * 2);
+          timeField.textProperty().bind(kf.timeProperty().map(t -> t.toSeconds() + ""));
+          if (i > 0) {
+            Runnable onFocusAction = () -> {
               timeField.textProperty().unbind();
               timeField.setEditable(true);
               timeField.setMaxValue(maxTime.getDouble());
-            });
+            };
             Runnable lostFocusAction = () -> {
               timeField.textProperty().unbind();
               kf.setTime(Duration.seconds(timeField.getDouble()));
               timeField.textProperty().bind(kf.timeProperty().map(t -> t.toSeconds() + ""));
               timeField.setEditable(false);
             };
+            timeField.setOnMousePressed(_ -> onFocusAction.run());
             timeField.setOnKeyPressed(e -> {
               if (e.getCode() == KeyCode.ENTER) {
                 lostFocusAction.run();
               }
             });
-            timeField.focusedProperty().addListener((_, _, _) -> lostFocusAction.run());
-          }else{
+            timeField.focusedProperty().addListener((_, _, newValue) -> {
+              if (newValue)
+                onFocusAction.run();
+              else
+                lostFocusAction.run();
+            });
+          } else {
             timeField.setDisable(true);
           }
           pane.getChildren().addAll(kf, timeField);
