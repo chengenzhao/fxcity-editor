@@ -193,15 +193,13 @@ public interface GameAppDecorator {
         anchor.startYProperty().bind(line.startYProperty().subtract(25));
         anchor.endYProperty().bind(anchor.startYProperty().add(50));
 
-        var kf0 = keyFrames.get(0);
-        var kf1 = keyFrames.get(1);
+        for(var kf:keyFrames){
+          kf.setCenterX(line.getStartX() + (line.getEndX() - line.getStartX())*kf.getTime().toSeconds()/1.0);
+          kf.bindCenterY(line.startYProperty());
+        }
 
-        kf0.setCenterX(line.getStartX());
-        kf0.bindCenterY(line.startYProperty());
-        kf1.setCenterX(line.getEndX());
-        kf1.bindCenterY(line.endYProperty());
-
-        pane.getChildren().addAll(hbox, anchor, line, kf0,kf1);
+        pane.getChildren().addAll(hbox, anchor, line);
+        pane.getChildren().addAll(keyFrames.toArray(new KeyFrame[0]));
 
         playButton.setOnAction(_ -> entity.getViewComponent().getChildren().forEach(this::startAnimations));
 
@@ -297,7 +295,6 @@ public interface GameAppDecorator {
             var m = keyFrame.getRotateTransit2DTextureBiMap();
             m.get(childBox).setParent(m.get(parentBox));
           }
-//          texture.setParent(map.get(choiceBox.getValue()));
         });
 
         var hbox = new HBox();

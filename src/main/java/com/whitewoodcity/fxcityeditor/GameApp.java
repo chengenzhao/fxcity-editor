@@ -252,24 +252,6 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     selectTreeItem(hBox);
     fireEvent(keyFrames.get(currentKeyFrame));
 
-//    var texture = new RotateTransit2DTexture(image);
-//    entity.getViewComponent().addChild(texture);
-//
-//    var rect = createSelectionRectangle(texture);
-//    var arrow = createRotateArrow(texture);
-//    var rectangles = new ArrayList<Rectangle>();
-//    var textureItem = createDeletableTreeItem(name, () -> {
-//      texture.setParent(null);
-//      new ArrayList<>(texture.children()).forEach(e -> e.setParent(null));
-//      entity.getViewComponent().removeChild(texture);
-//      rotateTransit2DTextureBiMap.inverse().remove(texture);
-//    });
-//
-//    var textureHBox = textureItem.getValue();
-//
-//    rotateTransit2DTextureBiMap.put((HBox) textureHBox, texture);
-//
-
     var rectangles = new ArrayList<Rectangle>();
 
     hBox.setOnMousePressed(_ -> {
