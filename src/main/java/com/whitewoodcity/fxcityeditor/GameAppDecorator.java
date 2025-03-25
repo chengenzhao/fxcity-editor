@@ -193,10 +193,11 @@ public interface GameAppDecorator {
         anchor.startYProperty().bind(line.startYProperty().subtract(25));
         anchor.endYProperty().bind(anchor.startYProperty().add(50));
 
-        for (var kf : keyFrames) {
+        for (int i = 0; i < keyFrames.size(); i++) {
+          var kf = keyFrames.get(i);
           var maxTime = FXGL.<GameApp>getAppCast().maxTime;
-          kf.bindCenterX(XBindings.reduce(kf.timeProperty(), maxTime.textProperty().map(Double::parseDouble),
-            (keyFrameTime, totalTime) -> line.getStartX() + (line.getEndX() - line.getStartX()) * keyFrameTime.toSeconds() / totalTime));
+          kf.bindCenterX(XBindings.reduce(kf.timeProperty(), maxTime.textProperty().map(Double::parseDouble).map(t -> Math.max(t, 0.0001)),
+            (keyFrameTime, totalTime) -> Math.min(line.getStartX() + (line.getEndX() - line.getStartX()) * keyFrameTime.toSeconds() / totalTime, line.getEndX())));
           kf.bindCenterY(line.startYProperty());
         }
 
