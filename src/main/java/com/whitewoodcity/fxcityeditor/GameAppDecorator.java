@@ -221,8 +221,13 @@ public interface GameAppDecorator {
             keyFrames.remove(kf);
             pane.getChildren().removeAll(kf, timeField, delButton);
             var gameApp = FXGL.<GameApp>getAppCast();
-            gameApp.rectMap.remove(kf);
-            gameApp.arrowMap.remove(kf);
+            for(var map:gameApp.rectMaps.values()){
+              map.remove(kf);
+            }
+            for(var map:gameApp.arrowMaps.values()){
+              map.remove(kf);
+            }
+            gameApp.setCurrentKeyFrame(0);
           });
           pane.getChildren().addAll(kf, timeField, delButton);
         });

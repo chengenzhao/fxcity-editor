@@ -212,11 +212,16 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     selectTreeItem(textureHBox);
   }
 
-  HashMap<KeyFrame, Rectangle> rectMap = new HashMap<>();
-  HashMap<KeyFrame, Arrow> arrowMap = new HashMap<>();
+  HashMap<HBox, HashMap<KeyFrame, Rectangle>> rectMaps = new HashMap<>();
+  HashMap<HBox, HashMap<KeyFrame, Arrow>> arrowMaps = new HashMap<>();
 
   private void addTransitTexture(TreeItem<Node> treeItem, String name, Image image) {
     var hBox = createDeletableLableBox(name);
+
+    rectMaps.put(hBox, new HashMap<>());
+    arrowMaps.put(hBox, new HashMap<>());
+    var rectMap = rectMaps.get(hBox);
+    var arrowMap = arrowMaps.get(hBox);
 
     for (var keyFrame : keyFrames) {
       var texture = new RotateTransit2DTexture(image);
