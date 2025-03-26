@@ -208,16 +208,17 @@ public interface GameAppDecorator {
             FXGL.<GameApp>getAppCast().setCurrentKeyFrame(j);
             decorateMiddlePane(kf);
 
-            var ox = kf.getX();
-            kf.setOnMouseDragged(e -> {
-              var cx = e.getX() - ox;
-              var ex = ox + cx - line.getStartX();
+            if(j>0) {
+              var ox = kf.getX();
+              kf.setOnMouseDragged(e -> {
+                var cx = e.getX() - ox;
+                var ex = ox + cx - line.getStartX();
 
-              ex = Math.min(Math.max(0,ex), line.getEndX() - line.getStartX());
+                ex = Math.min(Math.max(0, ex), line.getEndX() - line.getStartX());
 
-              kf.setTime(Duration.seconds((ex - 0)*maxTime.getDouble()/(line.getEndX() - line.getStartX())));
-            });
-
+                kf.setTime(Duration.seconds((ex - 0) * maxTime.getDouble() / (line.getEndX() - line.getStartX())));
+              });
+            }
           });
 
           var timeField = new NumberField(0, (int) maxTime.getDouble() + 1);
