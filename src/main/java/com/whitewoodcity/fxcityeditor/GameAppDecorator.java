@@ -208,51 +208,10 @@ public interface GameAppDecorator {
             FXGL.<GameApp>getAppCast().setCurrentKeyFrame(j);
             decorateMiddlePane(kf);
 
-            if(j>0) {
-              var ox = kf.getX();
-              kf.setOnMouseDragged(e -> {
-                var cx = e.getX() - ox;
-                var ex = ox + cx - line.getStartX();
-
-                ex = Math.min(Math.max(0, ex), line.getEndX() - line.getStartX());
-
-                kf.setTime(Duration.seconds((ex - 0) * maxTime.getDouble() / (line.getEndX() - line.getStartX())));
-              });
-            }
+            if (j > 0) makeKeyFrameDraggable(kf, line);
           });
 
-          var timeField = new NumberField(0, (int) maxTime.getDouble() + 1);
-          timeField.translateXProperty().bind(kf.xProperty());
-          timeField.translateYProperty().bind(kf.yProperty().add(kf.heightProperty()));
-          timeField.setPrefWidth(kf.getWidth() * 2);
-          timeField.textProperty().bind(kf.timeProperty().map(t -> t.toSeconds() + ""));
-          if (i > 0) {
-            Runnable onFocusAction = () -> {
-              timeField.textProperty().unbind();
-              timeField.setEditable(true);
-              timeField.setMaxValue(maxTime.getDouble());
-            };
-            Runnable lostFocusAction = () -> {
-              timeField.textProperty().unbind();
-              kf.setTime(Duration.seconds(timeField.getDouble()));
-              timeField.textProperty().bind(kf.timeProperty().map(t -> t.toSeconds() + ""));
-              timeField.setEditable(false);
-            };
-            timeField.setOnMouseClicked(_ -> onFocusAction.run());
-            timeField.setOnKeyPressed(e -> {
-              if (e.getCode() == KeyCode.ENTER) {
-                lostFocusAction.run();
-              }
-            });
-            timeField.focusedProperty().addListener((_, _, newValue) -> {
-              if (newValue)
-                onFocusAction.run();
-              else
-                lostFocusAction.run();
-            });
-          } else {
-            timeField.setDisable(true);
-          }
+          var timeField = buildTimeFieldForKeyFrame(kf, i > 0);
           pane.getChildren().addAll(kf, timeField);
         }
 
@@ -364,6 +323,56 @@ public interface GameAppDecorator {
       default -> {
       }
     }
+  }
+
+  private void makeKeyFrameDraggable(KeyFrame kf, Line line){
+    var maxTime = FXGL.<GameApp>getAppCast().maxTime;
+    var ox = kf.getX();
+    kf.setOnMouseDragged(e -> {
+      var cx = e.getX() - ox;
+      var ex = ox + cx - line.getStartX();
+
+      ex = Math.min(Math.max(0, ex), line.getEndX() - line.getStartX());
+
+      kf.setTime(Duration.seconds(ex * maxTime.getDouble() / (line.getEndX() - line.getStartX())));
+    });
+  }
+
+  private TextField buildTimeFieldForKeyFrame(KeyFrame kf, boolean editable) {
+    var maxTime = FXGL.<GameApp>getAppCast().maxTime;
+    var timeField = new NumberField(0, (int) maxTime.getDouble() + 1);
+    timeField.translateXProperty().bind(kf.xProperty());
+    timeField.translateYProperty().bind(kf.yProperty().add(kf.heightProperty()));
+    timeField.setPrefWidth(kf.getWidth() * 2);
+    timeField.textProperty().bind(kf.timeProperty().map(t -> t.toSeconds() + ""));
+    if (editable) {
+      Runnable onFocusAction = () -> {
+        timeField.textProperty().unbind();
+        timeField.setEditable(true);
+        timeField.setMaxValue(maxTime.getDouble());
+      };
+      Runnable lostFocusAction = () -> {
+        timeField.textProperty().unbind();
+        kf.setTime(Duration.seconds(timeField.getDouble()));
+        timeField.textProperty().bind(kf.timeProperty().map(t -> t.toSeconds() + ""));
+        timeField.setEditable(false);
+      };
+      timeField.setOnMouseClicked(_ -> onFocusAction.run());
+      timeField.setOnKeyPressed(e -> {
+        if (e.getCode() == KeyCode.ENTER) {
+          lostFocusAction.run();
+        }
+      });
+      timeField.focusedProperty().addListener((_, _, newValue) -> {
+        if (newValue)
+          onFocusAction.run();
+        else
+          lostFocusAction.run();
+      });
+    } else {
+      timeField.setDisable(true);
+    }
+    return timeField;
   }
 
   default void decorateRightPane(Object object) {
