@@ -209,7 +209,8 @@ public interface GameAppDecorator {
           var maxTime = FXGL.<GameApp>getAppCast().maxTime;
           var kf = generateKeyFrame(Duration.seconds(maxTime.getDouble()));
 
-          FXGL.<GameApp>getAppCast().keyFrames.add(kf);
+          kf.copyFrom(keyFrames.getLast());
+          keyFrames.add(kf);
 
           bindKeyFrame(kf,line,true);
           var timeField = buildTimeFieldForKeyFrame(kf, true);
@@ -337,7 +338,7 @@ public interface GameAppDecorator {
       (keyFrameTime, totalTime) -> Math.min(line.getStartX() + (line.getEndX() - line.getStartX()) * keyFrameTime.toSeconds() / totalTime, line.getEndX())));
     kf.bindCenterY(line.startYProperty());
 
-    kf.setOnMouseClicked(e -> {
+    kf.setOnMousePressed(_ -> {
       FXGL.<GameApp>getAppCast().getCurrentKeyFrame().deSelect();
       kf.select();
       FXGL.<GameApp>getAppCast().setCurrentKeyFrame(kf);

@@ -212,10 +212,12 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     selectTreeItem(textureHBox);
   }
 
+  HashMap<KeyFrame, Rectangle> rectMap = new HashMap<>();
+  HashMap<KeyFrame, Arrow> arrowMap = new HashMap<>();
+
   private void addTransitTexture(TreeItem<Node> treeItem, String name, Image image) {
     var hBox = createDeletableLableBox(name);
-    var rectMap = new HashMap<KeyFrame, Rectangle>();
-    var arrowMap = new HashMap<KeyFrame, Arrow>();
+
     for (var keyFrame : keyFrames) {
       var texture = new RotateTransit2DTexture(image);
       keyFrame.getRotateTransit2DTextureBiMap().put(hBox, texture);
@@ -343,19 +345,10 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         });
       });
     });
-//    texture.setOnMouseClicked(_ -> selectTreeItem(textureHBox, this.treeView));
-//    texture.children().addListener((ListChangeListener<RotateTransit2DTexture>) _ -> selectTreeItem(textureHBox, this.treeView));
-//    rect.setOnMouseReleased(e -> {//deselect the view component
-//      if (e.getButton() == MouseButton.SECONDARY)
-//        freezeEvent(textureHBox);
-//    });
     hBox.setOnMouseReleased(e -> {//freeze event
       if(e.getButton() == MouseButton.SECONDARY)
         fireEvent(keyFrames.get(currentKeyFrame));
     });
-//
-//    treeItem.getChildren().add(textureItem);
-//    selectTreeItem(textureHBox, this.treeView);
   }
 
   private void populateJointSelectionRectanglesExceptThis(RotateTransit2DTexture texture, List<Rectangle> rectangles) {

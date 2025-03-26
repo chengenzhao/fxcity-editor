@@ -13,7 +13,7 @@ import java.util.List;
 public class RotateTransit2DTexture extends Texture {
 
   private final ObservableList<Rotate> rotates = FXCollections.observableArrayList();
-  private final Rotate rotate;
+  private Rotate rotate;
 
   private RotateTransit2DTexture parent;
   private final ObservableList<RotateTransit2DTexture> children = FXCollections.observableArrayList();
@@ -115,10 +115,6 @@ public class RotateTransit2DTexture extends Texture {
       removeAncestorsRotations(this, this.parent.getRotation());
     }
 
-//    if(this.parent != null) {
-//      this.parent.children().remove(this);
-//      removeAncestorsRotations(this.parent);
-//    }
     this.parent = parent;
     if (parent != null) {
       this.parent.children().add(this);
@@ -155,5 +151,15 @@ public class RotateTransit2DTexture extends Texture {
 
   public ObservableList<RotateTransit2DTexture> children() {
     return children;
+  }
+
+  @Override
+  public RotateTransit2DTexture clone(){
+    var texture = new RotateTransit2DTexture(getImage());
+
+    texture.rotate = rotate.clone();
+    texture.addRotate(texture.rotate);
+
+    return texture;
   }
 }

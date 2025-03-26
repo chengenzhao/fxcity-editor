@@ -1,12 +1,14 @@
 package com.whitewoodcity.fxcityeditor;
 
 
+import com.almasb.fxgl.dsl.FXGL;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.whitewoodcity.control.RotateTransit2DTexture;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -15,7 +17,7 @@ import javafx.util.Duration;
 
 import java.security.Key;
 
-public class KeyFrame extends Rectangle{
+public class KeyFrame extends Rectangle implements GameAppDecorator{
   private final double width, height;
 
   public KeyFrame(double width, double height) {
@@ -88,5 +90,22 @@ public class KeyFrame extends Rectangle{
 
   public BiMap<HBox, RotateTransit2DTexture> getRotateTransit2DTextureBiMap() {
     return rotateTransit2DTextureBiMap;
+  }
+
+  public void copyFrom(KeyFrame keyFrame){
+    var keySet = keyFrame.rotateTransit2DTextureBiMap.keySet();
+    for(var hBox:keySet){
+      var texture = keyFrame.rotateTransit2DTextureBiMap.get(hBox).clone();
+      this.rotateTransit2DTextureBiMap.put(hBox, texture);
+
+      texture.setOnMouseClicked(_ -> selectTreeItem(hBox));
+      texture.children().addListener((ListChangeListener<RotateTransit2DTexture>) _ -> selectTreeItem(hBox));
+
+      var gameApp = FXGL.<GameApp>getAppCast();
+
+      gameApp.rectMap.put(this, createSelectionRectangle(texture));
+      gameApp.arrowMap.put(this, createRotateArrow(texture));
+    }
+
   }
 }
