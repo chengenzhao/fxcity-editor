@@ -148,10 +148,6 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     keyFrames.getFirst().select();
   }
 
-  private KeyFrame generateKeyFrame(Duration duration) {
-    return new KeyFrame(20, 50).setTime(duration).setColor(Color.ORANGE);//LIGHTSEAGREEN
-  }
-
   private void addImage() {
     FileChooser fileChooser = new FileChooser();
     fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image files", "*.PNG", "*.JPG"));
@@ -389,5 +385,9 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 
   public void setCurrentKeyFrame(int currentKeyFrame) {
     this.currentKeyFrame = currentKeyFrame;
+  }
+
+  public void setCurrentKeyFrame(KeyFrame currentKeyFrame) {
+    this.currentKeyFrame = keyFrames.indexOf(currentKeyFrame);
   }
 }

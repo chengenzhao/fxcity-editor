@@ -36,7 +36,6 @@ import javafx.util.StringConverter;
 import javafx.util.converter.NumberStringConverter;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 public interface GameAppDecorator {
@@ -171,8 +170,9 @@ public interface GameAppDecorator {
         hbox.setPadding(new Insets(20));
         var playButton = new Button("⏯");
         var stopButton = new Button("⏹");
+        var addButton = new Button("+");
         hbox.layoutXProperty().bind(pane.widthProperty().subtract(hbox.widthProperty()));
-        hbox.getChildren().addAll(playButton, stopButton, new Label("Total Time: "), FXGL.<GameApp>getAppCast().maxTime);
+        hbox.getChildren().addAll(playButton, stopButton, new Label("Total Time: "), FXGL.<GameApp>getAppCast().maxTime, addButton);
 
         var line = new Line();
         line.setStroke(Color.DARKCYAN);
@@ -196,21 +196,7 @@ public interface GameAppDecorator {
 
         for (int i = 0; i < keyFrames.size(); i++) {
           var kf = keyFrames.get(i);
-          var maxTime = FXGL.<GameApp>getAppCast().maxTime;
-          kf.bindCenterX(XBindings.reduce(kf.timeProperty(), maxTime.textProperty().map(Double::parseDouble).map(t -> Math.max(t, 0.0001)),
-            (keyFrameTime, totalTime) -> Math.min(line.getStartX() + (line.getEndX() - line.getStartX()) * keyFrameTime.toSeconds() / totalTime, line.getEndX())));
-          kf.bindCenterY(line.startYProperty());
-
-          var j = i;
-          kf.setOnMousePressed(_ -> {
-            FXGL.<GameApp>getAppCast().getCurrentKeyFrame().deSelect();
-            kf.select();
-            FXGL.<GameApp>getAppCast().setCurrentKeyFrame(j);
-            decorateMiddlePane(kf);
-
-            if (j > 0) makeKeyFrameDraggable(kf, line);
-          });
-
+          bindKeyFrame(kf, line, i>0);
           var timeField = buildTimeFieldForKeyFrame(kf, i > 0);
           pane.getChildren().addAll(kf, timeField);
         }
@@ -218,6 +204,17 @@ public interface GameAppDecorator {
         playButton.setOnAction(_ -> entity.getViewComponent().getChildren().forEach(this::startAnimations));
 
         stopButton.setOnAction(_ -> entity.getViewComponent().getChildren().forEach(this::stopAnimations));
+
+        addButton.setOnAction(_ ->{
+          var maxTime = FXGL.<GameApp>getAppCast().maxTime;
+          var kf = generateKeyFrame(Duration.seconds(maxTime.getDouble()));
+
+          FXGL.<GameApp>getAppCast().keyFrames.add(kf);
+
+          bindKeyFrame(kf,line,true);
+          var timeField = buildTimeFieldForKeyFrame(kf, true);
+          pane.getChildren().addAll(kf, timeField);
+        });
 
         decorateRightPane(entity);
       }
@@ -325,17 +322,31 @@ public interface GameAppDecorator {
     }
   }
 
-  private void makeKeyFrameDraggable(KeyFrame kf, Line line){
+  private void bindKeyFrame(KeyFrame kf, Line line, boolean draggable){
     var maxTime = FXGL.<GameApp>getAppCast().maxTime;
     var ox = kf.getX();
-    kf.setOnMouseDragged(e -> {
-      var cx = e.getX() - ox;
-      var ex = ox + cx - line.getStartX();
 
-      ex = Math.min(Math.max(0, ex), line.getEndX() - line.getStartX());
+    kf.bindCenterX(XBindings.reduce(kf.timeProperty(), maxTime.textProperty().map(Double::parseDouble).map(t -> Math.max(t, 0.0001)),
+      (keyFrameTime, totalTime) -> Math.min(line.getStartX() + (line.getEndX() - line.getStartX()) * keyFrameTime.toSeconds() / totalTime, line.getEndX())));
+    kf.bindCenterY(line.startYProperty());
 
-      kf.setTime(Duration.seconds(ex * maxTime.getDouble() / (line.getEndX() - line.getStartX())));
+    kf.setOnMouseClicked(e -> {
+      FXGL.<GameApp>getAppCast().getCurrentKeyFrame().deSelect();
+      kf.select();
+      FXGL.<GameApp>getAppCast().setCurrentKeyFrame(kf);
+      decorateMiddlePane(kf);
     });
+
+    if(draggable) {
+      kf.setOnMouseDragged(e -> {
+        var cx = e.getX() - ox;
+        var ex = ox + cx - line.getStartX();
+
+        ex = Math.min(Math.max(0, ex), line.getEndX() - line.getStartX());
+
+        kf.setTime(Duration.seconds(ex * maxTime.getDouble() / (line.getEndX() - line.getStartX())));
+      });
+    }
   }
 
   private TextField buildTimeFieldForKeyFrame(KeyFrame kf, boolean editable) {
@@ -496,6 +507,10 @@ public interface GameAppDecorator {
       var texture = keyFrame.getRotateTransit2DTextureBiMap().get(hbox);
       entity.getViewComponent().addChild(texture);
     }
+  }
+
+  default KeyFrame generateKeyFrame(Duration duration) {
+    return new KeyFrame(20, 50).setTime(duration).setColor(Color.ORANGE);//LIGHTSEAGREEN
   }
 
   private void removeTextureFromItems(ObservableList<HBox> items, RotateTransit2DTexture texture, BiMap<HBox, RotateTransit2DTexture> map) {
