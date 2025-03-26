@@ -213,7 +213,14 @@ public interface GameAppDecorator {
 
           bindKeyFrame(kf,line,true);
           var timeField = buildTimeFieldForKeyFrame(kf, true);
-          pane.getChildren().addAll(kf, timeField);
+          var delButton = new Button("x");
+          delButton.translateXProperty().bind(kf.xProperty());
+          delButton.translateYProperty().bind(kf.yProperty().add(kf.heightProperty()).add(timeField.heightProperty()));
+          delButton.setOnAction(_->{
+            keyFrames.remove(kf);
+            pane.getChildren().removeAll(kf, timeField, delButton);
+          });
+          pane.getChildren().addAll(kf, timeField, delButton);
         });
 
         decorateRightPane(entity);
