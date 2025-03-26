@@ -220,6 +220,9 @@ public interface GameAppDecorator {
           delButton.setOnAction(_->{
             keyFrames.remove(kf);
             pane.getChildren().removeAll(kf, timeField, delButton);
+            var gameApp = FXGL.<GameApp>getAppCast();
+            gameApp.rectMap.remove(kf);
+            gameApp.arrowMap.remove(kf);
           });
           pane.getChildren().addAll(kf, timeField, delButton);
         });

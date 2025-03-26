@@ -105,6 +105,8 @@ public class KeyFrame extends Rectangle implements GameAppDecorator{
 
       gameApp.rectMap.put(this, createSelectionRectangle(texture));
       gameApp.arrowMap.put(this, createRotateArrow(texture));
+
+      //todo copy parent-children relations from keyFrame
     }
 
   }
