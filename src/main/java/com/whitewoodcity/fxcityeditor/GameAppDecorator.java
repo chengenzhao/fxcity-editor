@@ -200,6 +200,15 @@ public interface GameAppDecorator {
           kf.bindCenterX(XBindings.reduce(kf.timeProperty(), maxTime.textProperty().map(Double::parseDouble).map(t -> Math.max(t, 0.0001)),
             (keyFrameTime, totalTime) -> Math.min(line.getStartX() + (line.getEndX() - line.getStartX()) * keyFrameTime.toSeconds() / totalTime, line.getEndX())));
           kf.bindCenterY(line.startYProperty());
+
+          var j = i;
+          kf.setOnMousePressed(_ -> {
+            FXGL.<GameApp>getAppCast().getCurrentKeyFrame().deSelect();
+            kf.select();
+            FXGL.<GameApp>getAppCast().setCurrentKeyFrame(j);
+            decorateMiddlePane(kf);
+          });
+
           var timeField = new NumberField(0, (int) maxTime.getDouble() + 1);
           timeField.translateXProperty().bind(kf.xProperty());
           timeField.translateYProperty().bind(kf.yProperty().add(kf.heightProperty()));
@@ -217,7 +226,7 @@ public interface GameAppDecorator {
               timeField.textProperty().bind(kf.timeProperty().map(t -> t.toSeconds() + ""));
               timeField.setEditable(false);
             };
-            timeField.setOnMousePressed(_ -> onFocusAction.run());
+            timeField.setOnMouseClicked(_ -> onFocusAction.run());
             timeField.setOnKeyPressed(e -> {
               if (e.getCode() == KeyCode.ENTER) {
                 lostFocusAction.run();

@@ -145,17 +145,6 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     keyFrames.add(generateKeyFrame(Duration.seconds(0)));
     keyFrames.add(generateKeyFrame(Duration.seconds(1)));
 
-    for (int i = 0; i < keyFrames.size(); i++) {
-      var frame = keyFrames.get(i);
-      final int j = i;
-      frame.setOnMousePressed(_ -> {
-        keyFrames.get(currentKeyFrame).deSelect();
-        frame.select();
-        currentKeyFrame = j;
-        decorateMiddlePane(frame);
-      });
-    }
-
     keyFrames.getFirst().select();
   }
 
@@ -394,8 +383,8 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     }
   }
 
-  public int getCurrentKeyFrame() {
-    return currentKeyFrame;
+  public KeyFrame getCurrentKeyFrame() {
+    return keyFrames.get(currentKeyFrame);
   }
 
   public void setCurrentKeyFrame(int currentKeyFrame) {
