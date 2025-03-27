@@ -237,24 +237,6 @@ public interface GameAppDecorator {
           keyFrames.add(kf);
 
           decorateBottomAndRightPane(entity);
-//          bindKeyFrame(kf,line,true);
-//          var timeField = buildTimeFieldForKeyFrame(kf, true);
-//          var delButton = new Button("x");
-//          delButton.translateXProperty().bind(kf.xProperty());
-//          delButton.translateYProperty().bind(kf.yProperty().add(kf.heightProperty()).add(timeField.heightProperty()));
-//          delButton.setOnAction(_->{
-//            keyFrames.remove(kf);
-//            pane.getChildren().removeAll(kf, timeField, delButton);
-//            var gameApp = FXGL.<GameApp>getAppCast();
-//            for(var map:gameApp.rectMaps.values()){
-//              map.remove(kf);
-//            }
-//            for(var map:gameApp.arrowMaps.values()){
-//              map.remove(kf);
-//            }
-//            gameApp.setCurrentKeyFrame(0);
-//          });
-//          pane.getChildren().addAll(kf, timeField, delButton);
         });
 
         decorateRightPane(entity);
