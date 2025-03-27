@@ -43,6 +43,10 @@ public class KeyFrame extends Rectangle implements GameAppDecorator{
     return time.get();
   }
 
+  public double getTimeInSeconds(){
+    return getTime().toSeconds();
+  }
+
   public ObjectProperty<Duration> timeProperty() {
     return time;
   }
@@ -107,5 +111,12 @@ public class KeyFrame extends Rectangle implements GameAppDecorator{
       gameApp.arrowMaps.get(hBox).put(this, createRotateArrow(texture));
     }
 
+    for(var texture:keyFrame.rotateTransit2DTextureBiMap.values()){
+      if(texture.parent()!=null){
+        var child = rotateTransit2DTextureBiMap.get(keyFrame.rotateTransit2DTextureBiMap.inverse().get(texture));
+        var parent = rotateTransit2DTextureBiMap.get(keyFrame.rotateTransit2DTextureBiMap.inverse().get(texture.parent()));
+        child.setParent(parent);
+      }
+    }
   }
 }

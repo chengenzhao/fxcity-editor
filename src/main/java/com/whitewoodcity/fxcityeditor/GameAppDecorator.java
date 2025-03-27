@@ -36,6 +36,7 @@ import javafx.util.StringConverter;
 import javafx.util.converter.NumberStringConverter;
 
 import java.text.DecimalFormat;
+import java.util.Comparator;
 import java.util.List;
 
 public interface GameAppDecorator {
@@ -162,8 +163,9 @@ public interface GameAppDecorator {
         decorateRightPane(image);
       }
 
-      case Entity entity when p.length == 1 && p[0] instanceof List keyFrameList -> {
-        List<KeyFrame> keyFrames = (List<KeyFrame>) keyFrameList;
+      case Entity entity  -> {
+        var keyFrames = FXGL.<GameApp>getAppCast().keyFrames;
+        keyFrames.sort(Comparator.comparingDouble(KeyFrame::getTimeInSeconds));
 
         var hbox = new HBox(20);
         hbox.setAlignment(Pos.TOP_RIGHT);
@@ -212,24 +214,25 @@ public interface GameAppDecorator {
           kf.copyFrom(keyFrames.getLast());
           keyFrames.add(kf);
 
-          bindKeyFrame(kf,line,true);
-          var timeField = buildTimeFieldForKeyFrame(kf, true);
-          var delButton = new Button("x");
-          delButton.translateXProperty().bind(kf.xProperty());
-          delButton.translateYProperty().bind(kf.yProperty().add(kf.heightProperty()).add(timeField.heightProperty()));
-          delButton.setOnAction(_->{
-            keyFrames.remove(kf);
-            pane.getChildren().removeAll(kf, timeField, delButton);
-            var gameApp = FXGL.<GameApp>getAppCast();
-            for(var map:gameApp.rectMaps.values()){
-              map.remove(kf);
-            }
-            for(var map:gameApp.arrowMaps.values()){
-              map.remove(kf);
-            }
-            gameApp.setCurrentKeyFrame(0);
-          });
-          pane.getChildren().addAll(kf, timeField, delButton);
+          decorateBottomAndRightPane(entity);
+//          bindKeyFrame(kf,line,true);
+//          var timeField = buildTimeFieldForKeyFrame(kf, true);
+//          var delButton = new Button("x");
+//          delButton.translateXProperty().bind(kf.xProperty());
+//          delButton.translateYProperty().bind(kf.yProperty().add(kf.heightProperty()).add(timeField.heightProperty()));
+//          delButton.setOnAction(_->{
+//            keyFrames.remove(kf);
+//            pane.getChildren().removeAll(kf, timeField, delButton);
+//            var gameApp = FXGL.<GameApp>getAppCast();
+//            for(var map:gameApp.rectMaps.values()){
+//              map.remove(kf);
+//            }
+//            for(var map:gameApp.arrowMaps.values()){
+//              map.remove(kf);
+//            }
+//            gameApp.setCurrentKeyFrame(0);
+//          });
+//          pane.getChildren().addAll(kf, timeField, delButton);
         });
 
         decorateRightPane(entity);

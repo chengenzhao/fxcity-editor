@@ -123,7 +123,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     var entityHBox = (HBox) entityTree.getValue();
     entityHBox.setAlignment(Pos.BASELINE_LEFT);
     entityHBox.getChildren().addAll(new Label("Entity"), addViewComponentButton);
-    entityHBox.setOnMousePressed(_ -> decorateBottomAndRightPane(entity, keyFrames));
+    entityHBox.setOnMousePressed(_ -> decorateBottomAndRightPane(entity));
 
     addImageButton.setOnAction(_ -> addImage());
 

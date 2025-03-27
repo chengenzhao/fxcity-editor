@@ -19,12 +19,24 @@ public class RotateTransit2DTexture extends Texture {
   private final ObservableList<RotateTransit2DTexture> children = FXCollections.observableArrayList();
 
   public RotateTransit2DTexture(Image image) {
+//    super(image);
+//
+//    setFitWidth(image.getWidth());
+//    setFitHeight(image.getHeight());
+//
+//    rotate = new Rotate(0, this.getX(), this.getY());
+//
+//    this.addRotate(rotate);
+    this(image, new Rotate(0));
+  }
+
+  public RotateTransit2DTexture(Image image, Rotate rotate){
     super(image);
 
     setFitWidth(image.getWidth());
     setFitHeight(image.getHeight());
 
-    rotate = new Rotate(0, this.getX(), this.getY());
+    this.rotate = rotate;
 
     this.addRotate(rotate);
   }
@@ -155,11 +167,6 @@ public class RotateTransit2DTexture extends Texture {
 
   @Override
   public RotateTransit2DTexture clone(){
-    var texture = new RotateTransit2DTexture(getImage());
-
-    texture.rotate = rotate.clone();
-    texture.addRotate(texture.rotate);
-
-    return texture;
+    return new RotateTransit2DTexture(getImage(),rotate.clone());
   }
 }
