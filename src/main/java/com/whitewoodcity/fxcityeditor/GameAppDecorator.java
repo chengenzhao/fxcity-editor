@@ -230,12 +230,17 @@ public interface GameAppDecorator {
         stopButton.setOnAction(_ -> entity.getViewComponent().getChildren().forEach(this::stopAnimations));
 
         addButton.setOnAction(_ ->{
-          var maxTime = FXGL.<GameApp>getAppCast().maxTime;
+          var app = FXGL.<GameApp>getAppCast();
+          app.getCurrentKeyFrame().deSelect();
+          var maxTime = app.maxTime;
           var kf = generateKeyFrame(Duration.seconds(maxTime.getDouble()));
 
           kf.copyFrom(keyFrames.getLast());
           keyFrames.add(kf);
 
+          app.setCurrentKeyFrame(kf);
+          app.getCurrentKeyFrame().select();
+          decorateMiddlePane(keyFrames.getLast());
           decorateBottomAndRightPane(entity);
         });
 
