@@ -251,6 +251,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     hBox.setOnMousePressed(_ -> {
       var keyFrame = keyFrames.get(currentKeyFrame);
       var texture = keyFrame.getRotateTransit2DTextureBiMap().get(hBox);
+      decorateMiddlePane(keyFrame);
       decorateBottomAndRightPane(texture, keyFrame.getRotateTransit2DTextureBiMap());
 
       var rect = rectMap.get(keyFrame);
