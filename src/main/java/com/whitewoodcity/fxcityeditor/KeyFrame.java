@@ -118,5 +118,8 @@ public class KeyFrame extends Rectangle implements GameAppDecorator{
         child.setParent(parent);
       }
     }
+
+    for(var texture:rotateTransit2DTextureBiMap.values())
+      texture.update();
   }
 }
