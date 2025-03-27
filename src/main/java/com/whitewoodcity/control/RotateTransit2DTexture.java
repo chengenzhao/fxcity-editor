@@ -167,6 +167,12 @@ public class RotateTransit2DTexture extends Texture {
 
   @Override
   public RotateTransit2DTexture clone(){
-    return new RotateTransit2DTexture(getImage(),rotate.clone());
+    var texture = new RotateTransit2DTexture(getImage(),rotate.clone());
+    texture.setTranslateX(this.getTranslateX());
+    texture.setTranslateY(this.getTranslateY());
+    texture.setTranslateZ(this.getTranslateZ());
+    texture.setX(this.getX());
+    texture.setY(this.getY());
+    return texture;
   }
 }

@@ -201,6 +201,28 @@ public interface GameAppDecorator {
           bindKeyFrame(kf, line, i>0);
           var timeField = buildTimeFieldForKeyFrame(kf, i > 0);
           pane.getChildren().addAll(kf, timeField);
+
+          if(i>1){
+            var delButton = new Button("x");
+            delButton.translateXProperty().bind(kf.xProperty());
+            delButton.translateYProperty().bind(kf.yProperty().add(kf.heightProperty()).add(timeField.heightProperty()));
+            delButton.setOnAction(_->{
+              var gameApp = FXGL.<GameApp>getAppCast();
+              gameApp.getCurrentKeyFrame().deSelect();
+              keyFrames.remove(kf);
+              for(var map:gameApp.rectMaps.values()){
+                map.remove(kf);
+              }
+              for(var map:gameApp.arrowMaps.values()){
+                map.remove(kf);
+              }
+              gameApp.setCurrentKeyFrame(0);
+              gameApp.getCurrentKeyFrame().select();
+              decorateMiddlePane(gameApp.getCurrentKeyFrame());
+              decorateBottomAndRightPane(entity);
+            });
+            pane.getChildren().add(delButton);
+          }
         }
 
         playButton.setOnAction(_ -> entity.getViewComponent().getChildren().forEach(this::startAnimations));
