@@ -98,14 +98,13 @@ public class KeyFrame extends Rectangle implements GameAppDecorator{
 
   public void copyFrom(KeyFrame keyFrame){
     var keySet = keyFrame.rotateTransit2DTextureBiMap.keySet();
+    var gameApp = FXGL.<GameApp>getAppCast();
     for(var hBox:keySet){
       var texture = keyFrame.rotateTransit2DTextureBiMap.get(hBox).clone();
       this.rotateTransit2DTextureBiMap.put(hBox, texture);
 
       texture.setOnMouseClicked(_ -> selectTreeItem(hBox));
       texture.children().addListener((ListChangeListener<RotateTransit2DTexture>) _ -> selectTreeItem(hBox));
-
-      var gameApp = FXGL.<GameApp>getAppCast();
 
       gameApp.rectMaps.get(hBox).put(this, createSelectionRectangle(texture));
       gameApp.arrowMaps.get(hBox).put(this, createRotateArrow(texture));
