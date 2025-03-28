@@ -164,7 +164,7 @@ public interface GameAppDecorator {
         decorateRightPane(image);
       }
 
-      case Entity entity  -> {
+      case Entity entity -> {
         var keyFrames = FXGL.<GameApp>getAppCast().keyFrames;
         keyFrames.sort(Comparator.comparingDouble(KeyFrame::getTimeInSeconds));
 
@@ -199,22 +199,22 @@ public interface GameAppDecorator {
 
         for (int i = 0; i < keyFrames.size(); i++) {
           var kf = keyFrames.get(i);
-          bindKeyFrame(kf, line, i>0);
+          bindKeyFrame(kf, line, i > 0);
           var timeField = buildTimeFieldForKeyFrame(kf, i > 0);
           pane.getChildren().addAll(kf, timeField);
 
-          if(i>1){
+          if (i > 1) {
             var delButton = new Button("x");
             delButton.translateXProperty().bind(kf.xProperty());
             delButton.translateYProperty().bind(kf.yProperty().add(kf.heightProperty()).add(timeField.heightProperty()));
-            delButton.setOnAction(_->{
+            delButton.setOnAction(_ -> {
               var gameApp = FXGL.<GameApp>getAppCast();
               gameApp.getCurrentKeyFrame().deSelect();
               keyFrames.remove(kf);
-              for(var map:gameApp.rectMaps.values()){
+              for (var map : gameApp.rectMaps.values()) {
                 map.remove(kf);
               }
-              for(var map:gameApp.arrowMaps.values()){
+              for (var map : gameApp.arrowMaps.values()) {
                 map.remove(kf);
               }
               gameApp.setCurrentKeyFrame(0);
@@ -228,29 +228,46 @@ public interface GameAppDecorator {
 
         playButton.setOnAction(_ -> {
           //collect data
-          for(var item:keyFrames.getFirst().getRotateTransit2DTextureBiMap().keySet()){
+          for (var item : keyFrames.getFirst().getRotateTransit2DTextureBiMap().keySet()) {
             ObjectMapper objectMapper = new ObjectMapper();
             var animationData = objectMapper.createArrayNode();
 
-            for(var kf:keyFrames){
+            for (var kf : keyFrames) {
               var json = objectMapper.createObjectNode();
-              json.put("time",kf.getTimeInSeconds()*1000);//time in millis
+              json.put("time", kf.getTimeInSeconds() * 1000);//time in millis
               var texture = kf.getRotateTransit2DTextureBiMap().get(item);
-              json.put("x",texture.getX());
-              json.put("y",texture.getY());
+              json.put("x", texture.getX());
+              json.put("y", texture.getY());
               var rotates = objectMapper.createArrayNode();
-              for(var rotate:texture.getRotates()){
+              for (var rotate : texture.getRotates()) {
                 var rjson = objectMapper.createObjectNode();
                 rjson.put("pivotX", rotate.getPivotX());
-                rjson.put("pivotY",rotate.getPivotY());
+                rjson.put("pivotY", rotate.getPivotY());
                 rjson.put("angle", rotate.getAngle());
                 rotates.add(rjson);
               }
-              json.set("rotates",rotates);
+              json.set("rotates", rotates);
               animationData.add(json);
             }
 
-            System.out.println(animationData);
+            var json = objectMapper.createObjectNode();
+            json.put("time", FXGL.<GameApp>getAppCast().maxTime.getDouble() * 1000);//time in millis
+            var texture = keyFrames.getFirst().getRotateTransit2DTextureBiMap().get(item);
+            json.put("x", texture.getX());
+            json.put("y", texture.getY());
+            var rotates = objectMapper.createArrayNode();
+            for (var rotate : texture.getRotates()) {
+              var rjson = objectMapper.createObjectNode();
+              rjson.put("pivotX", rotate.getPivotX());
+              rjson.put("pivotY", rotate.getPivotY());
+              rjson.put("angle", rotate.getAngle());
+              rotates.add(rjson);
+            }
+            json.set("rotates", rotates);
+            animationData.add(json);
+
+            //todo
+            texture.constructTransition(animationData);
           }
 
 
@@ -259,7 +276,7 @@ public interface GameAppDecorator {
 
         stopButton.setOnAction(_ -> entity.getViewComponent().getChildren().forEach(this::stopAnimations));
 
-        addButton.setOnAction(_ ->{
+        addButton.setOnAction(_ -> {
           var app = FXGL.<GameApp>getAppCast();
           app.getCurrentKeyFrame().deSelect();
           var maxTime = app.maxTime;
@@ -380,7 +397,7 @@ public interface GameAppDecorator {
     }
   }
 
-  private void bindKeyFrame(KeyFrame kf, Line line, boolean draggable){
+  private void bindKeyFrame(KeyFrame kf, Line line, boolean draggable) {
     var maxTime = FXGL.<GameApp>getAppCast().maxTime;
     var ox = kf.getX();
 
@@ -395,7 +412,7 @@ public interface GameAppDecorator {
       decorateMiddlePane(kf);
     });
 
-    if(draggable) {
+    if (draggable) {
       kf.setOnMouseDragged(e -> {
         var cx = e.getX() - ox;
         var ex = ox + cx - line.getStartX();

@@ -1,6 +1,11 @@
 package com.whitewoodcity.control;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.whitewoodcity.fxgl.texture.Texture;
+import javafx.animation.Animation;
+import javafx.animation.SequentialTransition;
+import javafx.animation.Timeline;
 import javafx.animation.Transition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -9,6 +14,7 @@ import javafx.scene.image.Image;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Rotate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RotateTransit2DTexture extends Texture {
@@ -18,6 +24,8 @@ public class RotateTransit2DTexture extends Texture {
 
   private RotateTransit2DTexture parent;
   private final ObservableList<RotateTransit2DTexture> children = FXCollections.observableArrayList();
+
+  private Transition transition;
 
   public RotateTransit2DTexture(Image image) {
     this(image, new Rotate(0));
@@ -169,7 +177,27 @@ public class RotateTransit2DTexture extends Texture {
     return texture;
   }
 
-  public void startAnimation(){
+  public void constructTransition(ArrayNode jsonArray){
+    var list = new ArrayList<TransitionData>();
+    for(int i=0;i<jsonArray.size()-1;i++){
+      list.add(new TransitionData((ObjectNode) jsonArray.get(i), (ObjectNode) jsonArray.get(i+1)));
+    }
+    System.out.println(list);
+  }
 
+  public void startTransition(){
+    transition.setCycleCount(1);
+    transition.play();
+  }
+
+  public void loopTransition(){
+    transition.setCycleCount(Timeline.INDEFINITE);
+    transition.play();
+  }
+
+  public void stopTransition(){
+    transition.stop();
   }
 }
+
+record TransitionData(ObjectNode start, ObjectNode end){}
