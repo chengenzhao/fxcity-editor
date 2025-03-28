@@ -13,6 +13,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Rotate;
+import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,7 @@ public class RotateTransit2DTexture extends Texture {
     this(image, new Rotate(0));
   }
 
-  public RotateTransit2DTexture(Image image, Rotate rotate){
+  public RotateTransit2DTexture(Image image, Rotate rotate) {
     super(image);
 
     setFitWidth(image.getWidth());
@@ -167,8 +168,8 @@ public class RotateTransit2DTexture extends Texture {
   }
 
   @Override
-  public RotateTransit2DTexture clone(){
-    var texture = new RotateTransit2DTexture(getImage(),rotate.clone());
+  public RotateTransit2DTexture clone() {
+    var texture = new RotateTransit2DTexture(getImage(), rotate.clone());
     texture.setTranslateX(this.getTranslateX());
     texture.setTranslateY(this.getTranslateY());
     texture.setTranslateZ(this.getTranslateZ());
@@ -177,27 +178,51 @@ public class RotateTransit2DTexture extends Texture {
     return texture;
   }
 
-  public void constructTransition(ArrayNode jsonArray){
+  public void constructTransition(ArrayNode jsonArray) {
     var list = new ArrayList<TransitionData>();
-    for(int i=0;i<jsonArray.size()-1;i++){
-      list.add(new TransitionData((ObjectNode) jsonArray.get(i), (ObjectNode) jsonArray.get(i+1)));
+    for (int i = 0; i < jsonArray.size() - 1; i++) {
+      list.add(new TransitionData((ObjectNode) jsonArray.get(i), (ObjectNode) jsonArray.get(i + 1)));
     }
-    System.out.println(list);
+    var tran = new SequentialTransition(this);
+    for (var data : list) {
+      tran.getChildren().add(new CusteomTransition(this,data.start(), data.end()));
+    }
+    this.transition = tran;
   }
 
-  public void startTransition(){
+  public void startTransition() {
     transition.setCycleCount(1);
     transition.play();
   }
 
-  public void loopTransition(){
+  public void loopTransition() {
     transition.setCycleCount(Timeline.INDEFINITE);
     transition.play();
   }
 
-  public void stopTransition(){
+  public void stopTransition() {
     transition.stop();
   }
 }
 
-record TransitionData(ObjectNode start, ObjectNode end){}
+record TransitionData(ObjectNode start, ObjectNode end) { }
+
+class CusteomTransition extends Transition{
+
+  private final RotateTransit2DTexture cachedNode;
+  private final ObjectNode start;
+  private final ObjectNode end;
+
+  public CusteomTransition(RotateTransit2DTexture cachedNode, ObjectNode start, ObjectNode end) {
+    this.cachedNode = cachedNode;
+    this.start = start;
+    this.end = end;
+    setCycleDuration(Duration.millis(end.get("time").asDouble() - start.get("time").asDouble()));
+  }
+
+  @Override
+  protected void interpolate(double frac) {
+    cachedNode.setX((end.get("x").asDouble() - start.get("x").asDouble())*frac + start.get("x").asDouble());
+    cachedNode.setY((end.get("y").asDouble() - start.get("y").asDouble())*frac + start.get("y").asDouble());
+  }
+}

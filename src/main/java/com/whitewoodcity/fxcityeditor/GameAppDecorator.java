@@ -227,6 +227,7 @@ public interface GameAppDecorator {
         }
 
         playButton.setOnAction(_ -> {
+          decorateMiddlePane(keyFrames.getFirst());
           //collect data
           for (var item : keyFrames.getFirst().getRotateTransit2DTextureBiMap().keySet()) {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -268,6 +269,7 @@ public interface GameAppDecorator {
 
             //todo
             texture.constructTransition(animationData);
+            texture.startTransition();
           }
 
 
