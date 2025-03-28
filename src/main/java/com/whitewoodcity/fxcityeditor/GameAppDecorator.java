@@ -2,6 +2,7 @@ package com.whitewoodcity.fxcityeditor;
 
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.BiMap;
 import com.whitewoodcity.control.IntField;
 import com.whitewoodcity.control.NumberField;
@@ -225,7 +226,36 @@ public interface GameAppDecorator {
           }
         }
 
-        playButton.setOnAction(_ -> entity.getViewComponent().getChildren().forEach(this::startAnimations));
+        playButton.setOnAction(_ -> {
+          //collect data
+          for(var item:keyFrames.getFirst().getRotateTransit2DTextureBiMap().keySet()){
+            ObjectMapper objectMapper = new ObjectMapper();
+            var animationData = objectMapper.createArrayNode();
+
+            for(var kf:keyFrames){
+              var json = objectMapper.createObjectNode();
+              json.put("time",kf.getTimeInSeconds()*1000);//time in millis
+              var texture = kf.getRotateTransit2DTextureBiMap().get(item);
+              json.put("x",texture.getX());
+              json.put("y",texture.getY());
+              var rotates = objectMapper.createArrayNode();
+              for(var rotate:texture.getRotates()){
+                var rjson = objectMapper.createObjectNode();
+                rjson.put("pivotX", rotate.getPivotX());
+                rjson.put("pivotY",rotate.getPivotY());
+                rjson.put("angle", rotate.getAngle());
+                rotates.add(rjson);
+              }
+              json.set("rotates",rotates);
+              animationData.add(json);
+            }
+
+            System.out.println(animationData);
+          }
+
+
+          entity.getViewComponent().getChildren().forEach(this::startAnimations);
+        });
 
         stopButton.setOnAction(_ -> entity.getViewComponent().getChildren().forEach(this::stopAnimations));
 

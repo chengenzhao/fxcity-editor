@@ -1,6 +1,7 @@
 package com.whitewoodcity.control;
 
 import com.whitewoodcity.fxgl.texture.Texture;
+import javafx.animation.Transition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
@@ -13,20 +14,12 @@ import java.util.List;
 public class RotateTransit2DTexture extends Texture {
 
   private final ObservableList<Rotate> rotates = FXCollections.observableArrayList();
-  private Rotate rotate;
+  private final Rotate rotate;
 
   private RotateTransit2DTexture parent;
   private final ObservableList<RotateTransit2DTexture> children = FXCollections.observableArrayList();
 
   public RotateTransit2DTexture(Image image) {
-//    super(image);
-//
-//    setFitWidth(image.getWidth());
-//    setFitHeight(image.getHeight());
-//
-//    rotate = new Rotate(0, this.getX(), this.getY());
-//
-//    this.addRotate(rotate);
     this(image, new Rotate(0));
   }
 
@@ -174,5 +167,9 @@ public class RotateTransit2DTexture extends Texture {
     texture.setX(this.getX());
     texture.setY(this.getY());
     return texture;
+  }
+
+  public void startAnimation(){
+
   }
 }
