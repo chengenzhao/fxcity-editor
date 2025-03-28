@@ -29,7 +29,7 @@ public class RotateTransit2DTexture extends Texture {
   private Transition transition;
 
   public RotateTransit2DTexture(Image image) {
-    this(image, new Rotate(0));
+    this(image, new Rotate(360));
   }
 
   public RotateTransit2DTexture(Image image, Rotate rotate) {
@@ -222,7 +222,21 @@ class CusteomTransition extends Transition{
 
   @Override
   protected void interpolate(double frac) {
+
     cachedNode.setX((end.get("x").asDouble() - start.get("x").asDouble())*frac + start.get("x").asDouble());
     cachedNode.setY((end.get("y").asDouble() - start.get("y").asDouble())*frac + start.get("y").asDouble());
+
+    System.out.println(cachedNode + ":"+cachedNode.getX() + " "+cachedNode.getY());
+
+    var rotatesStart = start.withArray("rotates");
+    var rotatesEnd = end.withArray("rotates");
+    for(int i=0;i<rotatesStart.size();i++){
+      var rotateStart = rotatesStart.get(i);
+      var rotateEnd = rotatesEnd.get(i);
+      var rotate = (Rotate)cachedNode.getTransforms().get(i);
+      rotate.setPivotX((rotateEnd.get("pivotX").asDouble() - rotateStart.get("pivotX").asDouble())*frac + rotateStart.get("pivotX").asDouble());
+      rotate.setPivotY((rotateEnd.get("pivotY").asDouble() - rotateStart.get("pivotY").asDouble())*frac + rotateStart.get("pivotY").asDouble());
+      rotate.setAngle((rotateEnd.get("angle").asDouble() - rotateStart.get("angle").asDouble())*frac + rotateStart.get("angle").asDouble());
+    }
   }
 }

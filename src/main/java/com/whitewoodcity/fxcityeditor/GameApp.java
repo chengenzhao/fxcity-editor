@@ -328,12 +328,8 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         var ox = oe.getX();
         arrow.getHeadB().setOnMouseDragged(e -> {
           double changeInX = e.getX() - ox;
-          var angle = texture.getRotation().getAngle();
-          if (changeInX > 0) texture.getRotation().setAngle(angle - 1 < 0 ? 361 - angle : angle - 1);
-          if (changeInX < 0) texture.getRotation().setAngle((angle + 1) % 360);
-          if (changeInX != 0) {
+          if(changeTextureAngle(texture,changeInX))
             update(texture, rect, arrow);
-          }
         });
       });
 
@@ -342,12 +338,8 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         var ox = oe.getX();
         arrow.getMainLine().setOnMouseDragged(e -> {
           double changeInX = e.getX() - ox;
-          var angle = texture.getRotation().getAngle();
-          if (changeInX > 0) texture.getRotation().setAngle(angle - 1 < 0 ? 361 - angle : angle - 1);
-          if (changeInX < 0) texture.getRotation().setAngle((angle + 1) % 360);
-          if (changeInX != 0) {
+          if(changeTextureAngle(texture,changeInX))
             update(texture, rect, arrow);
-          }
         });
       });
     });
@@ -355,6 +347,13 @@ public class GameApp extends GameApplication implements GameAppDecorator {
       if(e.getButton() == MouseButton.SECONDARY)
         fireEvent(keyFrames.get(currentKeyFrame));
     });
+  }
+
+  private boolean changeTextureAngle(RotateTransit2DTexture texture, double changeInX){
+    var angle = texture.getRotation().getAngle();
+    if (changeInX > 0) texture.getRotation().setAngle(angle - 1);
+    if (changeInX < 0) texture.getRotation().setAngle(angle + 1);
+    return changeInX!=0;
   }
 
   private void populateJointSelectionRectanglesExceptThis(RotateTransit2DTexture texture, List<Rectangle> rectangles) {
@@ -376,6 +375,8 @@ public class GameApp extends GameApplication implements GameAppDecorator {
       node.getTransforms().clear();
       node.getTransforms().addAll(texture.getTransforms());
     }
+    if(texture.parent()!=null)
+      texture.parent().update();
   }
 
   public KeyFrame getCurrentKeyFrame() {

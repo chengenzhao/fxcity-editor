@@ -30,6 +30,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineCap;
+import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Transform;
 import javafx.stage.Screen;
 import javafx.util.Duration;
@@ -240,7 +241,8 @@ public interface GameAppDecorator {
               json.put("x", texture.getX());
               json.put("y", texture.getY());
               var rotates = objectMapper.createArrayNode();
-              for (var rotate : texture.getRotates()) {
+              for (var rotateRaw : texture.getTransforms()) {
+                var rotate = (Rotate)rotateRaw;
                 var rjson = objectMapper.createObjectNode();
                 rjson.put("pivotX", rotate.getPivotX());
                 rjson.put("pivotY", rotate.getPivotY());
@@ -257,7 +259,8 @@ public interface GameAppDecorator {
             json.put("x", texture.getX());
             json.put("y", texture.getY());
             var rotates = objectMapper.createArrayNode();
-            for (var rotate : texture.getRotates()) {
+            for (var rotateRaw : texture.getTransforms()) {
+              var rotate = (Rotate)rotateRaw;
               var rjson = objectMapper.createObjectNode();
               rjson.put("pivotX", rotate.getPivotX());
               rjson.put("pivotY", rotate.getPivotY());
@@ -533,7 +536,7 @@ public interface GameAppDecorator {
           rightPane.add(new Label("Rotate:"), 0, 3 + i * 4 + 2);
           var px = new NumberField(-WIDTH, WIDTH);
           var py = new NumberField(-HEIGHT, HEIGHT);
-          var r = new NumberField(360);
+          var r = new NumberField(0,720);
           rightPane.add(px, 1, 3 + 4 * i);
           rightPane.add(py, 1, 3 + 4 * i + 1);
           rightPane.add(r, 1, 3 + 4 * i + 2);
