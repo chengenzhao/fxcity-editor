@@ -7,6 +7,7 @@ import com.google.common.collect.BiMap;
 import com.whitewoodcity.control.IntField;
 import com.whitewoodcity.control.NumberField;
 import com.whitewoodcity.control.RotateTransit2DTexture;
+import com.whitewoodcity.control.TransitTexture;
 import com.whitewoodcity.control.arrows.Arrow;
 import com.whitewoodcity.fxgl.texture.AnimatedTexture;
 import com.whitewoodcity.fxgl.texture.AnimationChannel;
@@ -38,6 +39,7 @@ import javafx.util.StringConverter;
 import javafx.util.converter.NumberStringConverter;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -210,8 +212,10 @@ public interface GameAppDecorator {
           }
         }
 
+        var list = new ArrayList<TransitTexture>();
+
         playButton.setOnAction(_ -> {
-          decorateMiddlePane(keyFrames.getFirst());
+          list.clear();
           //collect data
           for (var item : keyFrames.getFirst().getRotateTransit2DTextureBiMap().keySet()) {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -253,11 +257,17 @@ public interface GameAppDecorator {
             json.set("rotates", rotates);
             animationData.add(json);
 
-            //todo
-            texture.constructTransition(animationData);
-            texture.loopTransition();
+            var t = texture.copy();
+            t.buildTransition("test",animationData);
+            list.add(t);
           }
 
+          List.copyOf(entity.getViewComponent().getChildren())
+            .forEach(e -> entity.getViewComponent().removeChild(e));
+          for(var texture:list) {
+            entity.getViewComponent().addChild(texture);
+            texture.startTransition("test");
+          }
 
           entity.getViewComponent().getChildren().forEach(this::startAnimations);
         });

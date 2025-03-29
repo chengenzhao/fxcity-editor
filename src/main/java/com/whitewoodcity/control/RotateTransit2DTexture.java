@@ -12,12 +12,11 @@ import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Rotate;
-import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class RotateTransit2DTexture extends Texture {
+public class RotateTransit2DTexture extends TransitTexture {
 
   private final ObservableList<Rotate> rotates = FXCollections.observableArrayList();
   private final Rotate rotate;
@@ -174,65 +173,5 @@ public class RotateTransit2DTexture extends Texture {
     texture.setX(this.getX());
     texture.setY(this.getY());
     return texture;
-  }
-
-  public void constructTransition(ArrayNode jsonArray) {
-    var list = new ArrayList<TransitionData>();
-    for (int i = 0; i < jsonArray.size() - 1; i++) {
-      list.add(new TransitionData((ObjectNode) jsonArray.get(i), (ObjectNode) jsonArray.get(i + 1)));
-    }
-    var tran = new SequentialTransition(this);
-    for (var data : list) {
-      tran.getChildren().add(new CusteomTransition(this,data.start(), data.end()));
-    }
-    this.transition = tran;
-  }
-
-  public void startTransition() {
-    transition.setCycleCount(1);
-    transition.play();
-  }
-
-  public void loopTransition() {
-    transition.setCycleCount(Timeline.INDEFINITE);
-    transition.play();
-  }
-
-  public void stopTransition() {
-    transition.stop();
-  }
-}
-
-record TransitionData(ObjectNode start, ObjectNode end) { }
-
-class CusteomTransition extends Transition{
-
-  private final RotateTransit2DTexture cachedNode;
-  private final ObjectNode start;
-  private final ObjectNode end;
-
-  public CusteomTransition(RotateTransit2DTexture cachedNode, ObjectNode start, ObjectNode end) {
-    this.cachedNode = cachedNode;
-    this.start = start;
-    this.end = end;
-    setCycleDuration(Duration.millis(end.get("time").asDouble() - start.get("time").asDouble()));
-  }
-
-  @Override
-  protected void interpolate(double frac) {
-
-    cachedNode.setX((end.get("x").asDouble() - start.get("x").asDouble())*frac + start.get("x").asDouble());
-    cachedNode.setY((end.get("y").asDouble() - start.get("y").asDouble())*frac + start.get("y").asDouble());
-
-    var rotatesStart = start.withArray("rotates");
-    var rotatesEnd = end.withArray("rotates");
-    for(int i=0;i<rotatesStart.size();i++){
-      var rotateStart = rotatesStart.get(i);
-      var rotateEnd = rotatesEnd.get(i);
-      var rotate = (Rotate)cachedNode.getTransforms().get(i);
-      rotate.setPivotX((rotateEnd.get("pivotX").asDouble() - rotateStart.get("pivotX").asDouble())*frac + rotateStart.get("pivotX").asDouble());
-      rotate.setPivotY((rotateEnd.get("pivotY").asDouble() - rotateStart.get("pivotY").asDouble())*frac + rotateStart.get("pivotY").asDouble());
-      rotate.setAngle((rotateEnd.get("angle").asDouble() - rotateStart.get("angle").asDouble())*frac + rotateStart.get("angle").asDouble());
-    }
   }
 }
