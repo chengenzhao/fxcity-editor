@@ -255,7 +255,7 @@ public interface GameAppDecorator {
 
             //todo
             texture.constructTransition(animationData);
-            texture.startTransition();
+            texture.loopTransition();
           }
 
 

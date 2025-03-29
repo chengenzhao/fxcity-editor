@@ -71,7 +71,6 @@ public class RotateTransit2DTexture extends Texture {
       r.setAngle(rotate.getAngle());
       this.getTransforms().set(i, r);
     }
-
   }
 
   public void addRotate(Rotate rotate) {
