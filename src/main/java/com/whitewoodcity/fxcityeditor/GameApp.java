@@ -143,7 +143,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     FXGL.getGameScene().addUINodes(menubar, treeView, rightPane, bottomPane);
 
     keyFrames.add(generateKeyFrame(Duration.seconds(0)));
-    keyFrames.add(generateKeyFrame(Duration.seconds(1)));
+//    keyFrames.add(generateKeyFrame(Duration.seconds(1)));
 
     keyFrames.getFirst().select();
   }

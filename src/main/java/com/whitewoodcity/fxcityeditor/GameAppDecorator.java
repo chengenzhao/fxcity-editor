@@ -200,29 +200,12 @@ public interface GameAppDecorator {
 
         for (int i = 0; i < keyFrames.size(); i++) {
           var kf = keyFrames.get(i);
-          bindKeyFrame(kf, line, i > 0);
+          bindKeyFrameTag(kf, line, i > 0);
           var timeField = buildTimeFieldForKeyFrame(kf, i > 0);
           pane.getChildren().addAll(kf, timeField);
 
-          if (i > 1) {
-            var delButton = new Button("x");
-            delButton.translateXProperty().bind(kf.xProperty());
-            delButton.translateYProperty().bind(kf.yProperty().add(kf.heightProperty()).add(timeField.heightProperty()));
-            delButton.setOnAction(_ -> {
-              var gameApp = FXGL.<GameApp>getAppCast();
-              gameApp.getCurrentKeyFrame().deSelect();
-              keyFrames.remove(kf);
-              for (var map : gameApp.rectMaps.values()) {
-                map.remove(kf);
-              }
-              for (var map : gameApp.arrowMaps.values()) {
-                map.remove(kf);
-              }
-              gameApp.setCurrentKeyFrame(0);
-              gameApp.getCurrentKeyFrame().select();
-              decorateMiddlePane(gameApp.getCurrentKeyFrame());
-              decorateBottomAndRightPane(entity);
-            });
+          if (i > 0) {
+            var delButton = buildDelButtonForKeyFrame(kf, timeField);
             pane.getChildren().add(delButton);
           }
         }
@@ -242,7 +225,7 @@ public interface GameAppDecorator {
               json.put("y", texture.getY());
               var rotates = objectMapper.createArrayNode();
               for (var rotateRaw : texture.getTransforms()) {
-                var rotate = (Rotate)rotateRaw;
+                var rotate = (Rotate) rotateRaw;
                 var rjson = objectMapper.createObjectNode();
                 rjson.put("pivotX", rotate.getPivotX());
                 rjson.put("pivotY", rotate.getPivotY());
@@ -260,7 +243,7 @@ public interface GameAppDecorator {
             json.put("y", texture.getY());
             var rotates = objectMapper.createArrayNode();
             for (var rotateRaw : texture.getTransforms()) {
-              var rotate = (Rotate)rotateRaw;
+              var rotate = (Rotate) rotateRaw;
               var rjson = objectMapper.createObjectNode();
               rjson.put("pivotX", rotate.getPivotX());
               rjson.put("pivotY", rotate.getPivotY());
@@ -402,7 +385,7 @@ public interface GameAppDecorator {
     }
   }
 
-  private void bindKeyFrame(KeyFrame kf, Line line, boolean draggable) {
+  private void bindKeyFrameTag(KeyFrame kf, Line line, boolean draggable) {
     var maxTime = FXGL.<GameApp>getAppCast().maxTime;
     var ox = kf.getX();
 
@@ -427,6 +410,28 @@ public interface GameAppDecorator {
         kf.setTime(Duration.seconds(ex * maxTime.getDouble() / (line.getEndX() - line.getStartX())));
       });
     }
+  }
+
+  private Button buildDelButtonForKeyFrame(KeyFrame kf, TextField timeField) {
+    var delButton = new Button("x");
+    delButton.translateXProperty().bind(kf.xProperty());
+    delButton.translateYProperty().bind(kf.yProperty().add(kf.heightProperty()).add(timeField.heightProperty()));
+    var gameApp = FXGL.<GameApp>getAppCast();
+    delButton.setOnAction(_ -> {
+      gameApp.getCurrentKeyFrame().deSelect();
+      gameApp.keyFrames.remove(kf);
+      for (var map : gameApp.rectMaps.values()) {
+        map.remove(kf);
+      }
+      for (var map : gameApp.arrowMaps.values()) {
+        map.remove(kf);
+      }
+      gameApp.setCurrentKeyFrame(0);
+      gameApp.getCurrentKeyFrame().select();
+      decorateMiddlePane(gameApp.getCurrentKeyFrame());
+      decorateBottomAndRightPane(gameApp.entity);
+    });
+    return delButton;
   }
 
   private TextField buildTimeFieldForKeyFrame(KeyFrame kf, boolean editable) {
@@ -536,7 +541,7 @@ public interface GameAppDecorator {
           rightPane.add(new Label("Rotate:"), 0, 3 + i * 4 + 2);
           var px = new NumberField(-WIDTH, WIDTH);
           var py = new NumberField(-HEIGHT, HEIGHT);
-          var r = new NumberField(0,720);
+          var r = new NumberField(0, 720);
           rightPane.add(px, 1, 3 + 4 * i);
           rightPane.add(py, 1, 3 + 4 * i + 1);
           rightPane.add(r, 1, 3 + 4 * i + 2);
