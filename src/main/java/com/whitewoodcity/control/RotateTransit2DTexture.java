@@ -1,10 +1,6 @@
 package com.whitewoodcity.control;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.whitewoodcity.fxgl.texture.Texture;
-import javafx.animation.SequentialTransition;
-import javafx.animation.Timeline;
+import com.whitewoodcity.fxgl.texture.TransitTexture;
 import javafx.animation.Transition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -13,7 +9,6 @@ import javafx.scene.image.Image;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Rotate;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class RotateTransit2DTexture extends TransitTexture {
