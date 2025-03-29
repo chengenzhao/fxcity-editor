@@ -3,7 +3,6 @@ package com.whitewoodcity.control;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.whitewoodcity.fxgl.texture.Texture;
-import javafx.animation.Animation;
 import javafx.animation.SequentialTransition;
 import javafx.animation.Timeline;
 import javafx.animation.Transition;
@@ -225,8 +224,6 @@ class CusteomTransition extends Transition{
 
     cachedNode.setX((end.get("x").asDouble() - start.get("x").asDouble())*frac + start.get("x").asDouble());
     cachedNode.setY((end.get("y").asDouble() - start.get("y").asDouble())*frac + start.get("y").asDouble());
-
-    System.out.println(cachedNode + ":"+cachedNode.getX() + " "+cachedNode.getY());
 
     var rotatesStart = start.withArray("rotates");
     var rotatesEnd = end.withArray("rotates");
