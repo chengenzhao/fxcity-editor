@@ -1,5 +1,6 @@
 package com.whitewoodcity.control;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.whitewoodcity.fxgl.texture.Texture;
@@ -18,7 +19,7 @@ import java.util.Map;
 public class TransitTexture extends Texture {
 
   private Transition currentTransition;
-  private Map<String, Transition> transitions = new HashMap<>();
+  private final Map<String, Transition> transitions = new HashMap<>();
 
   public TransitTexture(Image image) {
     super(image);
@@ -43,6 +44,20 @@ public class TransitTexture extends Texture {
       tran.getChildren().add(new CusteomTransition(this,data.start(), data.end()));
     }
     this.transitions.put(name, tran);
+  }
+
+  public void show(JsonNode json){
+    this.setX(json.get("x").asDouble());
+    this.setY(json.get("y").asDouble());
+
+    var rotates = json.withArray("rotates");
+    for(int i=0;i<rotates.size();i++){
+      var r = rotates.get(i);
+      var rotate = (Rotate)this.getTransforms().get(i);
+      rotate.setPivotX(r.get("pivotX").asDouble());
+      rotate.setPivotY(r.get("pivotY").asDouble());
+      rotate.setAngle(r.get("angle").asDouble());
+    }
   }
 
   public void startTransition(String name) {
