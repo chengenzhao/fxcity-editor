@@ -2,6 +2,7 @@ package com.whitewoodcity.fxcityeditor;
 
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.BiMap;
 import com.whitewoodcity.control.IntField;
@@ -221,40 +222,11 @@ public interface GameAppDecorator {
             ObjectMapper objectMapper = new ObjectMapper();
             var animationData = objectMapper.createArrayNode();
 
-            for (var kf : keyFrames) {
-              var json = objectMapper.createObjectNode();
-              json.put("time", kf.getTimeInSeconds() * 1000);//time in millis
-              var texture = kf.getRotateTransit2DTextureBiMap().get(item);
-              json.put("x", texture.getX());
-              json.put("y", texture.getY());
-              var rotates = objectMapper.createArrayNode();
-              for (var rotateRaw : texture.getTransforms()) {
-                var rotate = (Rotate) rotateRaw;
-                var rjson = objectMapper.createObjectNode();
-                rjson.put("pivotX", rotate.getPivotX());
-                rjson.put("pivotY", rotate.getPivotY());
-                rjson.put("angle", rotate.getAngle());
-                rotates.add(rjson);
-              }
-              json.set("rotates", rotates);
-              animationData.add(json);
-            }
+            var jsons = keyFrames.stream().map(kf -> extractJsonFromTexture(kf.getTimeInSeconds() * 1000,kf.getRotateTransit2DTextureBiMap().get(item))).toList();
+            animationData.addAll(jsons);
 
-            var json = objectMapper.createObjectNode();
-            json.put("time", FXGL.<GameApp>getAppCast().maxTime.getDouble() * 1000);//time in millis
             var texture = keyFrames.getFirst().getRotateTransit2DTextureBiMap().get(item);
-            json.put("x", texture.getX());
-            json.put("y", texture.getY());
-            var rotates = objectMapper.createArrayNode();
-            for (var rotateRaw : texture.getTransforms()) {
-              var rotate = (Rotate) rotateRaw;
-              var rjson = objectMapper.createObjectNode();
-              rjson.put("pivotX", rotate.getPivotX());
-              rjson.put("pivotY", rotate.getPivotY());
-              rjson.put("angle", rotate.getAngle());
-              rotates.add(rjson);
-            }
-            json.set("rotates", rotates);
+            var json = extractJsonFromTexture(FXGL.<GameApp>getAppCast().maxTime.getDouble() * 1000, texture);
             animationData.add(json);
 
             var t = texture.copy();
@@ -393,6 +365,25 @@ public interface GameAppDecorator {
       default -> {
       }
     }
+  }
+
+  private JsonNode extractJsonFromTexture(double timeInMillis, Texture texture){
+    ObjectMapper objectMapper = new ObjectMapper();
+    var json = objectMapper.createObjectNode();
+    json.put("time", timeInMillis);//time in millis
+    json.put("x", texture.getX());
+    json.put("y", texture.getY());
+    var rotates = objectMapper.createArrayNode();
+    for (var rotateRaw : texture.getTransforms()) {
+      var rotate = (Rotate) rotateRaw;
+      var rjson = objectMapper.createObjectNode();
+      rjson.put("pivotX", rotate.getPivotX());
+      rjson.put("pivotY", rotate.getPivotY());
+      rjson.put("angle", rotate.getAngle());
+      rotates.add(rjson);
+    }
+    json.set("rotates", rotates);
+    return json;
   }
 
   private void bindKeyFrameTag(KeyFrame kf, Line line, boolean draggable) {
