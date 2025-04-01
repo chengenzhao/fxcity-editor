@@ -175,11 +175,12 @@ public interface GameAppDecorator {
         var hbox = new HBox(20);
         hbox.setAlignment(Pos.TOP_RIGHT);
         hbox.setPadding(new Insets(20));
+        var loopButton = new Button("↻");
         var playButton = new Button("⏯");
         var stopButton = new Button("⏹");
         var addButton = new Button("+");
         hbox.layoutXProperty().bind(pane.widthProperty().subtract(hbox.widthProperty()));
-        hbox.getChildren().addAll(playButton, stopButton, new Label("Total Time: "), FXGL.<GameApp>getAppCast().maxTime, addButton);
+        hbox.getChildren().addAll(loopButton, playButton, stopButton, new Label("Total Time: "), FXGL.<GameApp>getAppCast().maxTime, addButton);
 
         var line = new Line();
         line.setStroke(Color.DARKCYAN);
@@ -213,35 +214,28 @@ public interface GameAppDecorator {
           }
         }
 
-        var list = new ArrayList<TransitTexture>();
+        var actionName = "test";
 
-        playButton.setOnAction(_ -> {
-          list.clear();
-          //collect data
-          for (var item : keyFrames.getFirst().getRotateTransit2DTextureBiMap().keySet()) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            var animationData = objectMapper.createArrayNode();
-
-            var jsons = keyFrames.stream().map(kf -> extractJsonFromTexture(kf.getTimeInSeconds() * 1000,kf.getRotateTransit2DTextureBiMap().get(item))).toList();
-            animationData.addAll(jsons);
-
-            var texture = keyFrames.getFirst().getRotateTransit2DTextureBiMap().get(item);
-            var json = extractJsonFromTexture(FXGL.<GameApp>getAppCast().maxTime.getDouble() * 1000, texture);
-            animationData.add(json);
-
-            var t = texture.copy();
-            t.buildTransition("test",animationData);
-            list.add(t);
-          }
-
-          List.copyOf(entity.getViewComponent().getChildren())
-            .forEach(e -> entity.getViewComponent().removeChild(e));
-          for(var texture:list) {
+        loopButton.setOnAction(_->{
+          var l = buildTransition(actionName);
+          clearViewComponent(entity);
+          for(var texture:l) {
             entity.getViewComponent().addChild(texture);
-            texture.startTransition("test");
+            texture.loopTransition(actionName);
           }
 
           entity.getViewComponent().getChildren().forEach(this::startAnimations);
+        });
+
+        playButton.setOnAction(_ -> {
+          var l = buildTransition(actionName);
+          clearViewComponent(entity);
+          for(var texture:l) {
+            entity.getViewComponent().addChild(texture);
+            texture.startTransition(actionName);
+          }
+
+          entity.getViewComponent().getChildren().forEach(this::loopAnimations);
         });
 
         stopButton.setOnAction(_ -> entity.getViewComponent().getChildren().forEach(this::stopAnimations));
@@ -315,7 +309,7 @@ public interface GameAppDecorator {
 
         pane.getChildren().addAll(hbox, line, anchor);
 
-        playButton.setOnAction(_ -> startAnimations(animatedTexture));
+        playButton.setOnAction(_ -> loopAnimations(animatedTexture));
 
         stopButton.setOnAction(_ -> stopAnimations(animatedTexture));
 
@@ -365,6 +359,34 @@ public interface GameAppDecorator {
       default -> {
       }
     }
+  }
+
+  private List<TransitTexture> buildTransition(String name){
+    var list = new ArrayList<TransitTexture>();
+    var keyFrames = FXGL.<GameApp>getAppCast().keyFrames;
+    for (var item : keyFrames.getFirst().getRotateTransit2DTextureBiMap().keySet()) {
+      ObjectMapper objectMapper = new ObjectMapper();
+      var animationData = objectMapper.createArrayNode();
+
+      var jsons = keyFrames.stream().map(kf -> extractJsonFromTexture(kf.getTimeInSeconds() * 1000,kf.getRotateTransit2DTextureBiMap().get(item))).toList();
+      animationData.addAll(jsons);
+
+      var texture = keyFrames.getFirst().getRotateTransit2DTextureBiMap().get(item);
+      var json = extractJsonFromTexture(FXGL.<GameApp>getAppCast().maxTime.getDouble() * 1000, texture);
+      animationData.add(json);
+
+      System.out.println(animationData);
+
+      var t = texture.copy();
+      t.buildTransition(name,animationData);
+      list.add(t);
+    }
+    return list;
+  }
+
+  private void clearViewComponent(Entity entity){
+    List.copyOf(entity.getViewComponent().getChildren())
+      .forEach(e -> entity.getViewComponent().removeChild(e));
   }
 
   private JsonNode extractJsonFromTexture(double timeInMillis, Texture texture){
@@ -607,11 +629,26 @@ public interface GameAppDecorator {
     items.remove(item);
   }
 
-  private void startAnimations(Node component) {
+  private void loopAnimations(Node component) {
     switch (component) {
       case AnimatedTexture animatedTexture -> {
         if (!animatedTexture.isAnimating())
           animatedTexture.loop();
+        else if (animatedTexture.isPaused())
+          animatedTexture.resume();
+        else
+          animatedTexture.pause();
+      }
+      default -> {
+      }
+    }
+  }
+
+  private void startAnimations(Node component) {
+    switch (component) {
+      case AnimatedTexture animatedTexture -> {
+        if (!animatedTexture.isAnimating())
+          animatedTexture.play();
         else if (animatedTexture.isPaused())
           animatedTexture.resume();
         else
