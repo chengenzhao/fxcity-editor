@@ -238,7 +238,9 @@ public interface GameAppDecorator {
           entity.getViewComponent().getChildren().forEach(this::loopAnimations);
         });
 
-        stopButton.setOnAction(_ -> entity.getViewComponent().getChildren().forEach(this::stopAnimations));
+        stopButton.setOnAction(_ -> {
+          entity.getViewComponent().getChildren().forEach(this::stop);
+        });
 
         addButton.setOnAction(_ -> {
           var app = FXGL.<GameApp>getAppCast();
@@ -311,7 +313,7 @@ public interface GameAppDecorator {
 
         playButton.setOnAction(_ -> loopAnimations(animatedTexture));
 
-        stopButton.setOnAction(_ -> stopAnimations(animatedTexture));
+        stopButton.setOnAction(_ -> stop(animatedTexture));
 
         decorateRightPane(animatedTexture);
       }
@@ -659,8 +661,9 @@ public interface GameAppDecorator {
     }
   }
 
-  private void stopAnimations(Node component) {
+  private void stop(Node component) {
     switch (component) {
+      case TransitTexture transitTexture -> transitTexture.stop();
       case AnimatedTexture animatedTexture -> animatedTexture.stop();
       default -> {
       }
