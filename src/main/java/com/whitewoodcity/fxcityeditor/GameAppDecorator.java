@@ -177,10 +177,11 @@ public interface GameAppDecorator {
         hbox.setPadding(new Insets(20));
         var loopButton = new Button("↻");
         var playButton = new Button("▶");
+        var pauseButton = new Button("⏸");
         var stopButton = new Button("⏹");
         var addButton = new Button("+");
         hbox.layoutXProperty().bind(pane.widthProperty().subtract(hbox.widthProperty()));
-        hbox.getChildren().addAll(loopButton, playButton, stopButton, new Label("Total Time: "), FXGL.<GameApp>getAppCast().maxTime, addButton);
+        hbox.getChildren().addAll(loopButton, playButton, pauseButton, stopButton, new Label("Total Time: "), FXGL.<GameApp>getAppCast().maxTime, addButton);
 
         var line = new Line();
         line.setStroke(Color.DARKCYAN);
@@ -237,7 +238,7 @@ public interface GameAppDecorator {
 
           entity.getViewComponent().getChildren().forEach(this::loopAnimations);
         });
-
+        pauseButton.setOnAction( _ -> entity.getViewComponent().getChildren().forEach(this::pause));
         stopButton.setOnAction(_ -> {
           entity.getViewComponent().getChildren().forEach(this::stop);
         });
@@ -668,6 +669,25 @@ public interface GameAppDecorator {
         if (!animatedTexture.isAnimating())
           animatedTexture.play();
         else if (animatedTexture.isPaused())
+          animatedTexture.resume();
+        else
+          animatedTexture.pause();
+      }
+      default -> {
+      }
+    }
+  }
+
+  private void pause(Node component) {
+    switch (component) {
+      case TransitTexture transitTexture ->{
+        if(transitTexture.isRunning())
+          transitTexture.pause();
+        else if(transitTexture.isPaused())
+          transitTexture.resume();
+      }
+      case AnimatedTexture animatedTexture -> {
+        if (animatedTexture.isPaused())
           animatedTexture.resume();
         else
           animatedTexture.pause();
