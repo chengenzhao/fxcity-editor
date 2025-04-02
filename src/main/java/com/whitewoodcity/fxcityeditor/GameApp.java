@@ -347,6 +347,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
       if(e.getButton() == MouseButton.SECONDARY)
         fireEvent(keyFrames.get(currentKeyFrame));
     });
+    fireEvent(hBox);
   }
 
   private boolean changeTextureAngle(RotateTransit2DTexture texture, double changeInX){
