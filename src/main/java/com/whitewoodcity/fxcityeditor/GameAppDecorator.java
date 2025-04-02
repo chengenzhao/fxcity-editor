@@ -176,7 +176,7 @@ public interface GameAppDecorator {
         hbox.setAlignment(Pos.TOP_RIGHT);
         hbox.setPadding(new Insets(20));
         var loopButton = new Button("↻");
-        var playButton = new Button("⏯");
+        var playButton = new Button("▶");
         var stopButton = new Button("⏹");
         var addButton = new Button("+");
         hbox.layoutXProperty().bind(pane.widthProperty().subtract(hbox.widthProperty()));
@@ -216,10 +216,10 @@ public interface GameAppDecorator {
 
         var actionName = "test";
 
-        loopButton.setOnAction(_->{
+        loopButton.setOnAction(_ -> {
           var l = buildTransition(actionName);
           clearViewComponent(entity);
-          for(var texture:l) {
+          for (var texture : l) {
             entity.getViewComponent().addChild(texture);
             texture.loopTransition(actionName);
           }
@@ -230,7 +230,7 @@ public interface GameAppDecorator {
         playButton.setOnAction(_ -> {
           var l = buildTransition(actionName);
           clearViewComponent(entity);
-          for(var texture:l) {
+          for (var texture : l) {
             entity.getViewComponent().addChild(texture);
             texture.startTransition(actionName);
           }
@@ -363,14 +363,14 @@ public interface GameAppDecorator {
     }
   }
 
-  private List<TransitTexture> buildTransition(String name){
+  private List<TransitTexture> buildTransition(String name) {
     var list = new ArrayList<TransitTexture>();
     var keyFrames = FXGL.<GameApp>getAppCast().keyFrames;
     for (var item : keyFrames.getFirst().getRotateTransit2DTextureBiMap().keySet()) {
       ObjectMapper objectMapper = new ObjectMapper();
       var animationData = objectMapper.createArrayNode();
 
-      var jsons = keyFrames.stream().map(kf -> extractJsonFromTexture(kf.getTimeInSeconds() * 1000,kf.getRotateTransit2DTextureBiMap().get(item))).toList();
+      var jsons = keyFrames.stream().map(kf -> extractJsonFromTexture(kf.getTimeInSeconds() * 1000, kf.getRotateTransit2DTextureBiMap().get(item))).toList();
       animationData.addAll(jsons);
 
       var texture = keyFrames.getFirst().getRotateTransit2DTextureBiMap().get(item);
@@ -380,18 +380,18 @@ public interface GameAppDecorator {
       System.out.println(animationData);
 
       var t = texture.copy();
-      t.buildTransition(name,animationData);
+      t.buildTransition(name, animationData);
       list.add(t);
     }
     return list;
   }
 
-  private void clearViewComponent(Entity entity){
+  private void clearViewComponent(Entity entity) {
     List.copyOf(entity.getViewComponent().getChildren())
       .forEach(e -> entity.getViewComponent().removeChild(e));
   }
 
-  private JsonNode extractJsonFromTexture(double timeInMillis, Texture texture){
+  private JsonNode extractJsonFromTexture(double timeInMillis, Texture texture) {
     ObjectMapper objectMapper = new ObjectMapper();
     var json = objectMapper.createObjectNode();
     json.put("time", timeInMillis);//time in millis
@@ -580,12 +580,28 @@ public interface GameAppDecorator {
               rotate.setAngle(Double.parseDouble(value));
               rotateTransit2DTexture.update();
             });
+            Runnable pxAction = () -> {
+              var number = Math.max(rotateTransit2DTexture.getX(), Double.parseDouble(px.getText()));
+              number = Math.min(number, rotateTransit2DTexture.getX() + rotateTransit2DTexture.getWidth());
+              rotate.setPivotX(number);
+              rotateTransit2DTexture.update();
+            };
+            px.setOnAction(_ -> pxAction.run());
+            px.focusedProperty().addListener((_, _, _) -> pxAction.run());
+
+            Runnable pyAction = () -> {
+              var number = Math.max(rotateTransit2DTexture.getY(), Double.parseDouble(py.getText()));
+              number = Math.min(number, rotateTransit2DTexture.getY() + rotateTransit2DTexture.getHeight());
+              rotate.setPivotY(number);
+              rotateTransit2DTexture.update();
+            };
+            py.setOnAction(_ -> pyAction.run());
+            py.focusedProperty().addListener((_, _, _) -> pyAction.run());
           } else {
             r.setEditable(false);
+            px.setEditable(false);
+            py.setEditable(false);
           }
-
-          px.setEditable(false);
-          py.setEditable(false);
 
           final Separator sh = new Separator();
           sh.setValignment(VPos.CENTER);
