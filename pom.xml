@@ -18,12 +18,12 @@
         <dependency>
             <groupId>io.github.chengenzhao</groupId>
             <artifactId>fxcity</artifactId>
-            <version>0.3.4</version>
+            <version>0.3.5</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>33.4.6-jre</version>
+            <version>33.4.8-jre</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

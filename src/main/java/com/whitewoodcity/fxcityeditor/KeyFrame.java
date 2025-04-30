@@ -4,6 +4,7 @@ package com.whitewoodcity.fxcityeditor;
 import com.almasb.fxgl.dsl.FXGL;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.whitewoodcity.control.LabelBox;
 import com.whitewoodcity.control.RotateTransit2DTexture;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -15,8 +16,6 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
-import java.security.Key;
-
 public class KeyFrame extends Rectangle implements GameAppDecorator{
   private final double width, height;
 
@@ -26,18 +25,8 @@ public class KeyFrame extends Rectangle implements GameAppDecorator{
     this.height = height;
   }
 
-  private final BiMap<HBox, RotateTransit2DTexture> rotateTransit2DTextureBiMap = HashBiMap.create();
-//  private Duration time;
+  private final BiMap<LabelBox, RotateTransit2DTexture> rotateTransit2DTextureBiMap = HashBiMap.create();
   private final ObjectProperty<Duration> time = new SimpleObjectProperty<>();
-
-//  public Duration getTime() {
-//    return time;
-//  }
-//
-//  public KeyFrame setTime(Duration time) {
-//    this.time = time;
-//    return this;
-//  }
 
   public Duration getTime() {
     return time.get();
@@ -92,7 +81,7 @@ public class KeyFrame extends Rectangle implements GameAppDecorator{
     this.setStroke(null);
   }
 
-  public BiMap<HBox, RotateTransit2DTexture> getRotateTransit2DTextureBiMap() {
+  public BiMap<LabelBox, RotateTransit2DTexture> getRotateTransit2DTextureBiMap() {
     return rotateTransit2DTextureBiMap;
   }
 
@@ -121,4 +110,6 @@ public class KeyFrame extends Rectangle implements GameAppDecorator{
     for(var texture:rotateTransit2DTextureBiMap.values())
       texture.update();
   }
+
+
 }

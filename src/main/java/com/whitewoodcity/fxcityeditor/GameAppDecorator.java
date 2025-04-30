@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.BiMap;
 import com.whitewoodcity.control.IntField;
+import com.whitewoodcity.control.LabelBox;
 import com.whitewoodcity.control.NumberField;
 import com.whitewoodcity.control.RotateTransit2DTexture;
 import com.whitewoodcity.control.arrows.Arrow;
@@ -95,10 +96,10 @@ public interface GameAppDecorator {
     treeItem.getParent().getChildren().remove(treeItem);
   }
 
-  default HBox createDeletableLableBox(String name) {
+  default LabelBox createDeletableLableBox(String name) {
     var textureLabel = new Label(name);
     var delTextureButton = new Button("×");
-    var textureHBox = new HBox(20, textureLabel, delTextureButton);
+    var textureHBox = new LabelBox(20, textureLabel, delTextureButton);
     textureHBox.setAlignment(Pos.BASELINE_LEFT);
     return textureHBox;
   }
@@ -378,6 +379,8 @@ public interface GameAppDecorator {
       var json = extractJsonFromTexture(FXGL.<GameApp>getAppCast().maxTime.getDouble() * 1000, texture);
       animationData.add(json);
 
+      //todo persist this data
+      System.out.print(item.getLabel()+" : ");
       System.out.println(animationData);
 
       var t = texture.copy();
