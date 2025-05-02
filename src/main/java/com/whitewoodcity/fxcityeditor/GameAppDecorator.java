@@ -4,6 +4,8 @@ import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.BiMap;
 import com.whitewoodcity.control.IntField;
 import com.whitewoodcity.control.LabelBox;
@@ -15,6 +17,8 @@ import com.whitewoodcity.fxgl.texture.AnimationChannel;
 import com.whitewoodcity.fxgl.texture.Texture;
 import com.whitewoodcity.fxgl.texture.TransitTexture;
 import com.whitewoodcity.javafx.binding.XBindings;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -365,12 +369,32 @@ public interface GameAppDecorator {
     }
   }
 
+  default ArrayNode buildTransitionJson(){
+    var mapper = new ObjectMapper();
+    var arrayNode = mapper.createArrayNode();
+    var keyFrames = FXGL.<GameApp>getAppCast().keyFrames;
+    for (var item : keyFrames.getFirst().getRotateTransit2DTextureBiMap().keySet()) {
+      var animationData = mapper.createArrayNode();
+
+      var jsons = keyFrames.stream().map(kf -> extractJsonFromTexture(kf.getTimeInSeconds() * 1000, kf.getRotateTransit2DTextureBiMap().get(item))).toList();
+      animationData.addAll(jsons);
+
+      var texture = keyFrames.getFirst().getRotateTransit2DTextureBiMap().get(item);
+      var jsonNode = extractJsonFromTexture(FXGL.<GameApp>getAppCast().maxTime.getDouble() * 1000, texture);
+      animationData.add(jsonNode);
+
+      arrayNode.add(animationData);
+    }
+    return arrayNode;
+  }
+
   private List<TransitTexture> buildTransition(String name) {
     var list = new ArrayList<TransitTexture>();
     var keyFrames = FXGL.<GameApp>getAppCast().keyFrames;
     for (var item : keyFrames.getFirst().getRotateTransit2DTextureBiMap().keySet()) {
       ObjectMapper objectMapper = new ObjectMapper();
       var animationData = objectMapper.createArrayNode();
+      var array = new JsonArray();
 
       var jsons = keyFrames.stream().map(kf -> extractJsonFromTexture(kf.getTimeInSeconds() * 1000, kf.getRotateTransit2DTextureBiMap().get(item))).toList();
       animationData.addAll(jsons);

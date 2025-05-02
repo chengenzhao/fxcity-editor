@@ -11,6 +11,7 @@ import com.whitewoodcity.control.RotateTransit2DTexture;
 import com.whitewoodcity.control.arrows.Arrow;
 import com.whitewoodcity.fxgl.texture.AnimatedTexture;
 import com.whitewoodcity.fxgl.texture.AnimationChannel;
+import io.vertx.core.Vertx;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
@@ -28,6 +29,9 @@ import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -75,6 +79,23 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     var menu = new Menu("Editor");
 
     var exit = new MenuItem("Exit");
+    var save = new MenuItem("Save");
+
+    save.setOnAction(_->{
+      var fileChooser = new FileChooser();
+      fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON files", "*.json"));
+      fileChooser.setInitialFileName("config.json");
+      var file = fileChooser.showSaveDialog(FXGL.getPrimaryStage());
+      var json = buildTransitionJson();
+      try {
+        Files.write(Paths.get(file.getPath()), json.toString().getBytes());
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    });
+    exit.setOnAction(_ -> System.exit(0));
+
+    menu.getItems().addAll(save, exit);
 
     menubar.getMenus().add(menu);
     menubar.setPrefWidth(WIDTH);
@@ -138,8 +159,6 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         if (newValue != null) fireEvent(newValue.getValue());
       });
 
-    exit.setOnAction(_ -> System.exit(0));
-
     FXGL.getGameScene().addUINodes(menubar, treeView, rightPane, bottomPane);
 
     keyFrames.add(generateKeyFrame(Duration.seconds(0)));
@@ -151,7 +170,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
   private void addImage() {
     FileChooser fileChooser = new FileChooser();
     fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image files", "*.PNG", "*.JPG"));
-    File file = fileChooser.showOpenDialog(null);
+    File file = fileChooser.showOpenDialog(FXGL.getPrimaryStage());
 
     if (file != null) {
       var label = new Label(file.getName());
