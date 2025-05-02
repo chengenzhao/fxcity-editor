@@ -2,6 +2,7 @@ package com.whitewoodcity.fxcityeditor;
 
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -369,15 +370,16 @@ public interface GameAppDecorator {
     }
   }
 
-  default ArrayNode buildTransitionJson(){
+  default JsonArray buildTransitionJson(){
     var mapper = new ObjectMapper();
-    var arrayNode = mapper.createArrayNode();
+    var arrayNode = new JsonArray();
     var keyFrames = FXGL.<GameApp>getAppCast().keyFrames;
     for (var item : keyFrames.getFirst().getRotateTransit2DTextureBiMap().keySet()) {
-      var animationData = mapper.createArrayNode();
+//      var animationData = mapper.createArrayNode();
+      var animationData = new JsonArray();
 
       var jsons = keyFrames.stream().map(kf -> extractJsonFromTexture(kf.getTimeInSeconds() * 1000, kf.getRotateTransit2DTextureBiMap().get(item))).toList();
-      animationData.addAll(jsons);
+      animationData.addAll(new JsonArray(jsons));
 
       var texture = keyFrames.getFirst().getRotateTransit2DTextureBiMap().get(item);
       var jsonNode = extractJsonFromTexture(FXGL.<GameApp>getAppCast().maxTime.getDouble() * 1000, texture);
@@ -392,12 +394,10 @@ public interface GameAppDecorator {
     var list = new ArrayList<TransitTexture>();
     var keyFrames = FXGL.<GameApp>getAppCast().keyFrames;
     for (var item : keyFrames.getFirst().getRotateTransit2DTextureBiMap().keySet()) {
-      ObjectMapper objectMapper = new ObjectMapper();
-      var animationData = objectMapper.createArrayNode();
-      var array = new JsonArray();
+      var animationData = new JsonArray();
 
       var jsons = keyFrames.stream().map(kf -> extractJsonFromTexture(kf.getTimeInSeconds() * 1000, kf.getRotateTransit2DTextureBiMap().get(item))).toList();
-      animationData.addAll(jsons);
+      animationData.addAll(new JsonArray(jsons));
 
       var texture = keyFrames.getFirst().getRotateTransit2DTextureBiMap().get(item);
       var json = extractJsonFromTexture(FXGL.<GameApp>getAppCast().maxTime.getDouble() * 1000, texture);
@@ -408,7 +408,14 @@ public interface GameAppDecorator {
       System.out.println(animationData);
 
       var t = texture.copy();
-      t.buildTransition(name, animationData);
+      var array = new ObjectMapper().createArrayNode();
+      try {
+        array = (ArrayNode) new ObjectMapper().readTree(animationData.toString());
+      } catch (JsonProcessingException e) {
+        throw new RuntimeException(e);
+      }
+
+      t.buildTransition(name, array);
       list.add(t);
     }
     return list;
@@ -419,22 +426,22 @@ public interface GameAppDecorator {
       .forEach(e -> entity.getViewComponent().removeChild(e));
   }
 
-  private JsonNode extractJsonFromTexture(double timeInMillis, Texture texture) {
-    ObjectMapper objectMapper = new ObjectMapper();
-    var json = objectMapper.createObjectNode();
+  private JsonObject extractJsonFromTexture(double timeInMillis, Texture texture) {
+    var json = new JsonObject();
+
     json.put("time", timeInMillis);//time in millis
     json.put("x", texture.getX());
     json.put("y", texture.getY());
-    var rotates = objectMapper.createArrayNode();
+    var rotates = new JsonArray();
     for (var rotateRaw : texture.getTransforms()) {
       var rotate = (Rotate) rotateRaw;
-      var rjson = objectMapper.createObjectNode();
+      var rjson = new JsonObject();
       rjson.put("pivotX", rotate.getPivotX());
       rjson.put("pivotY", rotate.getPivotY());
       rjson.put("angle", rotate.getAngle());
       rotates.add(rjson);
     }
-    json.set("rotates", rotates);
+    json.put("rotates", rotates);
     return json;
   }
 
