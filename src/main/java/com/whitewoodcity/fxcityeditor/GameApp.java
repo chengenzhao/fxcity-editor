@@ -84,11 +84,6 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 
     save.setOnAction(_->{
 
-      var keys = getAllComponentsLabelBoxes();
-      keys.stream().forEach(i -> {
-        System.out.println(i.getLabelString());
-      });
-
       var fileChooser = new FileChooser();
       fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON files", "*.json"));
       fileChooser.setInitialFileName("config.json");
@@ -145,10 +140,12 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         var name = view.image().getName();
         name = name.substring(0, name.indexOf("."));
 
-        switch (view.textureType()) {
+        var labelBox = switch (view.textureType()) {
           case TRANSIT -> addTransitTexture(entityTree, name, image);
-          case ANIMATED -> addAnimatedTexture(entityTree, name, image);
-        }
+//          case ANIMATED -> addAnimatedTexture(entityTree, name, image);
+        };
+
+        labelBox.setFilePath(view.image().getAbsolutePath());
       })
     );
     var entityHBox = (HBox) entityTree.getValue();
@@ -249,7 +246,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
   HashMap<HBox, HashMap<KeyFrame, Rectangle>> rectMaps = new HashMap<>();
   HashMap<HBox, HashMap<KeyFrame, Arrow>> arrowMaps = new HashMap<>();
 
-  private void addTransitTexture(TreeItem<Node> treeItem, String name, Image image) {
+  private LabelBox addTransitTexture(TreeItem<Node> treeItem, String name, Image image) {
     var hBox = createDeletableLableBox(name);
 
     rectMaps.put(hBox, new HashMap<>());
@@ -382,6 +379,8 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         fireEvent(keyFrames.get(currentKeyFrame));
     });
     fireEvent(hBox);
+
+    return hBox;
   }
 
   private boolean changeTextureAngle(RotateTransit2DTexture texture, double changeInX){

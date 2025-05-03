@@ -42,7 +42,7 @@ public class ViewComponentDialog extends Dialog<View> {
     grid.add(fileComboBox, 1, 0);
 
     ComboBox<View.TextureType> textureTypeComboBox = new ComboBox<>();
-    textureTypeComboBox.getItems().add(View.TextureType.ANIMATED);
+//    textureTypeComboBox.getItems().add(View.TextureType.ANIMATED);
     textureTypeComboBox.getItems().add(View.TextureType.TRANSIT);
     textureTypeComboBox.getSelectionModel().select(View.TextureType.TRANSIT);
 

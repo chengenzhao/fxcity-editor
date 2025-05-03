@@ -5,6 +5,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 
 public class LabelBox extends HBox {
+  private String filePath;
   public LabelBox() {
   }
 
@@ -28,4 +29,11 @@ public class LabelBox extends HBox {
     return (Label)this.getChildren().getFirst();
   }
 
+  public String getFilePath() {
+    return filePath;
+  }
+
+  public void setFilePath(String filePath) {
+    this.filePath = filePath;
+  }
 }

@@ -5,7 +5,8 @@ import java.io.File;
 public record View(File image, TextureType textureType) {
 
   public enum TextureType{
-    ANIMATED, TRANSIT;
+    //ANIMATED,
+    TRANSIT;
 
     @Override
     public String toString() {

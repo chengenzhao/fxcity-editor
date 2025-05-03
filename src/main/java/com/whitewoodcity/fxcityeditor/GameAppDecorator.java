@@ -372,10 +372,8 @@ public interface GameAppDecorator {
 
   default JsonArray buildImageJson(){
     var arrayNode = new JsonArray();
-    var fileBiMap = FXGL.<GameApp>getAppCast().fileBiMap;
-
-    fileBiMap.values().stream().map(e -> e.getAbsolutePath()).forEach(System.out::println);
-
+    var images = FXGL.<GameApp>getAppCast().getAllComponentsLabelBoxes().stream().map(LabelBox::getFilePath).toList();
+    arrayNode.addAll(new JsonArray(images));
     return arrayNode;
   }
 
