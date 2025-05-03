@@ -382,7 +382,7 @@ public interface GameAppDecorator {
   default JsonArray buildTransitionJson(){
     var arrayNode = new JsonArray();
     var keyFrames = FXGL.<GameApp>getAppCast().keyFrames;
-    for (var item : keyFrames.getFirst().getRotateTransit2DTextureBiMap().keySet()) {
+    for (var item : FXGL.<GameApp>getAppCast().getAllComponentsLabelBoxes()) {
       var animationData = new JsonArray();
 
       var jsons = keyFrames.stream().map(kf -> extractJsonFromTexture(kf.getTimeInSeconds() * 1000, kf.getRotateTransit2DTextureBiMap().get(item))).toList();
@@ -400,7 +400,7 @@ public interface GameAppDecorator {
   private List<TransitTexture> buildTransition(String name) {
     var list = new ArrayList<TransitTexture>();
     var keyFrames = FXGL.<GameApp>getAppCast().keyFrames;
-    for (var item : keyFrames.getFirst().getRotateTransit2DTextureBiMap().keySet()) {
+    for (var item : FXGL.<GameApp>getAppCast().getAllComponentsLabelBoxes()) {
       var animationData = new JsonArray();
 
       var jsons = keyFrames.stream().map(kf -> extractJsonFromTexture(kf.getTimeInSeconds() * 1000, kf.getRotateTransit2DTextureBiMap().get(item))).toList();

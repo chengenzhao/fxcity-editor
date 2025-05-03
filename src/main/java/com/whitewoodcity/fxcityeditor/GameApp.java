@@ -84,7 +84,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 
     save.setOnAction(_->{
 
-      var keys = getEntityComponentLabelBoxes();
+      var keys = getAllComponentsLabelBoxes();
       keys.stream().forEach(i -> {
         System.out.println(i.getLabelString());
       });
@@ -199,7 +199,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     }
   }
 
-  public List<LabelBox> getEntityComponentLabelBoxes(){
+  public List<LabelBox> getAllComponentsLabelBoxes(){
     var keys = FXGL.<GameApp>getAppCast().treeView.getRoot().getChildren().get(1).getChildren();
     return keys.stream().map(i -> ((LabelBox)i.getValue())).toList();
   }
