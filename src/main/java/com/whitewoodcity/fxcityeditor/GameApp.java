@@ -32,6 +32,7 @@ import javafx.util.Duration;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -81,9 +82,9 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 
     var exit = new MenuItem("Exit");
     var save = new MenuItem("Save");
+    var load = new MenuItem("Load");
 
-    save.setOnAction(_->{
-
+    save.setOnAction(_ -> {
       var fileChooser = new FileChooser();
       fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON files", "*.json"));
       fileChooser.setInitialFileName("config.json");
@@ -98,9 +99,25 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         throw new RuntimeException(e);
       }
     });
+    load.setOnAction(_ -> {
+      try {
+        var fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON files", "*.json"));
+        fileChooser.setInitialFileName("config.json");
+        var file = fileChooser.showOpenDialog(FXGL.getPrimaryStage());
+        var config = Files.readString(Path.of(file.getPath()));
+        var json = new JsonArray(config);
+        var images = json.getJsonArray(0);
+        var transitions = json.getJsonArray(1);
+        System.out.println(images);
+        System.out.println(transitions);
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    });
     exit.setOnAction(_ -> System.exit(0));
 
-    menu.getItems().addAll(save, exit);
+    menu.getItems().addAll(save, load, exit);
 
     menubar.getMenus().add(menu);
     menubar.setPrefWidth(WIDTH);
@@ -134,19 +151,19 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     entityTree = new TreeItem<>(new HBox(10));
     var addViewComponentButton = new Button("+");
     addViewComponentButton.setOnAction(_ ->
-      new ViewComponentDialog(fileBiMap.values()).showAndWait().ifPresent(view -> {
-        var image = new Image(view.image().toURI().toString());
+        new ViewComponentDialog(fileBiMap.values()).showAndWait().ifPresent(view -> {
+          var image = new Image(view.image().toURI().toString());
 
-        var name = view.image().getName();
-        name = name.substring(0, name.indexOf("."));
+          var name = view.image().getName();
+          name = name.substring(0, name.indexOf("."));
 
-        var labelBox = switch (view.textureType()) {
-          case TRANSIT -> addTransitTexture(entityTree, name, image);
+          var labelBox = switch (view.textureType()) {
+            case TRANSIT -> addTransitTexture(entityTree, name, image);
 //          case ANIMATED -> addAnimatedTexture(entityTree, name, image);
-        };
+          };
 
-        labelBox.setFilePath(view.image().getAbsolutePath());
-      })
+          labelBox.setFilePath(view.image().getAbsolutePath());
+        })
     );
     var entityHBox = (HBox) entityTree.getValue();
     entityHBox.setAlignment(Pos.BASELINE_LEFT);
@@ -196,9 +213,9 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     }
   }
 
-  public List<LabelBox> getAllComponentsLabelBoxes(){
+  public List<LabelBox> getAllComponentsLabelBoxes() {
     var keys = FXGL.<GameApp>getAppCast().treeView.getRoot().getChildren().get(1).getChildren();
-    return keys.stream().map(i -> ((LabelBox)i.getValue())).toList();
+    return keys.stream().map(i -> ((LabelBox) i.getValue())).toList();
   }
 
   private void addAnimatedTexture(TreeItem<Node> entityTree, String name, Image image) {
@@ -359,7 +376,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         var ox = oe.getX();
         arrow.getHeadB().setOnMouseDragged(e -> {
           double changeInX = e.getX() - ox;
-          if(changeTextureAngle(texture,changeInX))
+          if (changeTextureAngle(texture, changeInX))
             update(texture, rect, arrow);
         });
       });
@@ -369,13 +386,13 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         var ox = oe.getX();
         arrow.getMainLine().setOnMouseDragged(e -> {
           double changeInX = e.getX() - ox;
-          if(changeTextureAngle(texture,changeInX))
+          if (changeTextureAngle(texture, changeInX))
             update(texture, rect, arrow);
         });
       });
     });
     hBox.setOnMouseReleased(e -> {//freeze event
-      if(e.getButton() == MouseButton.SECONDARY)
+      if (e.getButton() == MouseButton.SECONDARY)
         fireEvent(keyFrames.get(currentKeyFrame));
     });
     fireEvent(hBox);
@@ -383,11 +400,11 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     return hBox;
   }
 
-  private boolean changeTextureAngle(RotateTransit2DTexture texture, double changeInX){
+  private boolean changeTextureAngle(RotateTransit2DTexture texture, double changeInX) {
     var angle = texture.getRotation().getAngle();
     if (changeInX > 0) texture.getRotation().setAngle(angle - 1);
     if (changeInX < 0) texture.getRotation().setAngle(angle + 1);
-    return changeInX!=0;
+    return changeInX != 0;
   }
 
   private void populateJointSelectionRectanglesExceptThis(RotateTransit2DTexture texture, List<Rectangle> rectangles) {
@@ -409,7 +426,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
       node.getTransforms().clear();
       node.getTransforms().addAll(texture.getTransforms());
     }
-    if(texture.parent()!=null)
+    if (texture.parent() != null)
       texture.parent().update();
   }
 
