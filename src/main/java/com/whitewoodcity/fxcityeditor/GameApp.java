@@ -105,6 +105,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON files", "*.json"));
         fileChooser.setInitialFileName("config.json");
         var file = fileChooser.showOpenDialog(FXGL.getPrimaryStage());
+        if (file == null) return;
         var config = Files.readString(Path.of(file.getPath()));
         var json = new JsonArray(config);
         var images = json.getJsonArray(0);
