@@ -121,6 +121,8 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         //todo display these data
         System.out.println(transitions);
       } catch (Exception e) {
+        fileBiMap.clear();
+        cleanTreeView();
         throw new RuntimeException(e);
       }
     });
