@@ -37,6 +37,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class GameApp extends GameApplication implements GameAppDecorator {
 
@@ -110,7 +111,11 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         var json = new JsonArray(config);
         var images = json.getJsonArray(0);
         var transitions = json.getJsonArray(1);
-        System.out.println(images);
+        for(Object image:images){
+          File imageFile = new File(image.toString());
+          addImage(imageFile);
+        }
+        //todo display these data
         System.out.println(transitions);
       } catch (Exception e) {
         throw new RuntimeException(e);
@@ -197,7 +202,11 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image files", "*.PNG", "*.JPG"));
     File file = fileChooser.showOpenDialog(FXGL.getPrimaryStage());
 
-    if (file != null) {
+    addImage(file);
+  }
+
+  private void addImage(File file){
+    if (file != null && file.exists()) {
       var label = new Label(file.getName());
       try {
         fileBiMap.put(label, file);
