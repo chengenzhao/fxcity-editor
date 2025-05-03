@@ -6,12 +6,13 @@ import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.whitewoodcity.control.LabelBox;
 import com.whitewoodcity.control.NumberField;
 import com.whitewoodcity.control.RotateTransit2DTexture;
 import com.whitewoodcity.control.arrows.Arrow;
 import com.whitewoodcity.fxgl.texture.AnimatedTexture;
 import com.whitewoodcity.fxgl.texture.AnimationChannel;
-import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonArray;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
@@ -82,11 +83,20 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     var save = new MenuItem("Save");
 
     save.setOnAction(_->{
+
+      var keys = getEntityComponentLabelBoxes();
+      keys.stream().forEach(i -> {
+        System.out.println(i.getLabelString());
+      });
+
       var fileChooser = new FileChooser();
       fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON files", "*.json"));
       fileChooser.setInitialFileName("config.json");
       var file = fileChooser.showSaveDialog(FXGL.getPrimaryStage());
-      var json = buildTransitionJson();
+      if (file == null) return;
+      var transitionJson = buildTransitionJson();
+      var imageJson = buildImageJson();
+      var json = new JsonArray().add(imageJson).add(transitionJson);
       try {
         Files.write(Paths.get(file.getPath()), json.toString().getBytes());
       } catch (IOException e) {
@@ -187,6 +197,11 @@ public class GameApp extends GameApplication implements GameAppDecorator {
       treeView.getTreeItem(0).getChildren().add(treeItem);//row 0 is resources tree item
       selectTreeItem(label);
     }
+  }
+
+  public List<LabelBox> getEntityComponentLabelBoxes(){
+    var keys = FXGL.<GameApp>getAppCast().treeView.getRoot().getChildren().get(1).getChildren();
+    return keys.stream().map(i -> ((LabelBox)i.getValue())).toList();
   }
 
   private void addAnimatedTexture(TreeItem<Node> entityTree, String name, Image image) {

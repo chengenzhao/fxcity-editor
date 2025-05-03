@@ -20,7 +20,12 @@ public class LabelBox extends HBox {
     super(v, nodes);
   }
 
-  public String getLabel(){
-    return ((Label)this.getChildren().getFirst()).getText();
+  public String getLabelString(){
+    return getLabel().getText();
   }
+
+  public Label getLabel(){
+    return (Label)this.getChildren().getFirst();
+  }
+
 }

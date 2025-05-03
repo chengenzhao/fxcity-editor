@@ -370,12 +370,19 @@ public interface GameAppDecorator {
     }
   }
 
+  default JsonArray buildImageJson(){
+    var arrayNode = new JsonArray();
+    var fileBiMap = FXGL.<GameApp>getAppCast().fileBiMap;
+
+    fileBiMap.values().stream().map(e -> e.getAbsolutePath()).forEach(System.out::println);
+
+    return arrayNode;
+  }
+
   default JsonArray buildTransitionJson(){
-    var mapper = new ObjectMapper();
     var arrayNode = new JsonArray();
     var keyFrames = FXGL.<GameApp>getAppCast().keyFrames;
     for (var item : keyFrames.getFirst().getRotateTransit2DTextureBiMap().keySet()) {
-//      var animationData = mapper.createArrayNode();
       var animationData = new JsonArray();
 
       var jsons = keyFrames.stream().map(kf -> extractJsonFromTexture(kf.getTimeInSeconds() * 1000, kf.getRotateTransit2DTextureBiMap().get(item))).toList();
@@ -403,19 +410,8 @@ public interface GameAppDecorator {
       var json = extractJsonFromTexture(FXGL.<GameApp>getAppCast().maxTime.getDouble() * 1000, texture);
       animationData.add(json);
 
-      //todo persist this data
-      System.out.print(item.getLabel()+" : ");
-      System.out.println(animationData);
-
       var t = texture.copy();
-      var array = new ObjectMapper().createArrayNode();
-      try {
-        array = (ArrayNode) new ObjectMapper().readTree(animationData.toString());
-      } catch (JsonProcessingException e) {
-        throw new RuntimeException(e);
-      }
-
-      t.buildTransition(name, array);
+      t.buildTransition(name, animationData.toString());
       list.add(t);
     }
     return list;
