@@ -107,6 +107,8 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         fileChooser.setInitialFileName("config.json");
         var file = fileChooser.showOpenDialog(FXGL.getPrimaryStage());
         if (file == null) return;
+        fileBiMap.clear();
+        cleanTreeView();
         var config = Files.readString(Path.of(file.getPath()));
         var json = new JsonArray(config);
         var images = json.getJsonArray(0);
@@ -114,6 +116,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         for(Object image:images){
           File imageFile = new File(image.toString());
           addImage(imageFile);
+          addTransitTexture(imageFile);
         }
         //todo display these data
         System.out.println(transitions);
@@ -157,19 +160,8 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     entityTree = new TreeItem<>(new HBox(10));
     var addViewComponentButton = new Button("+");
     addViewComponentButton.setOnAction(_ ->
-        new ViewComponentDialog(fileBiMap.values()).showAndWait().ifPresent(view -> {
-          var image = new Image(view.image().toURI().toString());
-
-          var name = view.image().getName();
-          name = name.substring(0, name.indexOf("."));
-
-          var labelBox = switch (view.textureType()) {
-            case TRANSIT -> addTransitTexture(entityTree, name, image);
-//          case ANIMATED -> addAnimatedTexture(entityTree, name, image);
-          };
-
-          labelBox.setFilePath(view.image().getAbsolutePath());
-        })
+        new ViewComponentDialog(fileBiMap.values()).showAndWait().ifPresent(
+          view -> addTransitTexture(view.image()))
     );
     var entityHBox = (HBox) entityTree.getValue();
     entityHBox.setAlignment(Pos.BASELINE_LEFT);
@@ -195,6 +187,11 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 //    keyFrames.add(generateKeyFrame(Duration.seconds(1)));
 
     keyFrames.getFirst().select();
+  }
+
+  private void cleanTreeView(){
+    this.treeView.getTreeItem(0).getChildren().clear();
+    this.treeView.getTreeItem(1).getChildren().clear();
   }
 
   private void addImage() {
@@ -223,8 +220,19 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     }
   }
 
+  private void addTransitTexture(File file){
+    var name = file.getName();
+    var image = new Image(file.toURI().toString());
+    name = name.substring(0, name.indexOf("."));
+
+    var labelBox = addTransitTexture(entityTree, name, image);
+
+    labelBox.setFilePath(file.getAbsolutePath());
+  }
+
   public List<LabelBox> getAllComponentsLabelBoxes() {
     var keys = FXGL.<GameApp>getAppCast().treeView.getRoot().getChildren().get(1).getChildren();
+    System.out.println(keys);
     return keys.stream().map(i -> ((LabelBox) i.getValue())).toList();
   }
 
