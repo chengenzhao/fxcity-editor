@@ -132,6 +132,13 @@ public class GameApp extends GameApplication implements GameAppDecorator {
           setParent(child, parent);
         }
 
+        var kfs = transitions.getJsonArray(0);
+        for(int i=1;i<kfs.size()-1;i++){
+          var kf = kfs.getJsonObject(i);
+          var time = kf.getNumber("time").doubleValue();
+          addKeyFrames(time);
+        }
+
         //todo display these data
         System.out.println(transitions);
       } catch (Exception e) {

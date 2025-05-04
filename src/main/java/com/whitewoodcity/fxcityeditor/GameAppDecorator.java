@@ -247,14 +247,13 @@ public interface GameAppDecorator {
         addButton.setOnAction(_ -> {
           var app = FXGL.<GameApp>getAppCast();
           app.getCurrentKeyFrame().deSelect();
-          var maxTime = app.maxTime;
-          var kf = generateKeyFrame(Duration.seconds(maxTime.getDouble()));
 
-          kf.copyFrom(keyFrames.getLast());
-          keyFrames.add(kf);
+          var kf = addKeyFrames(app.maxTime.getDouble() * 1000);
 
-          app.setCurrentKeyFrame(kf);
-          app.getCurrentKeyFrame().select();
+//          app.setCurrentKeyFrame(kf);
+//          app.getCurrentKeyFrame().select();
+          fireEvent(kf);
+
           decorateMiddlePane(keyFrames.getLast());
           decorateBottomAndRightPane(entity);
         });
@@ -360,6 +359,16 @@ public interface GameAppDecorator {
       default -> {
       }
     }
+  }
+
+  default KeyFrame addKeyFrames(double timeInMillis){
+    var kf = generateKeyFrame(Duration.millis(timeInMillis));
+
+    var keyFrames = FXGL.<GameApp>getAppCast().keyFrames;
+
+    kf.copyFrom(keyFrames.getLast());
+    keyFrames.add(kf);
+    return kf;
   }
 
   default void setParent(LabelBox child, LabelBox parent){
