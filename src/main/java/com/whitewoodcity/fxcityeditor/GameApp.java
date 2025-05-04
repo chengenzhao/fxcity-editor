@@ -214,6 +214,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
       removeTreeItem(labelBox);
     }
     cleanTreeView();
+    fireEvent(this.keyFrames.getFirst());
   }
 
   private void cleanTreeView(){
