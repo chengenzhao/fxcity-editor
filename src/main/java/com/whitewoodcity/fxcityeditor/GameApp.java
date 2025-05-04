@@ -114,12 +114,24 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         var config = Files.readString(Path.of(file.getPath()));
         var json = new JsonArray(config);
         var images = json.getJsonArray(0);
-        var transitions = json.getJsonArray(1);
+        var inheritance = json.getJsonArray(1);
+        var transitions = json.getJsonArray(2);
         for(Object image:images){
           File imageFile = new File(image.toString());
           addImage(imageFile);
           addTransitTexture(imageFile);
         }
+
+        for(int i=0;i<images.size();i++){
+          var child = (LabelBox) treeView.getRoot().getChildren().get(1).getChildren().get(i).getValue();
+          int index = inheritance.getInteger(i);
+          LabelBox parent = null;
+          if(index >=0){
+            parent = (LabelBox) treeView.getRoot().getChildren().get(1).getChildren().get(index).getValue();
+          }
+          setParent(child, parent);
+        }
+
         //todo display these data
         System.out.println(transitions);
       } catch (Exception e) {

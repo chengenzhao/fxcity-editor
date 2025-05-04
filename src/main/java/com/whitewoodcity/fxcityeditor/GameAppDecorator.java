@@ -350,11 +350,7 @@ public interface GameAppDecorator {
         choiceBox.setOnAction(_ -> {
           var childBox = map.inverse().get(texture);
           var parentBox = map.inverse().get(map.get(choiceBox.getValue()));
-          childBox.setFather(parentBox);
-          for (var keyFrame : FXGL.<GameApp>getAppCast().keyFrames) {
-            var m = keyFrame.getRotateTransit2DTextureBiMap();
-            m.get(childBox).setParent(m.get(parentBox));
-          }
+          setParent(childBox, parentBox);
         });
 
         var hbox = new HBox();
@@ -368,6 +364,14 @@ public interface GameAppDecorator {
       }
       default -> {
       }
+    }
+  }
+
+  default void setParent(LabelBox child, LabelBox parent){
+    child.setFather(parent);
+    for (var keyFrame : FXGL.<GameApp>getAppCast().keyFrames) {
+      var m = keyFrame.getRotateTransit2DTextureBiMap();
+      m.get(child).setParent(m.get(parent));
     }
   }
 
