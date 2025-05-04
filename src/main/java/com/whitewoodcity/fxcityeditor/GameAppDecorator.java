@@ -325,7 +325,7 @@ public interface GameAppDecorator {
         decorateRightPane(animatedTexture);
       }
       case RotateTransit2DTexture texture when p.length > 0 && p[0] instanceof BiMap biMap -> {
-        var map = (BiMap<HBox, RotateTransit2DTexture>) biMap;
+        var map = (BiMap<LabelBox, RotateTransit2DTexture>) biMap;
         var choiceBox = new ChoiceBox<HBox>();
         choiceBox.getItems().add(null);
         choiceBox.getItems().addAll(map.keySet());
@@ -668,7 +668,7 @@ public interface GameAppDecorator {
     return new KeyFrame(20, 50).setTime(duration).setColor(Color.ORANGE);//LIGHTSEAGREEN
   }
 
-  private void removeTextureFromItems(ObservableList<HBox> items, RotateTransit2DTexture texture, BiMap<HBox, RotateTransit2DTexture> map) {
+  private void removeTextureFromItems(ObservableList<HBox> items, RotateTransit2DTexture texture, BiMap<LabelBox, RotateTransit2DTexture> map) {
     for (var child : texture.children()) {
       removeTextureFromItems(items, child, map);
     }

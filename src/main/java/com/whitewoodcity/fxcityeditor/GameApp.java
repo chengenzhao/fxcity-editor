@@ -107,6 +107,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         fileChooser.setInitialFileName("config.json");
         var file = fileChooser.showOpenDialog(FXGL.getPrimaryStage());
         if (file == null) return;
+        //todo not just clean the treeview but also need to clean key frames and textures
         fileBiMap.clear();
         cleanTreeView();
         var config = Files.readString(Path.of(file.getPath()));
@@ -234,7 +235,6 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 
   public List<LabelBox> getAllComponentsLabelBoxes() {
     var keys = FXGL.<GameApp>getAppCast().treeView.getRoot().getChildren().get(1).getChildren();
-    System.out.println(keys);
     return keys.stream().map(i -> ((LabelBox) i.getValue())).toList();
   }
 
