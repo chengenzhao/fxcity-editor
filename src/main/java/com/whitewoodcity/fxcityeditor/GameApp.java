@@ -92,8 +92,9 @@ public class GameApp extends GameApplication implements GameAppDecorator {
       var file = fileChooser.showSaveDialog(FXGL.getPrimaryStage());
       if (file == null) return;
       var transitionJson = buildTransitionJson();
+      var inheritanceJson = buildInheritanceJson();
       var imageJson = buildImageJson();
-      var json = new JsonArray().add(imageJson).add(transitionJson);
+      var json = new JsonArray().add(imageJson).add(inheritanceJson).add(transitionJson);
       try {
         Files.write(Paths.get(file.getPath()), json.toString().getBytes());
       } catch (IOException e) {
@@ -195,6 +196,11 @@ public class GameApp extends GameApplication implements GameAppDecorator {
   private void cleanTreeView(){
     this.treeView.getTreeItem(0).getChildren().clear();
     this.treeView.getTreeItem(1).getChildren().clear();
+  }
+
+  public int indexOf(LabelBox labelBox){
+    var list = treeView.getRoot().getChildren().get(1).getChildren().stream().map(TreeItem::getValue).toList();
+    return list.indexOf(labelBox);
   }
 
   private void addImage() {

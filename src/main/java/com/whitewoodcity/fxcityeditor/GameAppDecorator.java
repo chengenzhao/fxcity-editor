@@ -350,6 +350,7 @@ public interface GameAppDecorator {
         choiceBox.setOnAction(_ -> {
           var childBox = map.inverse().get(texture);
           var parentBox = map.inverse().get(map.get(choiceBox.getValue()));
+          childBox.setFather(parentBox);
           for (var keyFrame : FXGL.<GameApp>getAppCast().keyFrames) {
             var m = keyFrame.getRotateTransit2DTextureBiMap();
             m.get(childBox).setParent(m.get(parentBox));
@@ -374,6 +375,16 @@ public interface GameAppDecorator {
     var arrayNode = new JsonArray();
     var images = FXGL.<GameApp>getAppCast().getAllComponentsLabelBoxes().stream().map(LabelBox::getFilePath).toList();
     arrayNode.addAll(new JsonArray(images));
+    return arrayNode;
+  }
+
+  default JsonArray buildInheritanceJson(){
+    var arrayNode = new JsonArray();
+    var indexes = FXGL.<GameApp>getAppCast().getAllComponentsLabelBoxes().stream().map(l -> {
+      var parent = l.getFather();
+      return FXGL.<GameApp>getAppCast().indexOf(parent);
+    }).toList();
+    arrayNode.addAll(new JsonArray(indexes));
     return arrayNode;
   }
 
