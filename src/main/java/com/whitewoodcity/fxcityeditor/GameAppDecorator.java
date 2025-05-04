@@ -2,11 +2,6 @@ package com.whitewoodcity.fxcityeditor;
 
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.BiMap;
 import com.whitewoodcity.control.IntField;
 import com.whitewoodcity.control.LabelBox;
@@ -486,21 +481,24 @@ public interface GameAppDecorator {
     delButton.translateXProperty().bind(kf.xProperty());
     delButton.translateYProperty().bind(kf.yProperty().add(kf.heightProperty()).add(timeField.heightProperty()));
     var gameApp = FXGL.<GameApp>getAppCast();
-    delButton.setOnAction(_ -> {
-      gameApp.getCurrentKeyFrame().deSelect();
-      gameApp.keyFrames.remove(kf);
-      for (var map : gameApp.rectMaps.values()) {
-        map.remove(kf);
-      }
-      for (var map : gameApp.arrowMaps.values()) {
-        map.remove(kf);
-      }
-      gameApp.setCurrentKeyFrame(0);
-      gameApp.getCurrentKeyFrame().select();
-      decorateMiddlePane(gameApp.getCurrentKeyFrame());
-      decorateBottomAndRightPane(gameApp.entity);
-    });
+    delButton.setOnAction(_ -> deleteKeyFrame(kf));
     return delButton;
+  }
+
+  default void deleteKeyFrame(KeyFrame kf){
+    var gameApp = FXGL.<GameApp>getAppCast();
+    gameApp.getCurrentKeyFrame().deSelect();
+    gameApp.keyFrames.remove(kf);
+    for (var map : gameApp.rectMaps.values()) {
+      map.remove(kf);
+    }
+    for (var map : gameApp.arrowMaps.values()) {
+      map.remove(kf);
+    }
+    gameApp.setCurrentKeyFrame(0);
+    gameApp.getCurrentKeyFrame().select();
+    decorateMiddlePane(gameApp.getCurrentKeyFrame());
+    decorateBottomAndRightPane(gameApp.entity);
   }
 
   private TextField buildTimeFieldForKeyFrame(KeyFrame kf, boolean editable) {

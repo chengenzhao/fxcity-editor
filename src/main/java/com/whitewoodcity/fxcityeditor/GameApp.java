@@ -84,7 +84,9 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     var exit = new MenuItem("Exit");
     var save = new MenuItem("Save");
     var load = new MenuItem("Load");
+    var clear = new MenuItem("Clear");
 
+    clear.setOnAction(_-> clearAll());
     save.setOnAction(_ -> {
       var fileChooser = new FileChooser();
       fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON files", "*.json"));
@@ -108,9 +110,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         fileChooser.setInitialFileName("config.json");
         var file = fileChooser.showOpenDialog(FXGL.getPrimaryStage());
         if (file == null) return;
-        //todo not just clean the treeview but also need to clean key frames and textures
-        fileBiMap.clear();
-        cleanTreeView();
+        clearAll();
         var config = Files.readString(Path.of(file.getPath()));
         var json = new JsonArray(config);
         var images = json.getJsonArray(0);
@@ -135,14 +135,13 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         //todo display these data
         System.out.println(transitions);
       } catch (Exception e) {
-        fileBiMap.clear();
-        cleanTreeView();
+        clearAll();
         throw new RuntimeException(e);
       }
     });
     exit.setOnAction(_ -> System.exit(0));
 
-    menu.getItems().addAll(save, load, exit);
+    menu.getItems().addAll(save, load, clear, exit);
 
     menubar.getMenus().add(menu);
     menubar.setPrefWidth(WIDTH);
@@ -200,9 +199,21 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     FXGL.getGameScene().addUINodes(menubar, treeView, rightPane, bottomPane);
 
     keyFrames.add(generateKeyFrame(Duration.seconds(0)));
-//    keyFrames.add(generateKeyFrame(Duration.seconds(1)));
 
     keyFrames.getFirst().select();
+  }
+
+  private void clearAll(){
+    fileBiMap.clear();
+    for(int i=1;i<keyFrames.size();i++){
+      var kf = keyFrames.get(i);
+      deleteKeyFrame(kf);
+    }
+    for(int i=0;i<treeView.getRoot().getChildren().get(1).getChildren().size();i++){
+      var labelBox = (LabelBox) treeView.getRoot().getChildren().get(1).getChildren().get(i).getValue();
+      removeTreeItem(labelBox);
+    }
+    cleanTreeView();
   }
 
   private void cleanTreeView(){
