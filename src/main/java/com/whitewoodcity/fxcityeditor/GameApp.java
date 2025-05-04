@@ -112,10 +112,10 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         if (file == null) return;
         clearAll();
         var config = Files.readString(Path.of(file.getPath()));
-        var json = new JsonArray(config);
-        var images = json.getJsonArray(0);
-        var inheritance = json.getJsonArray(1);
-        var transitions = json.getJsonArray(2);
+        var configJson = new JsonArray(config);
+        var images = configJson.getJsonArray(0);
+        var inheritance = configJson.getJsonArray(1);
+        var transitions = configJson.getJsonArray(2);
         for(Object image:images){
           File imageFile = new File(image.toString());
           addImage(imageFile);
@@ -123,11 +123,11 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         }
 
         for(int i=0;i<images.size();i++){
-          var child = (LabelBox) treeView.getRoot().getChildren().get(1).getChildren().get(i).getValue();
+          var child = getLabelBoxAt(i);
           int index = inheritance.getInteger(i);
           LabelBox parent = null;
           if(index >=0){
-            parent = (LabelBox) treeView.getRoot().getChildren().get(1).getChildren().get(index).getValue();
+            parent = getLabelBoxAt(index);
           }
           setParent(child, parent);
         }
@@ -139,8 +139,17 @@ public class GameApp extends GameApplication implements GameAppDecorator {
           addKeyFrames(time);
         }
 
-        //todo display these data
-        System.out.println(transitions);
+        for(int i=0;i<transitions.size();i++){
+          var array = transitions.getJsonArray(i);
+          var labelBox = getLabelBoxAt(i);
+          for(int j=0;j<array.size()-1;j++){
+            var json = array.getJsonObject(j);
+            var kf = keyFrames.get(j);
+            var texture = kf.getRotateTransit2DTextureBiMap().get(labelBox);
+            texture.show(json.toString());
+            texture.update();
+          }
+        }
       } catch (Exception e) {
         clearAll();
         throw new RuntimeException(e);
@@ -208,6 +217,10 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     keyFrames.add(generateKeyFrame(Duration.seconds(0)));
 
     keyFrames.getFirst().select();
+  }
+
+  private LabelBox getLabelBoxAt(int index){
+    return (LabelBox) treeView.getRoot().getChildren().get(1).getChildren().get(index).getValue();
   }
 
   private void clearAll(){

@@ -1,6 +1,7 @@
 package com.whitewoodcity.control;
 
 import com.whitewoodcity.fxgl.texture.TransitTexture;
+import io.vertx.core.json.JsonObject;
 import javafx.animation.Transition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -168,5 +169,23 @@ public class RotateTransit2DTexture extends TransitTexture {
     texture.setX(this.getX());
     texture.setY(this.getY());
     return texture;
+  }
+
+  @Override
+  public void show(String string) {
+    var json = new JsonObject(string);
+
+    this.setX(json.getDouble("x"));
+    this.setY(json.getDouble("y"));
+
+    var rs = json.getJsonArray("rotates");
+
+    for(int i=0;i<rs.size();i++){
+      var r = rs.getJsonObject(i);
+      var rotate = rotates.get(i);
+      rotate.setPivotX(r.getDouble("pivotX"));
+      rotate.setPivotY(r.getDouble("pivotY"));
+      rotate.setAngle( r.getDouble("angle"));
+    }
   }
 }

@@ -368,6 +368,7 @@ public interface GameAppDecorator {
 
     kf.copyFrom(keyFrames.getLast());
     keyFrames.add(kf);
+
     return kf;
   }
 
@@ -680,7 +681,7 @@ public interface GameAppDecorator {
       .forEach(e -> entity.getViewComponent().removeChild(e));
     var entityTree = FXGL.<GameApp>getAppCast().entityTree;
     for (var childItem : entityTree.getChildren()) {
-      var hbox = (HBox) childItem.getValue();
+      var hbox = (LabelBox) childItem.getValue();
       var texture = keyFrame.getRotateTransit2DTextureBiMap().get(hbox);
       entity.getViewComponent().addChild(texture);
     }
