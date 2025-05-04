@@ -428,6 +428,10 @@ public interface GameAppDecorator {
       var json = extractJsonFromTexture(FXGL.<GameApp>getAppCast().maxTime.getDouble() * 1000, texture);
       animationData.add(json);
 
+      //todo copy these data to the transit texture
+      System.out.print(item.getLabelString() + " : ");
+      System.out.println(animationData);
+
       var t = texture.copy();
       t.buildTransition(name, animationData.toString());
       list.add(t);
