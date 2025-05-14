@@ -178,6 +178,13 @@ public class RotateTransit2DTexture extends TransitTexture {
     this.setX(json.getDouble("x"));
     this.setY(json.getDouble("y"));
 
+    if(json.containsKey("translateX")){
+      this.setTranslateX(json.getDouble("translateX"));
+    }
+    if(json.containsKey("translateY")){
+      this.setTranslateY(json.getDouble("translateY"));
+    }
+
     var rs = json.getJsonArray("rotates");
 
     var r = rs.getJsonObject(0);
@@ -186,6 +193,7 @@ public class RotateTransit2DTexture extends TransitTexture {
     rotate.setPivotY(r.getDouble("pivotY"));
     rotate.setAngle(r.getDouble("angle"));
 
+    //spread the rotation to the children and parent textures
     update();
   }
 }
