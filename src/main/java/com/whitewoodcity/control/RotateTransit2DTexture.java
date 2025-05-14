@@ -180,12 +180,12 @@ public class RotateTransit2DTexture extends TransitTexture {
 
     var rs = json.getJsonArray("rotates");
 
-    for(int i=0;i<rs.size();i++){
-      var r = rs.getJsonObject(i);
-      var rotate = rotates.get(i);
-      rotate.setPivotX(r.getDouble("pivotX"));
-      rotate.setPivotY(r.getDouble("pivotY"));
-      rotate.setAngle( r.getDouble("angle"));
-    }
+    var r = rs.getJsonObject(0);
+    var rotate = rotates.getFirst();
+    rotate.setPivotX(r.getDouble("pivotX"));
+    rotate.setPivotY(r.getDouble("pivotY"));
+    rotate.setAngle(r.getDouble("angle"));
+
+    update();
   }
 }
