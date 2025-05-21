@@ -201,11 +201,12 @@ public interface GameAppDecorator {
             var json = extractJsonFromTexture(texture);
             var textArea = new TextArea(json.toString());
             textArea.setWrapText(true);
-            textArea.setPrefHeight(60);
+            textArea.setPrefHeight(100);
             vbox.getChildren().addAll(new Label(item.getLabelString()), textArea);
           }
 
-          dialog.getDialogPane().setContent(vbox);
+          var scrollpane = new ScrollPane(vbox);
+          dialog.getDialogPane().setContent(scrollpane);
           dialog.getDialogPane().getButtonTypes().add(okButtonType);
           dialog.getDialogPane().lookupButton(okButtonType);
 
