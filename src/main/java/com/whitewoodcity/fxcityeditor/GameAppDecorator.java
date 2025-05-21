@@ -28,7 +28,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
@@ -176,13 +178,32 @@ public interface GameAppDecorator {
         var hbox = new HBox(20);
         hbox.setAlignment(Pos.TOP_RIGHT);
         hbox.setPadding(new Insets(20));
+        var objectButton = new Button("{ Frame Data }");
+        var arrayButton = new Button("[ Transit Data ]");
         var loopButton = new Button("↻");
         var playButton = new Button("▶");
         var pauseButton = new Button("⏸");
         var stopButton = new Button("⏹");
         var addButton = new Button("+");
         hbox.layoutXProperty().bind(pane.widthProperty().subtract(hbox.widthProperty()));
-        hbox.getChildren().addAll(loopButton, playButton, pauseButton, stopButton, new Label("Total Time: "), FXGL.<GameApp>getAppCast().maxTime, addButton);
+        hbox.getChildren().addAll(loopButton, playButton, pauseButton, stopButton, new Label("Total Time: "), FXGL.<GameApp>getAppCast().maxTime, addButton, objectButton, arrayButton);
+
+        objectButton.setOnAction(_ -> {
+          ButtonType okButtonType = ButtonType.OK;
+          Dialog<ButtonType> dialog = new Dialog<>();
+
+          String json = """
+            fdjksalfjadkls
+            fdasjklfadlskfjal
+            fdajskl;'
+            """;
+
+          dialog.getDialogPane().setContent(new TextArea(json));
+          dialog.getDialogPane().getButtonTypes().add(okButtonType);
+          dialog.getDialogPane().lookupButton(okButtonType);
+
+          dialog.showAndWait();
+        });
 
         var line = new Line();
         line.setStroke(Color.DARKCYAN);
@@ -447,19 +468,19 @@ public interface GameAppDecorator {
   private JsonObject extractJsonFromTexture(double timeInMillis, Texture texture) {
     var json = new JsonObject();
 
-    json.put("time", timeInMillis);//time in millis
-    json.put("x", texture.getX());
-    json.put("y", texture.getY());
+    json.put(TransitTexture.JsonKeys.TIME.key(), timeInMillis);//time in millis
+    json.put(TransitTexture.JsonKeys.X.key(), texture.getX());
+    json.put(TransitTexture.JsonKeys.Y.key(), texture.getY());
     var rotates = new JsonArray();
     for (var rotateRaw : texture.getTransforms()) {
       var rotate = (Rotate) rotateRaw;
       var rjson = new JsonObject();
-      rjson.put("pivotX", rotate.getPivotX());
-      rjson.put("pivotY", rotate.getPivotY());
-      rjson.put("angle", rotate.getAngle());
+      rjson.put(TransitTexture.JsonKeys.PIVOT_X.key(), rotate.getPivotX());
+      rjson.put(TransitTexture.JsonKeys.PIVOT_Y.key(), rotate.getPivotY());
+      rjson.put(TransitTexture.JsonKeys.ANGLE.key(), rotate.getAngle());
       rotates.add(rjson);
     }
-    json.put("rotates", rotates);
+    json.put(TransitTexture.JsonKeys.ROTATES.key(), rotates);
     return json;
   }
 

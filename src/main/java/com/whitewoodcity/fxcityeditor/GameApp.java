@@ -12,6 +12,7 @@ import com.whitewoodcity.control.RotateTransit2DTexture;
 import com.whitewoodcity.control.arrows.Arrow;
 import com.whitewoodcity.fxgl.texture.AnimatedTexture;
 import com.whitewoodcity.fxgl.texture.AnimationChannel;
+import com.whitewoodcity.fxgl.texture.TransitTexture;
 import io.vertx.core.json.JsonArray;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
@@ -37,7 +38,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 public class GameApp extends GameApplication implements GameAppDecorator {
 
@@ -135,7 +135,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         var kfs = transitions.getJsonArray(0);
         for(int i=1;i<kfs.size()-1;i++){
           var kf = kfs.getJsonObject(i);
-          var time = kf.getNumber("time").doubleValue();
+          var time = kf.getNumber(TransitTexture.JsonKeys.TIME.key()).doubleValue();
           addKeyFrames(time);
         }
 
