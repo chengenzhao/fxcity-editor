@@ -24,6 +24,7 @@ public interface GameAppDecorator1 {
       var json = extractJsonFromTexture(texture);
       var textArea = new TextArea(json.toString());
       textArea.setWrapText(true);
+      textArea.setEditable(false);
       textArea.setPrefHeight(100);
       vbox.getChildren().addAll(new Label(item.getLabelString()), textArea);
     }
@@ -57,6 +58,7 @@ public interface GameAppDecorator1 {
       var textArea = new TextArea(animationData.toString());
       textArea.setWrapText(true);
       textArea.setPrefHeight(100);
+      textArea.setEditable(false);
       vbox.getChildren().addAll(new Label(item.getLabelString()), textArea);
     }
 
