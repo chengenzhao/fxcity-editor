@@ -213,6 +213,36 @@ public interface GameAppDecorator {
           dialog.showAndWait();
         });
 
+        arrayButton.setOnAction(_ -> {
+          ButtonType okButtonType = ButtonType.OK;
+          Dialog<ButtonType> dialog = new Dialog<>();
+
+          var vbox = new VBox();
+
+          for (var item : FXGL.<GameApp>getAppCast().getAllComponentsLabelBoxes()) {
+            var animationData = new JsonArray();
+
+            var jsons = keyFrames.stream().map(kf -> extractJsonFromTexture(kf.getTimeInSeconds() * 1000, kf.getRotateTransit2DTextureBiMap().get(item))).toList();
+            animationData.addAll(new JsonArray(jsons));
+
+            var texture = keyFrames.getFirst().getRotateTransit2DTextureBiMap().get(item);
+            var jsonNode = extractJsonFromTexture(FXGL.<GameApp>getAppCast().maxTime.getDouble() * 1000, texture);
+            animationData.add(jsonNode);
+
+            var textArea = new TextArea(animationData.toString());
+            textArea.setWrapText(true);
+            textArea.setPrefHeight(100);
+            vbox.getChildren().addAll(new Label(item.getLabelString()), textArea);
+          }
+
+          var scrollpane = new ScrollPane(vbox);
+          dialog.getDialogPane().setContent(scrollpane);
+          dialog.getDialogPane().getButtonTypes().add(okButtonType);
+          dialog.getDialogPane().lookupButton(okButtonType);
+
+          dialog.showAndWait();
+        });
+
         var line = new Line();
         line.setStroke(Color.DARKCYAN);
         line.setStrokeWidth(10);
