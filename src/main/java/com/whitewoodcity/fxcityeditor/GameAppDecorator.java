@@ -192,13 +192,20 @@ public interface GameAppDecorator {
           ButtonType okButtonType = ButtonType.OK;
           Dialog<ButtonType> dialog = new Dialog<>();
 
-          String json = """
-            fdjksalfjadkls
-            fdasjklfadlskfjal
-            fdajskl;'
-            """;
+          var vbox = new VBox();
+          var kf = keyFrames.get(FXGL.<GameApp>getAppCast().currentKeyFrame);
+          var map = kf.getRotateTransit2DTextureBiMap();
 
-          dialog.getDialogPane().setContent(new TextArea(json));
+          for (var item : FXGL.<GameApp>getAppCast().getAllComponentsLabelBoxes()) {
+            var texture = map.get(item);
+            var json = extractJsonFromTexture(texture);
+            var textArea = new TextArea(json.toString());
+            textArea.setWrapText(true);
+            textArea.setPrefHeight(60);
+            vbox.getChildren().addAll(new Label(item.getLabelString()), textArea);
+          }
+
+          dialog.getDialogPane().setContent(vbox);
           dialog.getDialogPane().getButtonTypes().add(okButtonType);
           dialog.getDialogPane().lookupButton(okButtonType);
 
@@ -466,9 +473,14 @@ public interface GameAppDecorator {
   }
 
   private JsonObject extractJsonFromTexture(double timeInMillis, Texture texture) {
+    var json = extractJsonFromTexture(texture);
+    json.put(TransitTexture.JsonKeys.TIME.key(), timeInMillis);//time in millis
+    return json;
+  }
+
+  private JsonObject extractJsonFromTexture(Texture texture) {
     var json = new JsonObject();
 
-    json.put(TransitTexture.JsonKeys.TIME.key(), timeInMillis);//time in millis
     json.put(TransitTexture.JsonKeys.X.key(), texture.getX());
     json.put(TransitTexture.JsonKeys.Y.key(), texture.getY());
     var rotates = new JsonArray();
