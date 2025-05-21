@@ -14,7 +14,6 @@ import com.whitewoodcity.fxgl.texture.Texture;
 import com.whitewoodcity.fxgl.texture.TransitTexture;
 import com.whitewoodcity.javafx.binding.XBindings;
 import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -35,7 +34,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeLineCap;
-import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Transform;
 import javafx.stage.Screen;
 import javafx.util.Duration;
@@ -47,7 +45,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public interface GameAppDecorator {
+public interface GameAppDecorator extends GameAppDecorator1{
 
   int HEIGHT = 1000;
   int WIDTH = (int) (Screen.getPrimary().getBounds().getWidth() / Screen.getPrimary().getBounds().getHeight() * 1000);
@@ -188,60 +186,8 @@ public interface GameAppDecorator {
         hbox.layoutXProperty().bind(pane.widthProperty().subtract(hbox.widthProperty()));
         hbox.getChildren().addAll(loopButton, playButton, pauseButton, stopButton, new Label("Total Time: "), FXGL.<GameApp>getAppCast().maxTime, addButton, objectButton, arrayButton);
 
-        objectButton.setOnAction(_ -> {
-          ButtonType okButtonType = ButtonType.OK;
-          Dialog<ButtonType> dialog = new Dialog<>();
-
-          var vbox = new VBox();
-          var kf = keyFrames.get(FXGL.<GameApp>getAppCast().currentKeyFrame);
-          var map = kf.getRotateTransit2DTextureBiMap();
-
-          for (var item : FXGL.<GameApp>getAppCast().getAllComponentsLabelBoxes()) {
-            var texture = map.get(item);
-            var json = extractJsonFromTexture(texture);
-            var textArea = new TextArea(json.toString());
-            textArea.setWrapText(true);
-            textArea.setPrefHeight(100);
-            vbox.getChildren().addAll(new Label(item.getLabelString()), textArea);
-          }
-
-          var scrollpane = new ScrollPane(vbox);
-          dialog.getDialogPane().setContent(scrollpane);
-          dialog.getDialogPane().getButtonTypes().add(okButtonType);
-          dialog.getDialogPane().lookupButton(okButtonType);
-
-          dialog.showAndWait();
-        });
-
-        arrayButton.setOnAction(_ -> {
-          ButtonType okButtonType = ButtonType.OK;
-          Dialog<ButtonType> dialog = new Dialog<>();
-
-          var vbox = new VBox();
-
-          for (var item : FXGL.<GameApp>getAppCast().getAllComponentsLabelBoxes()) {
-            var animationData = new JsonArray();
-
-            var jsons = keyFrames.stream().map(kf -> extractJsonFromTexture(kf.getTimeInSeconds() * 1000, kf.getRotateTransit2DTextureBiMap().get(item))).toList();
-            animationData.addAll(new JsonArray(jsons));
-
-            var texture = keyFrames.getFirst().getRotateTransit2DTextureBiMap().get(item);
-            var jsonNode = extractJsonFromTexture(FXGL.<GameApp>getAppCast().maxTime.getDouble() * 1000, texture);
-            animationData.add(jsonNode);
-
-            var textArea = new TextArea(animationData.toString());
-            textArea.setWrapText(true);
-            textArea.setPrefHeight(100);
-            vbox.getChildren().addAll(new Label(item.getLabelString()), textArea);
-          }
-
-          var scrollpane = new ScrollPane(vbox);
-          dialog.getDialogPane().setContent(scrollpane);
-          dialog.getDialogPane().getButtonTypes().add(okButtonType);
-          dialog.getDialogPane().lookupButton(okButtonType);
-
-          dialog.showAndWait();
-        });
+        objectButton.setOnAction(_ -> showFrameData());
+        arrayButton.setOnAction(_ -> showTransitData());
 
         var line = new Line();
         line.setStroke(Color.DARKCYAN);
@@ -501,30 +447,6 @@ public interface GameAppDecorator {
   private void clearViewComponent(Entity entity) {
     List.copyOf(entity.getViewComponent().getChildren())
       .forEach(e -> entity.getViewComponent().removeChild(e));
-  }
-
-  private JsonObject extractJsonFromTexture(double timeInMillis, Texture texture) {
-    var json = extractJsonFromTexture(texture);
-    json.put(TransitTexture.JsonKeys.TIME.key(), timeInMillis);//time in millis
-    return json;
-  }
-
-  private JsonObject extractJsonFromTexture(Texture texture) {
-    var json = new JsonObject();
-
-    json.put(TransitTexture.JsonKeys.X.key(), texture.getX());
-    json.put(TransitTexture.JsonKeys.Y.key(), texture.getY());
-    var rotates = new JsonArray();
-    for (var rotateRaw : texture.getTransforms()) {
-      var rotate = (Rotate) rotateRaw;
-      var rjson = new JsonObject();
-      rjson.put(TransitTexture.JsonKeys.PIVOT_X.key(), rotate.getPivotX());
-      rjson.put(TransitTexture.JsonKeys.PIVOT_Y.key(), rotate.getPivotY());
-      rjson.put(TransitTexture.JsonKeys.ANGLE.key(), rotate.getAngle());
-      rotates.add(rjson);
-    }
-    json.put(TransitTexture.JsonKeys.ROTATES.key(), rotates);
-    return json;
   }
 
   private void bindKeyFrameTag(KeyFrame kf, Line line, boolean draggable) {
