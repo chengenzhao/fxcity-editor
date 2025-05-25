@@ -5,12 +5,14 @@ import com.whitewoodcity.fxgl.texture.Texture;
 import com.whitewoodcity.fxgl.texture.TransitTexture;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import javafx.geometry.Orientation;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.transform.Rotate;
 
 public interface GameAppDecorator1 {
-  default void showFrameData(){
+  default void showFrameData() {
     ButtonType okButtonType = ButtonType.OK;
     Dialog<ButtonType> dialog = new Dialog<>();
 
@@ -18,6 +20,7 @@ public interface GameAppDecorator1 {
     var keyFrames = FXGL.<GameApp>getAppCast().keyFrames;
     var kf = keyFrames.get(FXGL.<GameApp>getAppCast().currentKeyFrame);
     var map = kf.getRotateTransit2DTextureBiMap();
+    vbox.setSpacing(5);
 
     for (var item : FXGL.<GameApp>getAppCast().getAllComponentsLabelBoxes()) {
       var texture = map.get(item);
@@ -26,7 +29,17 @@ public interface GameAppDecorator1 {
       textArea.setWrapText(true);
       textArea.setEditable(false);
       textArea.setPrefHeight(100);
-      vbox.getChildren().addAll(new Label(item.getLabelString()), textArea);
+      var rotateNum = new TextField("" + json.getJsonArray(TransitTexture.JsonKeys.ROTATES.key()).size());
+      rotateNum.setEditable(false);
+      rotateNum.setPrefWidth(50);
+      var hbox = new HBox(new Label("# of rotates in transforms:"), rotateNum);
+      hbox.setSpacing(20);
+      var s = new Separator();
+      s.setPrefWidth(500);
+      s.setOrientation(Orientation.HORIZONTAL);
+      if(!vbox.getChildren().isEmpty())
+        vbox.getChildren().add(s);
+      vbox.getChildren().addAll( new Label(item.getLabelString()), hbox, textArea);
     }
 
     var scrollpane = new ScrollPane(vbox);
@@ -37,13 +50,14 @@ public interface GameAppDecorator1 {
     dialog.showAndWait();
   }
 
-  default void showTransitData(){
+  default void showTransitData() {
     ButtonType okButtonType = ButtonType.OK;
     Dialog<ButtonType> dialog = new Dialog<>();
 
     var keyFrames = FXGL.<GameApp>getAppCast().keyFrames;
 
     var vbox = new VBox();
+    vbox.setSpacing(5);
 
     for (var item : FXGL.<GameApp>getAppCast().getAllComponentsLabelBoxes()) {
       var animationData = new JsonArray();
@@ -59,7 +73,20 @@ public interface GameAppDecorator1 {
       textArea.setWrapText(true);
       textArea.setPrefHeight(100);
       textArea.setEditable(false);
-      vbox.getChildren().addAll(new Label(item.getLabelString()), textArea);
+
+      var rotateNum = new TextField("" + jsons.getFirst().getJsonArray(TransitTexture.JsonKeys.ROTATES.key()).size());
+      rotateNum.setEditable(false);
+      rotateNum.setPrefWidth(50);
+      var hbox = new HBox(new Label("# of rotates in transforms:"), rotateNum);
+      hbox.setSpacing(20);
+
+      var s = new Separator();
+      s.setPrefWidth(500);
+      s.setOrientation(Orientation.HORIZONTAL);
+      if(!vbox.getChildren().isEmpty())
+        vbox.getChildren().add(s);
+
+      vbox.getChildren().addAll(new Label(item.getLabelString()), hbox, textArea);
     }
 
     var scrollpane = new ScrollPane(vbox);
