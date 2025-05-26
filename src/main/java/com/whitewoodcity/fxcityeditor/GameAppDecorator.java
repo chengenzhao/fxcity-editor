@@ -45,7 +45,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public interface GameAppDecorator extends GameAppDecorator1{
+public interface GameAppDecorator extends GameAppDecorator1 {
 
   int HEIGHT = 1000;
   int WIDTH = (int) (Screen.getPrimary().getBounds().getWidth() / Screen.getPrimary().getBounds().getHeight() * 1000);
@@ -244,7 +244,7 @@ public interface GameAppDecorator extends GameAppDecorator1{
 
           entity.getViewComponent().getChildren().forEach(this::loopAnimations);
         });
-        pauseButton.setOnAction( _ -> entity.getViewComponent().getChildren().forEach(this::pause));
+        pauseButton.setOnAction(_ -> entity.getViewComponent().getChildren().forEach(this::pause));
         stopButton.setOnAction(_ -> {
           entity.getViewComponent().getChildren().forEach(this::stop);
         });
@@ -366,7 +366,7 @@ public interface GameAppDecorator extends GameAppDecorator1{
     }
   }
 
-  default KeyFrame addKeyFrames(double timeInMillis){
+  default KeyFrame addKeyFrames(double timeInMillis) {
     var kf = generateKeyFrame(Duration.millis(timeInMillis));
 
     var keyFrames = FXGL.<GameApp>getAppCast().keyFrames;
@@ -377,7 +377,7 @@ public interface GameAppDecorator extends GameAppDecorator1{
     return kf;
   }
 
-  default void setParent(LabelBox child, LabelBox parent){
+  default void setParent(LabelBox child, LabelBox parent) {
     child.setFather(parent);
     for (var keyFrame : FXGL.<GameApp>getAppCast().keyFrames) {
       var m = keyFrame.getRotateTransit2DTextureBiMap();
@@ -385,14 +385,14 @@ public interface GameAppDecorator extends GameAppDecorator1{
     }
   }
 
-  default JsonArray buildImageJson(){
+  default JsonArray buildImageJson() {
     var arrayNode = new JsonArray();
     var images = FXGL.<GameApp>getAppCast().getAllComponentsLabelBoxes().stream().map(LabelBox::getFilePath).toList();
     arrayNode.addAll(new JsonArray(images));
     return arrayNode;
   }
 
-  default JsonArray buildInheritanceJson(){
+  default JsonArray buildInheritanceJson() {
     var arrayNode = new JsonArray();
     var indexes = FXGL.<GameApp>getAppCast().getAllComponentsLabelBoxes().stream().map(l -> {
       var parent = l.getFather();
@@ -402,7 +402,7 @@ public interface GameAppDecorator extends GameAppDecorator1{
     return arrayNode;
   }
 
-  default JsonArray buildTransitionJson(){
+  default JsonArray buildTransitionJson() {
     var arrayNode = new JsonArray();
     var keyFrames = FXGL.<GameApp>getAppCast().keyFrames;
     for (var item : FXGL.<GameApp>getAppCast().getAllComponentsLabelBoxes()) {
@@ -485,7 +485,7 @@ public interface GameAppDecorator extends GameAppDecorator1{
     return delButton;
   }
 
-  default void deleteKeyFrame(KeyFrame kf){
+  default void deleteKeyFrame(KeyFrame kf) {
     var gameApp = FXGL.<GameApp>getAppCast();
     gameApp.getCurrentKeyFrame().deSelect();
     gameApp.keyFrames.remove(kf);
@@ -566,6 +566,38 @@ public interface GameAppDecorator extends GameAppDecorator1{
 
         x.setOnAction(_ -> e.setX(x.getDouble()));
         y.setOnAction(_ -> e.setY(y.getDouble()));
+
+        rightPane.add(new Label("One-time global translation:"), 0, 2, 2, 1);
+        rightPane.add(new Label("Translate X:"), 0, 3);
+        rightPane.add(new Label("Translate Y:"), 0, 4);
+        var txField = new NumberField(-WIDTH / 4, WIDTH / 4);
+        var tyField = new NumberField(-HEIGHT / 4, HEIGHT / 4);
+        txField.setText("0");
+        tyField.setText("0");
+        rightPane.add(txField, 1, 3);
+        rightPane.add(tyField, 1, 4);
+
+        var apply = new Button("Apply");
+        rightPane.add(apply, 0, 5, 2, 1);
+        apply.setOnAction(_ -> {
+          double tx = txField.getDouble();
+          double ty = tyField.getDouble();
+          var kfs = FXGL.<GameApp>getAppCast().keyFrames;
+          for (var kf : kfs) {
+            var textures = kf.getRotateTransit2DTextureBiMap().values();
+            for (var texture : textures) {
+              texture.setX(texture.getX() + tx);
+              texture.setY(texture.getY() + ty);
+
+              var rotate = texture.getRotation();
+              rotate.setPivotX(rotate.getPivotX() + tx);
+              rotate.setPivotY(rotate.getPivotY() + ty);
+              texture.update();
+            }
+          }
+          txField.setText("0");
+          tyField.setText("0");
+        });
       }
       case AnimatedTexture animatedTexture -> {
         rightPane.add(new Label("X:"), 0, 0);
@@ -721,10 +753,10 @@ public interface GameAppDecorator extends GameAppDecorator1{
 
   private void pause(Node component) {
     switch (component) {
-      case TransitTexture transitTexture ->{
-        if(transitTexture.isRunning())
+      case TransitTexture transitTexture -> {
+        if (transitTexture.isRunning())
           transitTexture.pause();
-        else if(transitTexture.isPaused())
+        else if (transitTexture.isPaused())
           transitTexture.resume();
       }
       case AnimatedTexture animatedTexture -> {

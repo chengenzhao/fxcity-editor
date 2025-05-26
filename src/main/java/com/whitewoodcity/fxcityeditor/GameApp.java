@@ -165,6 +165,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     treeView = new TreeView<>();
     treeView.translateYProperty().bind(menubar.heightProperty());
     treeView.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
+//    treeView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
     rightPane = new GridPane(20, 20);
     rightPane.setPadding(new Insets(20));
