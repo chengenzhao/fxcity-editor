@@ -598,6 +598,8 @@ public interface GameAppDecorator extends GameAppDecorator1 {
           txField.setText("0");
           tyField.setText("0");
         });
+        txField.setOnAction(_ -> apply.fire());
+        tyField.setOnAction(_ -> apply.fire());
       }
       case AnimatedTexture animatedTexture -> {
         rightPane.add(new Label("X:"), 0, 0);
