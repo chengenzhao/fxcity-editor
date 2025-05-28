@@ -200,7 +200,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     entityHBox.getChildren().addAll(new Label("Entity"), addViewComponentButton);
     entityHBox.setOnMousePressed(_ -> decorateBottomAndRightPane(entity));
 
-    addImageButton.setOnAction(_ -> addImage());
+    addImageButton.setOnAction(_ -> addImages());
 
     treeviewRoot.getChildren().addAll(resourceTree, entityTree);
 
@@ -248,12 +248,11 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     return list.indexOf(labelBox);
   }
 
-  private void addImage() {
+  private void addImages() {
     FileChooser fileChooser = new FileChooser();
     fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image files", "*.PNG", "*.JPG"));
-    File file = fileChooser.showOpenDialog(FXGL.getPrimaryStage());
-
-    addImage(file);
+    List<File> files = fileChooser.showOpenMultipleDialog(FXGL.getPrimaryStage());
+    files.forEach(this::addImage);
   }
 
   private void addImage(File file){
