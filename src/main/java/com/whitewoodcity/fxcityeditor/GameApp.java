@@ -254,7 +254,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     FileChooser fileChooser = new FileChooser();
     fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image files", "*.PNG", "*.JPG"));
     List<File> files = fileChooser.showOpenMultipleDialog(FXGL.getPrimaryStage());
-    files.forEach(this::addImage);
+    if(files!=null) files.forEach(this::addImage);
   }
 
   private void addImage(File file){
