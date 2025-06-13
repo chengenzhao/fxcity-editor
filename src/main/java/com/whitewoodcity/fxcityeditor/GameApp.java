@@ -235,7 +235,9 @@ public class GameApp extends GameApplication implements GameAppDecorator {
       removeTreeItem(labelBox);
     }
     cleanTreeView();
-    fireEvent(this.keyFrames.getFirst());
+    var firstKeyFrame = keyFrames.getFirst();
+    firstKeyFrame.getRotateTransit2DTextureBiMap().clear();
+    fireEvent(firstKeyFrame);
   }
 
   private void cleanTreeView(){
