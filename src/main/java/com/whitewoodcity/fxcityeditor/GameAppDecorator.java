@@ -619,33 +619,39 @@ public interface GameAppDecorator extends GameAppDecorator1 {
         y.setOnAction(_ -> animatedTexture.setY(y.getDouble()));
       }
       case RotateTransit2DTexture rotateTransit2DTexture -> {
-        rightPane.add(new Label("X:"), 0, 0);
-        rightPane.add(new Label("Y:"), 0, 1);
+        var visible = new CheckBox();
+        visible.selectedProperty().bindBidirectional(rotateTransit2DTexture.visibleProperty());
+
+        rightPane.add(new Label("Visible:"), 0,0);
+        rightPane.add(visible,1,0);
+
+        rightPane.add(new Label("X:"), 0, 1);
+        rightPane.add(new Label("Y:"), 0, 2);
         var x = new NumberField(-WIDTH / 2, WIDTH / 2);
         var y = new NumberField(-HEIGHT / 2, HEIGHT / 2);
-        rightPane.add(x, 1, 0);
-        rightPane.add(y, 1, 1);
+        rightPane.add(x, 1, 1);
+        rightPane.add(y, 1, 2);
 
         Bindings.bindBidirectional(x.textProperty(), rotateTransit2DTexture.xProperty(), new NumberStringConverter());
         Bindings.bindBidirectional(y.textProperty(), rotateTransit2DTexture.yProperty(), new NumberStringConverter());
 
         final Separator sepHor = new Separator();
         sepHor.setValignment(VPos.CENTER);
-        GridPane.setConstraints(sepHor, 0, 2);
+        GridPane.setConstraints(sepHor, 0, 3);
         GridPane.setColumnSpan(sepHor, 2);
         rightPane.getChildren().add(sepHor);
 
         for (int i = 0; i < rotateTransit2DTexture.getRotates().size(); i++) {
           var rotate = rotateTransit2DTexture.getRotates().get(i);
-          rightPane.add(new Label("Pivot X:"), 0, 3 + i * 4);
-          rightPane.add(new Label("Pivot Y:"), 0, 3 + i * 4 + 1);
-          rightPane.add(new Label("Rotate:"), 0, 3 + i * 4 + 2);
+          rightPane.add(new Label("Pivot X:"), 0, 4 + i * 4);
+          rightPane.add(new Label("Pivot Y:"), 0, 4 + i * 4 + 1);
+          rightPane.add(new Label("Rotate:"), 0, 4 + i * 4 + 2);
           var px = new NumberField(-WIDTH, WIDTH);
           var py = new NumberField(-HEIGHT, HEIGHT);
           var r = new NumberField(0, 720);
-          rightPane.add(px, 1, 3 + 4 * i);
-          rightPane.add(py, 1, 3 + 4 * i + 1);
-          rightPane.add(r, 1, 3 + 4 * i + 2);
+          rightPane.add(px, 1, 4 + 4 * i);
+          rightPane.add(py, 1, 4 + 4 * i + 1);
+          rightPane.add(r, 1, 4 + 4 * i + 2);
 
           Bindings.bindBidirectional(px.textProperty(), rotate.pivotXProperty(), new NumberStringConverter());
           Bindings.bindBidirectional(py.textProperty(), rotate.pivotYProperty(), new NumberStringConverter());
