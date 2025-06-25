@@ -687,7 +687,7 @@ public interface GameAppDecorator extends GameAppDecorator1 {
 
           final Separator sh = new Separator();
           sh.setValignment(VPos.CENTER);
-          GridPane.setConstraints(sh, 0, 3 + 4 * i + 3);
+          GridPane.setConstraints(sh, 0, 4 + 4 * i + 3);
           GridPane.setColumnSpan(sh, 2);
           rightPane.getChildren().add(sh);
         }
