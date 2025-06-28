@@ -25,11 +25,10 @@
             <artifactId>guava</artifactId>
             <version>33.4.8-jre</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/io.vertx/vertx-core -->
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-core</artifactId>
-            <version>5.0.0</version>
+            <version>5.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
