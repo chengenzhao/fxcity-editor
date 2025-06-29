@@ -423,6 +423,7 @@ public interface GameAppDecorator extends GameAppDecorator1 {
   private List<TransitTexture> buildTransition(String name) {
     var list = new ArrayList<TransitTexture>();
     var keyFrames = FXGL.<GameApp>getAppCast().keyFrames;
+    keyFrames.sort(Comparator.comparing(KeyFrame::getTime));
     for (var item : FXGL.<GameApp>getAppCast().getAllComponentsLabelBoxes()) {
       var animationData = new JsonArray();
 
