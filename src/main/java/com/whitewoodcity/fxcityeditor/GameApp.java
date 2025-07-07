@@ -226,7 +226,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 
   private void clearAll(){
     fileBiMap.clear();
-    for(int i=1;i<keyFrames.size();i++){
+    for(int i=keyFrames.size()-1;i>0;i--){
       var kf = keyFrames.get(i);
       deleteKeyFrame(kf);
     }
@@ -362,7 +362,30 @@ public class GameApp extends GameApplication implements GameAppDecorator {
       }
       fireEvent(keyFrames.get(currentKeyFrame));
     });
+
     treeItem.getChildren().add(textureItem);
+
+    //change the order of items
+    var up = new Button("↑");
+    var down = new Button("↓");
+    var upNDown = new HBox(up,down);
+    upNDown.setAlignment(Pos.BASELINE_LEFT);
+    hBox.getChildren().add(upNDown);
+
+    up.setOnAction(_->{
+      var i = treeItem.getChildren().indexOf(textureItem);
+      if(i>0){
+        treeItem.getChildren().add(i-1,treeItem.getChildren().remove(i));
+      }
+    });
+
+    down.setOnAction(_->{
+      var i = treeItem.getChildren().indexOf(textureItem);
+      if(i<treeItem.getChildren().size()-1){
+        treeItem.getChildren().add(i+1,treeItem.getChildren().remove(i));
+      }
+    });
+
     selectTreeItem(hBox);
     fireEvent(keyFrames.get(currentKeyFrame));
 

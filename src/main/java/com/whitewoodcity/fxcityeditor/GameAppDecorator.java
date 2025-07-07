@@ -99,7 +99,7 @@ public interface GameAppDecorator extends GameAppDecorator1 {
   default LabelBox createDeletableLableBox(String name) {
     var textureLabel = new Label(name);
     var delTextureButton = new Button("×");
-    var textureHBox = new LabelBox(20, textureLabel, delTextureButton);
+    var textureHBox = new LabelBox(10, textureLabel, delTextureButton);
     textureHBox.setAlignment(Pos.BASELINE_LEFT);
     return textureHBox;
   }
@@ -474,7 +474,7 @@ public interface GameAppDecorator extends GameAppDecorator1 {
   }
 
   private Button buildDelButtonForKeyFrame(KeyFrame kf, TextField timeField) {
-    var delButton = new Button("x");
+    var delButton = new Button("×");
     delButton.translateXProperty().bind(kf.xProperty());
     delButton.translateYProperty().bind(kf.yProperty().add(kf.heightProperty()).add(timeField.heightProperty()));
     var gameApp = FXGL.<GameApp>getAppCast();
