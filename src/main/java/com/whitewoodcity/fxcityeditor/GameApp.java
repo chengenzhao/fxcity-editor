@@ -377,6 +377,8 @@ public class GameApp extends GameApplication implements GameAppDecorator {
       if(i>0){
         treeItem.getChildren().add(i-1,treeItem.getChildren().remove(i));
       }
+      selectTreeItem(hBox);
+      fireEvent(keyFrames.get(currentKeyFrame));
     });
 
     down.setOnAction(_->{
@@ -384,6 +386,8 @@ public class GameApp extends GameApplication implements GameAppDecorator {
       if(i<treeItem.getChildren().size()-1){
         treeItem.getChildren().add(i+1,treeItem.getChildren().remove(i));
       }
+      selectTreeItem(hBox);
+      fireEvent(keyFrames.get(currentKeyFrame));
     });
 
     selectTreeItem(hBox);
