@@ -86,7 +86,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     var load = new MenuItem("Load");
     var clear = new MenuItem("Clear");
 
-    clear.setOnAction(_-> clearAll());
+    clear.setOnAction(_ -> clearAll());
     save.setOnAction(_ -> {
       var fileChooser = new FileChooser();
       fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON files", "*.json"));
@@ -116,33 +116,33 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         var images = configJson.getJsonArray(0);
         var inheritance = configJson.getJsonArray(1);
         var transitions = configJson.getJsonArray(2);
-        for(Object image:images){
+        for (Object image : images) {
           File imageFile = new File(image.toString());
           addImage(imageFile);
           addTransitTexture(imageFile);
         }
 
-        for(int i=0;i<images.size();i++){
+        for (int i = 0; i < images.size(); i++) {
           var child = getLabelBoxAt(i);
           int index = inheritance.getInteger(i);
           LabelBox parent = null;
-          if(index >=0){
+          if (index >= 0) {
             parent = getLabelBoxAt(index);
           }
           setParent(child, parent);
         }
 
         var kfs = transitions.getJsonArray(0);
-        for(int i=1;i<kfs.size()-1;i++){
+        for (int i = 1; i < kfs.size() - 1; i++) {
           var kf = kfs.getJsonObject(i);
           var time = kf.getNumber(TransitTexture.JsonKeys.TIME.key()).doubleValue();
           addKeyFrames(time);
         }
 
-        for(int i=0;i<transitions.size();i++){
+        for (int i = 0; i < transitions.size(); i++) {
           var array = transitions.getJsonArray(i);
           var labelBox = getLabelBoxAt(i);
-          for(int j=0;j<array.size()-1;j++){
+          for (int j = 0; j < array.size() - 1; j++) {
             var json = array.getJsonObject(j);
             var kf = keyFrames.get(j);
             var texture = kf.getRotateTransit2DTextureBiMap().get(labelBox);
@@ -192,8 +192,8 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     entityTree = new TreeItem<>(new HBox(10));
     var addViewComponentButton = new Button("+");
     addViewComponentButton.setOnAction(_ ->
-        new ViewComponentDialog(fileBiMap.values()).showAndWait().ifPresent(
-          view -> addTransitTexture(view.image()))
+      new ViewComponentDialog(fileBiMap.values()).showAndWait().ifPresent(
+        view -> addTransitTexture(view.image()))
     );
     var entityHBox = (HBox) entityTree.getValue();
     entityHBox.setAlignment(Pos.BASELINE_LEFT);
@@ -220,17 +220,17 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     keyFrames.getFirst().select();
   }
 
-  private LabelBox getLabelBoxAt(int index){
+  private LabelBox getLabelBoxAt(int index) {
     return (LabelBox) treeView.getRoot().getChildren().get(1).getChildren().get(index).getValue();
   }
 
-  private void clearAll(){
+  private void clearAll() {
     fileBiMap.clear();
-    for(int i=keyFrames.size()-1;i>0;i--){
+    for (int i = keyFrames.size() - 1; i > 0; i--) {
       var kf = keyFrames.get(i);
       deleteKeyFrame(kf);
     }
-    for(int i=0;i<treeView.getRoot().getChildren().get(1).getChildren().size();i++){
+    for (int i = 0; i < treeView.getRoot().getChildren().get(1).getChildren().size(); i++) {
       var labelBox = (LabelBox) treeView.getRoot().getChildren().get(1).getChildren().get(i).getValue();
       removeTreeItem(labelBox);
     }
@@ -240,12 +240,12 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     fireEvent(firstKeyFrame);
   }
 
-  private void cleanTreeView(){
+  private void cleanTreeView() {
     this.treeView.getTreeItem(0).getChildren().clear();
     this.treeView.getTreeItem(1).getChildren().clear();
   }
 
-  public int indexOf(LabelBox labelBox){
+  public int indexOf(LabelBox labelBox) {
     var list = treeView.getRoot().getChildren().get(1).getChildren().stream().map(TreeItem::getValue).toList();
     return list.indexOf(labelBox);
   }
@@ -254,10 +254,10 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     FileChooser fileChooser = new FileChooser();
     fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image files", "*.PNG", "*.JPG"));
     List<File> files = fileChooser.showOpenMultipleDialog(FXGL.getPrimaryStage());
-    if(files!=null) files.forEach(this::addImage);
+    if (files != null) files.forEach(this::addImage);
   }
 
-  private void addImage(File file){
+  private void addImage(File file) {
     if (file != null && file.exists()) {
       var label = new Label(file.getName());
       try {
@@ -275,7 +275,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     }
   }
 
-  private void addTransitTexture(File file){
+  private void addTransitTexture(File file) {
     var name = file.getName();
     var image = new Image(file.toURI().toString());
     name = name.substring(0, name.indexOf("."));
@@ -368,23 +368,23 @@ public class GameApp extends GameApplication implements GameAppDecorator {
     //change the order of items
     var up = new Button("↑");
     var down = new Button("↓");
-    var upNDown = new HBox(up,down);
+    var upNDown = new HBox(up, down);
     upNDown.setAlignment(Pos.BASELINE_LEFT);
     hBox.getChildren().add(upNDown);
 
-    up.setOnAction(_->{
+    up.setOnAction(_ -> {
       var i = treeItem.getChildren().indexOf(textureItem);
-      if(i>0){
-        treeItem.getChildren().add(i-1,treeItem.getChildren().remove(i));
+      if (i > 0) {
+        treeItem.getChildren().add(i - 1, treeItem.getChildren().remove(i));
       }
       selectTreeItem(hBox);
       fireEvent(keyFrames.get(currentKeyFrame));
     });
 
-    down.setOnAction(_->{
+    down.setOnAction(_ -> {
       var i = treeItem.getChildren().indexOf(textureItem);
-      if(i<treeItem.getChildren().size()-1){
-        treeItem.getChildren().add(i+1,treeItem.getChildren().remove(i));
+      if (i < treeItem.getChildren().size() - 1) {
+        treeItem.getChildren().add(i + 1, treeItem.getChildren().remove(i));
       }
       selectTreeItem(hBox);
       fireEvent(keyFrames.get(currentKeyFrame));
