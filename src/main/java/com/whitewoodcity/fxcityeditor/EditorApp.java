@@ -1,11 +1,6 @@
 package com.whitewoodcity.fxcityeditor;
 
-import javafx.scene.Scene;
-import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.stage.Screen;
-import javafx.stage.Stage;
-
+import module javafx.controls;
 
 public class EditorApp extends javafx.application.Application {
   @Override
@@ -28,7 +23,7 @@ public class EditorApp extends javafx.application.Application {
 
   }
 
-  public static void main(String... args) {
+  void main(String... args) {
     System.setProperty("prism.lcdtext", "false");
     EditorApp.launch(EditorApp.class, args);
   }

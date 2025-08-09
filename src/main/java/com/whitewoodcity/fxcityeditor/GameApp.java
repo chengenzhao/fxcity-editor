@@ -1,5 +1,7 @@
 package com.whitewoodcity.fxcityeditor;
 
+import module java.base;
+import module javafx.controls;
 import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
 import com.almasb.fxgl.dsl.FXGL;
@@ -14,30 +16,12 @@ import com.whitewoodcity.fxgl.texture.AnimatedTexture;
 import com.whitewoodcity.fxgl.texture.AnimationChannel;
 import com.whitewoodcity.fxgl.texture.TransitTexture;
 import io.vertx.core.json.JsonArray;
-import javafx.collections.ListChangeListener;
-import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
-import javafx.geometry.Pos;
-import javafx.scene.Cursor;
-import javafx.scene.Node;
-import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.input.MouseButton;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
+import javafx.scene.control.Label;
 import javafx.scene.shape.Rectangle;
-import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 public class GameApp extends GameApplication implements GameAppDecorator {
 
