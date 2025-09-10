@@ -78,7 +78,7 @@ public class RotateTransit2DTexture extends TransitTexture {
   public void removeRotate(Rotate rotate) {
     for (var child : children)
       child.removeRotate(rotate);
-    this.rotates.remove(rotate);
+    this.rotates.remove( rotate);
     updateTransforms();
   }
 
