@@ -407,7 +407,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 
       rect.setOnMousePressed(oe -> {
         selectTreeItem(hBox);
-        var op = texture.getRotation().transform(new Point2D(oe.getX(), oe.getY()));
+        var op = texture.transform(new Point2D(oe.getX(), oe.getY()));
         var ox = op.getX();
         var oy = op.getY();
         var rx = rect.getX();
@@ -415,7 +415,7 @@ public class GameApp extends GameApplication implements GameAppDecorator {
         var ax = arrow.getX1();
         var ay = arrow.getY1();
         rect.setOnMouseDragged(e -> {
-          var p = texture.getRotation().transform(new Point2D(e.getX(), e.getY()));
+          var p = texture.transform(new Point2D(e.getX(), e.getY()));
           double changeInX = p.getX() - ox;
           double changeInY = p.getY() - oy;
           texture.setX(rx + changeInX);
@@ -433,17 +433,17 @@ public class GameApp extends GameApplication implements GameAppDecorator {
 
       arrow.getOrigin().setOnMousePressed(oe -> {
         selectTreeItem(hBox);
-        var op = texture.getRotation().transform(new Point2D(oe.getX(), oe.getY()));
+        var op = texture.transform(new Point2D(oe.getX(), oe.getY()));
         var ox = op.getX();
         var oy = op.getY();
         var tx = arrow.getX1();
         var ty = arrow.getY1();
         arrow.getOrigin().setOnMouseDragged(e -> {
-          var p = texture.getRotation().transform(new Point2D(e.getX(), e.getY()));
-          double changeInX = p.getX() - ox;
-          double changeInY = p.getY() - oy;
-          var x1 = tx + changeInX;
-          var y1 = ty + changeInY;
+          var p = texture.transform(new Point2D(e.getX(), e.getY()));
+          double dx = p.getX() - ox;
+          double dy = p.getY() - oy;
+          var x1 = tx + dx;
+          var y1 = ty + dy;
           if (x1 < texture.getX()) x1 = texture.getX();
           if (x1 > texture.getX() + texture.getFitWidth()) x1 = texture.getX() + texture.getFitWidth();
           if (y1 < texture.getY()) y1 = texture.getY();
@@ -504,13 +504,16 @@ public class GameApp extends GameApplication implements GameAppDecorator {
   }
 
   private void update(RotateTransit2DTexture texture, Node... nodes) {
-    texture.update();
+    if( texture.parent()!=null)
+      update(texture.parent());
+    else texture.update();
+//    texture.update();
     for (var node : nodes) {
       node.getTransforms().clear();
       node.getTransforms().addAll(texture.getTransforms());
     }
-    if (texture.parent() != null)
-      texture.parent().update();
+//    if (texture.parent() != null)
+//      texture.parent().update();
   }
 
   public KeyFrame getCurrentKeyFrame() {
